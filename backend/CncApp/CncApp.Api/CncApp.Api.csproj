@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CncApp.Application\CncApp.Application.csproj" />
+    <ProjectReference Include="..\CncApp.Infrastructure\CncApp.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

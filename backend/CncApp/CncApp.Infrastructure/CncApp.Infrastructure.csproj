@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CncApp.Application\CncApp.Application.csproj" />
+    <ProjectReference Include="..\CncApp.Domain\CncApp.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
