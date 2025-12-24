@@ -1,18 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CncApp.Domain.Common;
 using CncApp.Domain.Entities;
-using CncApp.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CncApp.Infrastructure.Persistence.Configurations;
 
 public static class FluentConfigurations
 {
+
     public static void Configure(ModelBuilder modelBuilder)
     {
         ConfigureUserRole(modelBuilder);
         ConfigureStockLot(modelBuilder);
+        ConfigureAuditTrail(modelBuilder);
+        ConfigureShift(modelBuilder);
+
     }
 
+    // AuditTrail
+    private static void ConfigureAuditTrail(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Owned<AuditTrail>();
+    }
+
+    // UserRole
     private static void ConfigureUserRole(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserRole>()
@@ -27,6 +38,7 @@ public static class FluentConfigurations
             .HasFilter("[AuditTrail_DisabledAtDateTime] IS NULL");
     }
 
+    //StockLot
     private static void ConfigureStockLot(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<StockLot>()
@@ -37,4 +49,16 @@ public static class FluentConfigurations
             .Property(x => x.BarLength)
             .HasPrecision(18, 4);
     }
+
+    // Shift
+    private static void ConfigureShift(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Shift>()
+            .HasOne(s => s.Operator)
+            .WithMany(u => u.Shifts)
+            .HasForeignKey(s => s.OperatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+
 }

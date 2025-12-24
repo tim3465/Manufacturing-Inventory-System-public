@@ -11,6 +11,11 @@ public class AppDbContext : DbContext
         : base(options)
     {
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        FluentConfigurations.Configure(modelBuilder);
+    }
 
     // Users
     public DbSet<User> Users => Set<User>();
@@ -28,10 +33,5 @@ public class AppDbContext : DbContext
     public DbSet<Job> Jobs => Set<Job>();
     public DbSet<Shift> Shifts => Set<Shift>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
 
-        FluentConfigurations.Configure(modelBuilder);
-    }
 }

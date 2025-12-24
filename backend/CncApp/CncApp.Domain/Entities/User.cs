@@ -24,8 +24,7 @@ public class User: UserBase
 {
     public AuditTrail AuditTrail { get; set; } = new();
 
-    // Navigation
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
 
-    // Later: Shifts + Created/Updated StockLotAdjustments, etc.
 }

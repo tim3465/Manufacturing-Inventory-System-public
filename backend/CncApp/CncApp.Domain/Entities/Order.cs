@@ -16,7 +16,7 @@ public class OrderBase
 
     public int PartsPerBar { get; set; }
 }
-public class Order
+public class Order: OrderBase
 {
     public Part Part { get; set; } = null!;
 

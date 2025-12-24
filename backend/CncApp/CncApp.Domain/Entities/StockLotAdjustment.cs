@@ -30,6 +30,5 @@ public class StockLotAdjustmentBase
 public class StockLotAdjustment : StockLotAdjustmentBase
 {
     public StockLot StockLot { get; set; } = null!;
-    // Add later when Job exists if you want:
-    // public Job? Job { get; set; }
+
 }

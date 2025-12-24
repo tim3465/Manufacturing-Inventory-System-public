@@ -34,6 +34,4 @@ public class StockLot : StockLotBase
 
     public ICollection<StockLotAdjustment> StockLotAdjustments { get; set; } = new List<StockLotAdjustment>();
 
-    // This will compile once Job exists and you add the using:
-    // public ICollection<Job> Jobs { get; set; } = new List<Job>();
 }
