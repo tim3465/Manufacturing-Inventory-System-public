@@ -9,7 +9,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
     public void Configure(EntityTypeBuilder<Part> builder)
     {
         // Primary Key
-        builder.HasKey(p => p.PartId);
+        builder.HasKey(p => p.Id);
 
         // Properties
         builder.Property(p => p.ApproxPartCycleTime)

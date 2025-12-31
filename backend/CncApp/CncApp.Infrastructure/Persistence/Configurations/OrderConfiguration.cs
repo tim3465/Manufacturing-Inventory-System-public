@@ -9,7 +9,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     public void Configure(EntityTypeBuilder<Order> builder)
     {
         // Primary Key
-        builder.HasKey(o => o.OrderId);
+        builder.HasKey(o => o.Id);
 
         // Properties
         builder.Property(o => o.PartId)

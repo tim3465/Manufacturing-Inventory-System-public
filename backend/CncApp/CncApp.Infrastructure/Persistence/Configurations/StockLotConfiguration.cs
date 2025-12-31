@@ -9,7 +9,7 @@ public class StockLotConfiguration : IEntityTypeConfiguration<StockLot>
     public void Configure(EntityTypeBuilder<StockLot> builder)
     {
         // Primary Key
-        builder.HasKey(sl => sl.StockLotId);
+        builder.HasKey(sl => sl.Id);
 
         // Properties
         builder.Property(sl => sl.LotNumber)

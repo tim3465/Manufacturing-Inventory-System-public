@@ -9,7 +9,7 @@ public class ShiftConfiguration : IEntityTypeConfiguration<Shift>
     public void Configure(EntityTypeBuilder<Shift> builder)
     {
         // Primary Key
-        builder.HasKey(s => s.ShiftId);
+        builder.HasKey(s => s.Id);
 
         // Properties
         builder.Property(s => s.JobId)

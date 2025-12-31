@@ -9,7 +9,7 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
     public void Configure(EntityTypeBuilder<Material> builder)
     {
         // Primary Key
-        builder.HasKey(m => m.MaterialId);
+        builder.HasKey(m => m.Id);
 
         // Properties
         builder.Property(m => m.HeatNumber)

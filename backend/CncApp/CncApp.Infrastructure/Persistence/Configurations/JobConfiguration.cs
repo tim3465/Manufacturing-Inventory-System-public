@@ -9,7 +9,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
     public void Configure(EntityTypeBuilder<Job> builder)
     {
         // Primary Key
-        builder.HasKey(j => j.JobId);
+        builder.HasKey(j => j.Id);
 
         // Properties
         builder.Property(j => j.OrderId)

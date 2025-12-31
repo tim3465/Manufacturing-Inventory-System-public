@@ -9,7 +9,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         // Primary Key
-        builder.HasKey(u => u.UserId);
+        builder.HasKey(u => u.Id);
 
         // Properties
         builder.Property(u => u.UserName)
@@ -24,29 +24,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Email)
             .HasMaxLength(320);
-
-        // Owned Entity - AuditTrail
-        builder.OwnsOne(u => u.AuditTrail, auditTrail =>
-        {
-            auditTrail.Property(a => a.CreatedAtDateTime)
-                .IsRequired()
-                .HasColumnName("AuditTrail_CreatedAtDateTime");
-
-            auditTrail.Property(a => a.CreatedByUserId)
-                .HasColumnName("AuditTrail_CreatedByUserId");
-
-            auditTrail.Property(a => a.UpdatedAtDateTime)
-                .HasColumnName("AuditTrail_UpdatedAtDateTime");
-
-            auditTrail.Property(a => a.UpdatedByUserId)
-                .HasColumnName("AuditTrail_UpdatedByUserId");
-
-            auditTrail.Property(a => a.DisabledAtDateTime)
-                .HasColumnName("AuditTrail_DisabledAtDateTime");
-
-            auditTrail.Property(a => a.DisabledByUserId)
-                .HasColumnName("AuditTrail_DisabledByUserId");
-        });
 
         // Navigation Properties
         builder.HasMany(u => u.UserRoles)

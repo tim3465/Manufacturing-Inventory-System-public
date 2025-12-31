@@ -9,7 +9,7 @@ public class MachineConfiguration : IEntityTypeConfiguration<Machine>
     public void Configure(EntityTypeBuilder<Machine> builder)
     {
         // Primary Key
-        builder.HasKey(m => m.MachineId);
+        builder.HasKey(m => m.Id);
 
         // Properties
         builder.Property(m => m.SerialNumber)
