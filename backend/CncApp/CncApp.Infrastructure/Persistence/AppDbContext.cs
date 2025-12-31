@@ -1,6 +1,6 @@
 ﻿
 using CncApp.Domain.Entities;
-using CncApp.Infrastructure.Persistence.Configurations;
+//using CncApp.Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace CncApp.Infrastructure.Persistence;
@@ -14,7 +14,9 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        FluentConfigurations.Configure(modelBuilder);
+    //FluentConfigurations.Configure(modelBuilder); // Old: used for FluentConfigurations static class
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 
     // Users
