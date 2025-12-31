@@ -15,71 +15,89 @@ namespace CncApp.Infrastructure.Migrations
                 name: "Machines",
                 columns: table => new
                 {
-                    MachineId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SerialNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ModelNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    ModelNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Machines", x => x.MachineId);
+                    table.PrimaryKey("PK_Machines", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Materials",
                 columns: table => new
                 {
-                    MaterialId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HeatNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    MaterialName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    MaterialName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Materials", x => x.MaterialId);
+                    table.PrimaryKey("PK_Materials", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Parts",
                 columns: table => new
                 {
-                    PartId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApproxPartCycleTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    CheckPerPart = table.Column<int>(type: "int", nullable: false)
+                    CheckPerPart = table.Column<int>(type: "int", nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Parts", x => x.PartId);
+                    table.PrimaryKey("PK_Parts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AuditTrail_CreatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuditTrail_CreatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_UpdatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_DisabledAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_DisabledByUserId = table.Column<int>(type: "int", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: true),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "StockLots",
                 columns: table => new
                 {
-                    StockLotId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LotNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     MaterialId = table.Column<int>(type: "int", nullable: false),
@@ -87,16 +105,22 @@ namespace CncApp.Infrastructure.Migrations
                     Diameter = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     BarLength = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     Condition = table.Column<byte>(type: "tinyint", nullable: false),
-                    CheckedInDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CheckedInDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockLots", x => x.StockLotId);
+                    table.PrimaryKey("PK_StockLots", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StockLots_Materials_MaterialId",
                         column: x => x.MaterialId,
                         principalTable: "Materials",
-                        principalColumn: "MaterialId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -104,21 +128,27 @@ namespace CncApp.Infrastructure.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PartId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     PartAmountRequested = table.Column<int>(type: "int", nullable: false),
-                    PartsPerBar = table.Column<int>(type: "int", nullable: false)
+                    PartsPerBar = table.Column<int>(type: "int", nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.OrderId);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Orders_Parts_PartId",
                         column: x => x.PartId,
                         principalTable: "Parts",
-                        principalColumn: "PartId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -126,25 +156,25 @@ namespace CncApp.Infrastructure.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    UserRoleId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AuditTrail_CreatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuditTrail_CreatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_UpdatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_DisabledAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_DisabledByUserId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleType = table.Column<byte>(type: "tinyint", nullable: false)
+                    RoleType = table.Column<byte>(type: "tinyint", nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRoles", x => x.UserRoleId);
+                    table.PrimaryKey("PK_UserRoles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -152,28 +182,28 @@ namespace CncApp.Infrastructure.Migrations
                 name: "StockLotAdjustments",
                 columns: table => new
                 {
-                    StockLotAdjustmentId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StockLotId = table.Column<int>(type: "int", nullable: false),
                     JobId = table.Column<int>(type: "int", nullable: true),
                     DeltaBars = table.Column<int>(type: "int", nullable: false),
                     Reason = table.Column<byte>(type: "tinyint", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    AuditTrail_CreatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AuditTrail_CreatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_UpdatedAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    AuditTrail_DisabledAtDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    AuditTrail_DisabledByUserId = table.Column<int>(type: "int", nullable: true)
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockLotAdjustments", x => x.StockLotAdjustmentId);
+                    table.PrimaryKey("PK_StockLotAdjustments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StockLotAdjustments_StockLots_StockLotId",
                         column: x => x.StockLotId,
                         principalTable: "StockLots",
-                        principalColumn: "StockLotId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -181,35 +211,41 @@ namespace CncApp.Infrastructure.Migrations
                 name: "Jobs",
                 columns: table => new
                 {
-                    JobId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     StockLotId = table.Column<int>(type: "int", nullable: false),
                     MachineId = table.Column<int>(type: "int", nullable: false),
                     PartAmountPlanned = table.Column<int>(type: "int", nullable: false),
                     BarAmountPlanned = table.Column<int>(type: "int", nullable: false),
-                    BarCycleTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                    BarCycleTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Jobs", x => x.JobId);
+                    table.PrimaryKey("PK_Jobs", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Jobs_Machines_MachineId",
                         column: x => x.MachineId,
                         principalTable: "Machines",
-                        principalColumn: "MachineId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Jobs_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
-                        principalColumn: "OrderId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Jobs_StockLots_StockLotId",
                         column: x => x.StockLotId,
                         principalTable: "StockLots",
-                        principalColumn: "StockLotId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -217,7 +253,7 @@ namespace CncApp.Infrastructure.Migrations
                 name: "Shifts",
                 columns: table => new
                 {
-                    ShiftId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     JobId = table.Column<int>(type: "int", nullable: false),
                     OperatorId = table.Column<int>(type: "int", nullable: false),
@@ -225,22 +261,28 @@ namespace CncApp.Infrastructure.Migrations
                     Scrap = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StopTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Downtime = table.Column<TimeSpan>(type: "time", nullable: true)
+                    Downtime = table.Column<TimeSpan>(type: "time", nullable: true),
+                    CreatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedByUserId = table.Column<int>(type: "int", nullable: true),
+                    InactivatedDateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    InactivatedByUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Shifts", x => x.ShiftId);
+                    table.PrimaryKey("PK_Shifts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Shifts_Jobs_JobId",
                         column: x => x.JobId,
                         principalTable: "Jobs",
-                        principalColumn: "JobId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Shifts_Users_OperatorId",
                         column: x => x.OperatorId,
                         principalTable: "Users",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -289,7 +331,7 @@ namespace CncApp.Infrastructure.Migrations
                 table: "UserRoles",
                 columns: new[] { "UserId", "RoleType" },
                 unique: true,
-                filter: "[AuditTrail_DisabledAtDateTime] IS NULL");
+                filter: "[InactivatedDateTime] IS NULL");
         }
 
         /// <inheritdoc />

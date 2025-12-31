@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CncApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251224122929_InitialCreate")]
+    [Migration("20251231204924_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,17 +27,29 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.Job", b =>
                 {
-                    b.Property<int>("JobId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BarAmountPlanned")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("BarCycleTime")
                         .HasColumnType("time");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("MachineId")
                         .HasColumnType("int");
@@ -51,7 +63,13 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("StockLotId")
                         .HasColumnType("int");
 
-                    b.HasKey("JobId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("MachineId");
 
@@ -64,11 +82,23 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.Machine", b =>
                 {
-                    b.Property<int>("MachineId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MachineId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ModelNumber")
                         .IsRequired()
@@ -80,44 +110,80 @@ namespace CncApp.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("MachineId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Machines");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Material", b =>
                 {
-                    b.Property<int>("MaterialId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaterialId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("HeatNumber")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("MaterialName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("MaterialId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("PartAmountRequested")
                         .HasColumnType("int");
@@ -128,7 +194,13 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("PartsPerBar")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("PartId");
 
@@ -137,11 +209,11 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.Part", b =>
                 {
-                    b.Property<int>("PartId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PartId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<TimeSpan>("ApproxPartCycleTime")
                         .HasColumnType("time");
@@ -149,21 +221,51 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("CheckPerPart")
                         .HasColumnType("int");
 
-                    b.HasKey("PartId");
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Parts");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Shift", b =>
                 {
-                    b.Property<int>("ShiftId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<TimeSpan?>("Downtime")
                         .HasColumnType("time");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("JobId")
                         .HasColumnType("int");
@@ -183,7 +285,13 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<DateTime?>("StopTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ShiftId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("JobId");
 
@@ -194,11 +302,11 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLot", b =>
                 {
-                    b.Property<int>("StockLotId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockLotId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AmountOfBars")
                         .HasColumnType("int");
@@ -213,9 +321,21 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<byte>("Condition")
                         .HasColumnType("tinyint");
 
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<decimal>("Diameter")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LotNumber")
                         .IsRequired()
@@ -225,7 +345,13 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("MaterialId")
                         .HasColumnType("int");
 
-                    b.HasKey("StockLotId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("MaterialId");
 
@@ -234,14 +360,26 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLotAdjustment", b =>
                 {
-                    b.Property<int>("StockLotAdjustmentId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockLotAdjustmentId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("DeltaBars")
                         .HasColumnType("int");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int?>("JobId")
                         .HasColumnType("int");
@@ -256,7 +394,13 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("StockLotId")
                         .HasColumnType("int");
 
-                    b.HasKey("StockLotAdjustmentId");
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("StockLotId");
 
@@ -265,11 +409,17 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .HasMaxLength(320)
@@ -279,39 +429,69 @@ namespace CncApp.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("LastName")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.UserRole", b =>
                 {
-                    b.Property<int>("UserRoleId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserRoleId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<byte>("RoleType")
                         .HasColumnType("tinyint");
 
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserRoleId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId", "RoleType")
                         .IsUnique()
-                        .HasFilter("[AuditTrail_DisabledAtDateTime] IS NULL");
+                        .HasFilter("[InactivatedDateTime] IS NULL");
 
                     b.ToTable("UserRoles");
                 });
@@ -392,78 +572,7 @@ namespace CncApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("CncApp.Domain.Common.AuditTrail", "AuditTrail", b1 =>
-                        {
-                            b1.Property<int>("StockLotAdjustmentId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime>("CreatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("CreatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("DisabledAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("DisabledByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("UpdatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("UpdatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.HasKey("StockLotAdjustmentId");
-
-                            b1.ToTable("StockLotAdjustments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StockLotAdjustmentId");
-                        });
-
-                    b.Navigation("AuditTrail")
-                        .IsRequired();
-
                     b.Navigation("StockLot");
-                });
-
-            modelBuilder.Entity("CncApp.Domain.Entities.User", b =>
-                {
-                    b.OwnsOne("CncApp.Domain.Common.AuditTrail", "AuditTrail", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime>("CreatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("CreatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("DisabledAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("DisabledByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("UpdatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("UpdatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.Navigation("AuditTrail")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.UserRole", b =>
@@ -472,40 +581,6 @@ namespace CncApp.Infrastructure.Migrations
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.OwnsOne("CncApp.Domain.Common.AuditTrail", "AuditTrail", b1 =>
-                        {
-                            b1.Property<int>("UserRoleId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime>("CreatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("CreatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("DisabledAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("DisabledByUserId")
-                                .HasColumnType("int");
-
-                            b1.Property<DateTime?>("UpdatedAtDateTime")
-                                .HasColumnType("datetime2");
-
-                            b1.Property<int?>("UpdatedByUserId")
-                                .HasColumnType("int");
-
-                            b1.HasKey("UserRoleId");
-
-                            b1.ToTable("UserRoles");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserRoleId");
-                        });
-
-                    b.Navigation("AuditTrail")
                         .IsRequired();
 
                     b.Navigation("User");
