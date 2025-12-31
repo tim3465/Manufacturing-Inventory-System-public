@@ -1,15 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-namespace CncApp.Domain.Entities;
-public class ShiftBase
-{
-    [Key]
-    public int ShiftId { get; set; }
+using CncApp.Domain.Common;
 
-    [Required]
+namespace CncApp.Domain.Entities;
+
+public class Shift : AuditableEntityBase
+{
     public int JobId { get; set; }
 
-    [Required]
-    public int OperatorId { get; set; } // UserId
+    public int OperatorId { get; set; }
 
     public int PartsMade { get; set; }
 
@@ -20,10 +17,7 @@ public class ShiftBase
     public DateTime? StopTime { get; set; }
 
     public TimeSpan? Downtime { get; set; }
-    }
 
-public class Shift : ShiftBase
-{
     public Job Job { get; set; } = null!;
 
     public User Operator { get; set; } = null!;
