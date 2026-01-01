@@ -14,9 +14,57 @@
 			"key": "machineId",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
+		{
+			"name": "POST Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+					"key": "Content-Type",
+					"value": "application/json",
+					"type": "text"
+				}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@local.test\",\n  \"password\": \"Admin123!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/api/auth/login"
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has accessToken\", function () {",
+							"  const jsonData = pm.response.json();",
+							"  pm.expect(jsonData).to.have.property(\"accessToken\");",
+							"  pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
 		{
 			"name": "POST Create Machine",
 			"request": {
@@ -25,6 +73,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
 						"type": "text"
 					}
 				],
@@ -108,7 +161,13 @@
 			"name": "DELETE Inactivate Machine",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
 				"url": "{{baseUrl}}/api/machines/{{machineId}}"
 			},
 			"response": [],
@@ -130,7 +189,13 @@
 			"name": "GET List All Machines",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
 				"url": "{{baseUrl}}/api/machines/all"
 			},
 			"response": [],
@@ -150,4 +215,3 @@
 		}
 	]
 }
-

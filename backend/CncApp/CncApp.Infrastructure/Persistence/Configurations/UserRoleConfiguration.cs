@@ -8,6 +8,9 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
+        // Table name (preserve existing table name despite DbSet rename)
+        builder.ToTable("UserRoles");
+
         // Primary Key
         builder.HasKey(ur => ur.Id);
 

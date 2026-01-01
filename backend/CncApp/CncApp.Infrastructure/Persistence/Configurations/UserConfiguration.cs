@@ -8,6 +8,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        // Table name (preserve existing table name despite DbSet rename)
+        builder.ToTable("Users");
+
         // Primary Key
         builder.HasKey(u => u.Id);
 

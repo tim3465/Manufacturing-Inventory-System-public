@@ -1,11 +1,13 @@
 ﻿
 using CncApp.Domain.Entities;
 //using CncApp.Infrastructure.Persistence.Configurations;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CncApp.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -19,9 +21,9 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 
-    // Users
-    public DbSet<User> Users => Set<User>();
-    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    // Domain Users (distinct from Identity Users)
+    public DbSet<User> DomainUsers => Set<User>();
+    public DbSet<UserRole> DomainUserRoles => Set<UserRole>();
 
     // Inventory
     public DbSet<Material> Materials => Set<Material>();
