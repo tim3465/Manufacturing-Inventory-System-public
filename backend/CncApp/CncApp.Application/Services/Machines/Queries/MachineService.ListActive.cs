@@ -5,9 +5,9 @@ namespace CncApp.Application.Services.Machines;
 
 public partial class MachineService
 {
-    public async Task<List<MachineDto>> ListAsync(CancellationToken ct = default)
+    public async Task<List<MachineDto>> ListActiveAsync(CancellationToken ct = default)
     {
-        var machines = await _machineRepository.ListAsync(ct);
+        var machines = await _machineRepository.ListActiveAsync(ct);
         return _mapper.Map<List<MachineDto>>(machines);
     }
 }

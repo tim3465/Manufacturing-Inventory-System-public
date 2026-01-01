@@ -19,10 +19,16 @@ public class MachineRepository : IMachineRepository
         return await _context.Machines.FindAsync(new object[] { id }, ct);
     }
 
-    public async Task<List<Machine>> ListAsync(CancellationToken ct = default)
+    public async Task<List<Machine>> ListActiveAsync(CancellationToken ct = default)
+    {
+        return await _context.Machines.Where(m =>!m.InactivatedDateTime.HasValue).ToListAsync(ct);
+    }
+
+    public async Task<List<Machine>> ListAllAsync(CancellationToken ct = default)
     {
         return await _context.Machines.ToListAsync(ct);
     }
+
 
     public async Task AddAsync(Machine machine, CancellationToken ct = default)
     {
