@@ -37,3 +37,4 @@ public abstract class AuditableEntityBase : EntityBase
     public int? InactivatedByUserId { get; set; }
 }
 
+
