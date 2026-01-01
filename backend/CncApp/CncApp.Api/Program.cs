@@ -70,15 +70,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Step 6: Seed Identity roles (Admin and User)
-await SeedRolesAsync(app.Services);
+// ==========================================================
+// DEV-ONLY START: AUTH SEEDING (REMOVE BEFORE PRODUCTION)
+// ==========================================================
 
-// Step 7: DEV ONLY - Seed dev admin user (remove/disable in production)
-await SeedDevAdminAsync(app.Services);
 
-app.Run();
+if (app.Environment.IsDevelopment())
+{
+    // Seed Identity roles (Admin and User)
+    await SeedRolesAsync(app.Services);
 
-// Step 6: Role seeding helper - ensures Admin and User roles exist on startup
+    //  DEV ONLY - Seed dev admin user (remove/disable in production)
+    await SeedDevAdminAsync(app.Services);
+}
+
+
+// Role seeding helper - ensures Admin and User roles exist on startup
 static async Task SeedRolesAsync(IServiceProvider services)
 {
     using var scope = services.CreateScope();
@@ -94,17 +101,19 @@ static async Task SeedRolesAsync(IServiceProvider services)
             var result = await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
             if (result.Succeeded)
             {
-                Console.WriteLine($"Step 6: Created role: {roleName}");
+                Console.WriteLine($"Created role: {roleName}");
             }
             else
             {
-                Console.WriteLine($"Step 6: Failed to create role {roleName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"Failed to create role {roleName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
     }
 }
 
-// Step 7: DEV ONLY - Seed dev admin user (remove/disable in production)
+
+
+//  DEV ONLY - Seed dev admin user (remove/disable in production)
 // Creates admin@local.test with password Admin123! and assigns Admin role
 static async Task SeedDevAdminAsync(IServiceProvider services)
 {
@@ -125,7 +134,7 @@ static async Task SeedDevAdminAsync(IServiceProvider services)
             var addToRoleResult = await userManager.AddToRoleAsync(existingUser, "Admin");
             if (addToRoleResult.Succeeded)
             {
-                Console.WriteLine($"Step 7 (DEV ONLY): Added Admin role to existing user: {devAdminEmail}");
+                Console.WriteLine($"(DEV ONLY): Added Admin role to existing user: {devAdminEmail}");
             }
         }
         return;
@@ -146,15 +155,21 @@ static async Task SeedDevAdminAsync(IServiceProvider services)
         var addToRoleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
         if (addToRoleResult.Succeeded)
         {
-            Console.WriteLine($"Step 7 (DEV ONLY): Created admin user: {devAdminEmail} with password: {devAdminPassword}");
+            Console.WriteLine($"(DEV ONLY): Created admin user: {devAdminEmail}");
         }
         else
         {
-            Console.WriteLine($"Step 7 (DEV ONLY): Created user but failed to assign Admin role: {string.Join(", ", addToRoleResult.Errors.Select(e => e.Description))}");
+            Console.WriteLine($"(DEV ONLY): Created user but failed to assign Admin role: {string.Join(", ", addToRoleResult.Errors.Select(e => e.Description))}");
         }
     }
     else
     {
-        Console.WriteLine($"Step 7 (DEV ONLY): Failed to create admin user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+        Console.WriteLine($" (DEV ONLY): Failed to create admin user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
     }
+
+
 }
+    // ==========================================================
+    // DEV-ONLY END: AUTH SEEDING
+    // ==========================================================
+app.Run();
