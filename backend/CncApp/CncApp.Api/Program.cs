@@ -73,6 +73,9 @@ app.MapControllers();
 // Step 6: Seed Identity roles (Admin and User)
 await SeedRolesAsync(app.Services);
 
+// Step 7: DEV ONLY - Seed dev admin user (remove/disable in production)
+await SeedDevAdminAsync(app.Services);
+
 app.Run();
 
 // Step 6: Role seeding helper - ensures Admin and User roles exist on startup
@@ -98,5 +101,60 @@ static async Task SeedRolesAsync(IServiceProvider services)
                 Console.WriteLine($"Step 6: Failed to create role {roleName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
+    }
+}
+
+// Step 7: DEV ONLY - Seed dev admin user (remove/disable in production)
+// Creates admin@local.test with password Admin123! and assigns Admin role
+static async Task SeedDevAdminAsync(IServiceProvider services)
+{
+    using var scope = services.CreateScope();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<int>>>();
+
+    const string devAdminEmail = "admin@local.test";
+    const string devAdminPassword = "Admin123!";
+
+    // Check if user already exists
+    var existingUser = await userManager.FindByEmailAsync(devAdminEmail);
+    if (existingUser != null)
+    {
+        // User exists - ensure they have Admin role
+        var isInAdminRole = await userManager.IsInRoleAsync(existingUser, "Admin");
+        if (!isInAdminRole)
+        {
+            var addToRoleResult = await userManager.AddToRoleAsync(existingUser, "Admin");
+            if (addToRoleResult.Succeeded)
+            {
+                Console.WriteLine($"Step 7 (DEV ONLY): Added Admin role to existing user: {devAdminEmail}");
+            }
+        }
+        return;
+    }
+
+    // Create new dev admin user
+    var adminUser = new IdentityUser<int>
+    {
+        UserName = devAdminEmail,
+        Email = devAdminEmail,
+        EmailConfirmed = true // Skip email confirmation for dev user
+    };
+
+    var createResult = await userManager.CreateAsync(adminUser, devAdminPassword);
+    if (createResult.Succeeded)
+    {
+        // Assign Admin role
+        var addToRoleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
+        if (addToRoleResult.Succeeded)
+        {
+            Console.WriteLine($"Step 7 (DEV ONLY): Created admin user: {devAdminEmail} with password: {devAdminPassword}");
+        }
+        else
+        {
+            Console.WriteLine($"Step 7 (DEV ONLY): Created user but failed to assign Admin role: {string.Join(", ", addToRoleResult.Errors.Select(e => e.Description))}");
+        }
+    }
+    else
+    {
+        Console.WriteLine($"Step 7 (DEV ONLY): Failed to create admin user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
     }
 }
