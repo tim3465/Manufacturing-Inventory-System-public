@@ -1,5 +1,7 @@
 using CncApp.Application;
 using CncApp.Infrastructure;
+using CncApp.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,14 @@ builder.Services.AddSwaggerGen();
 // Register Application and Infrastructure services
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// Register ASP.NET Core Identity
+builder.Services.AddIdentityCore<IdentityUser<int>>(options =>
+{
+    // Identity options can be configured here if needed
+})
+    .AddRoles<IdentityRole<int>>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 var app = builder.Build();
 
