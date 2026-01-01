@@ -1,16 +1,15 @@
 using CncApp.Application.Interfaces.Repositories;
+using CncApp.Domain.Entities;
 using CncApp.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace CncApp.Infrastructure.Repositories;
 
 public partial class MachineRepository : IMachineRepository
 {
-    private readonly AppDbContext _context;
-
-    public MachineRepository(AppDbContext context)
+    public async Task AddAsync(Machine machine, CancellationToken ct = default)
     {
-        _context = context;
+        await _context.Machines.AddAsync(machine, ct);
     }
 }
-
 

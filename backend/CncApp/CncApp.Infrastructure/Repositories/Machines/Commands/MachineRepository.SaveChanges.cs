@@ -5,12 +5,9 @@ namespace CncApp.Infrastructure.Repositories;
 
 public partial class MachineRepository : IMachineRepository
 {
-    private readonly AppDbContext _context;
-
-    public MachineRepository(AppDbContext context)
+    public async Task SaveChangesAsync(CancellationToken ct = default)
     {
-        _context = context;
+        await _context.SaveChangesAsync(ct);
     }
 }
-
 
