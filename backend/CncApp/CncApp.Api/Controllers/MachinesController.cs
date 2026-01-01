@@ -1,5 +1,6 @@
 using CncApp.Application.Dtos.Machines;
 using CncApp.Application.Services.Machines;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CncApp.Api.Controllers;
@@ -25,6 +26,7 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created machine ID with Location header.</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreateAsync(
@@ -56,6 +58,7 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all Active machines.</returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MachineDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -69,6 +72,7 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all machines.</returns>
     [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MachineDto>>> ListAllAsync(CancellationToken ct = default)
     {
@@ -83,6 +87,7 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The machine if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetMachine")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(MachineDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MachineDto>> GetAsync(int id, CancellationToken ct = default)
@@ -103,6 +108,7 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct = default)
