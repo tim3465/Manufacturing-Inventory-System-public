@@ -75,7 +75,7 @@ await SeedRolesAsync(app.Services);
 
 app.Run();
 
-// Step 6: Role seeding helper
+// Step 6: Role seeding helper - ensures Admin and User roles exist on startup
 static async Task SeedRolesAsync(IServiceProvider services)
 {
     using var scope = services.CreateScope();
@@ -88,8 +88,15 @@ static async Task SeedRolesAsync(IServiceProvider services)
         var roleExists = await roleManager.RoleExistsAsync(roleName);
         if (!roleExists)
         {
-            await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
-            Console.WriteLine($"Created role: {roleName}");
+            var result = await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName });
+            if (result.Succeeded)
+            {
+                Console.WriteLine($"Step 6: Created role: {roleName}");
+            }
+            else
+            {
+                Console.WriteLine($"Step 6: Failed to create role {roleName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
         }
     }
 }
