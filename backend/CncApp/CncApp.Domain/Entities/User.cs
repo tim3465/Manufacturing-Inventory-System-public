@@ -4,6 +4,8 @@ namespace CncApp.Domain.Entities;
 
 public class User : AuditableEntityBase
 {
+    public int IdentityUserId { get; set; }
+
     public string UserName { get; set; } = string.Empty;
 
     public string? FirstName { get; set; }

@@ -15,6 +15,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
         // Properties
+        builder.Property(u => u.IdentityUserId)
+            .IsRequired();
+
+        // Unique index for 1:1 relationship with Identity
+        builder.HasIndex(u => u.IdentityUserId)
+            .IsUnique();
+
         builder.Property(u => u.UserName)
             .IsRequired()
             .HasMaxLength(200);
