@@ -21,10 +21,14 @@ public static class DependencyInjection
 
         // Register Repositories
         services.AddScoped<IMachineRepository, MachineRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         // Register Current User Service
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        // Register Identity Provisioning Service
+        services.AddScoped<IIdentityProvisioningService, IdentityProvisioningService>();
 
         return services;
     }
