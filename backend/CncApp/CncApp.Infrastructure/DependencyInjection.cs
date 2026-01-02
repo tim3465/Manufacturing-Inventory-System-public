@@ -1,6 +1,8 @@
+using CncApp.Application.Interfaces;
 using CncApp.Application.Interfaces.Repositories;
 using CncApp.Infrastructure.Persistence;
 using CncApp.Infrastructure.Repositories;
+using CncApp.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +21,10 @@ public static class DependencyInjection
 
         // Register Repositories
         services.AddScoped<IMachineRepository, MachineRepository>();
+
+        // Register Current User Service
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         return services;
     }
