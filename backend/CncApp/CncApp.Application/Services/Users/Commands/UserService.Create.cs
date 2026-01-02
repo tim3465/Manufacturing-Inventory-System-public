@@ -31,7 +31,6 @@ public partial class UserService
         // Step 3: Create Domain User linked via IdentityUserId
         // Note: IdentityUserId is created internally, never from client
         // Domain User does NOT store Email - Identity owns email as source of truth
-        var currentIdentityUserId = _currentUserService.GetCurrentUserId();
         var domainUser = new User
         {
             IdentityUserId = identityUserId, // Link to Identity user
@@ -39,9 +38,7 @@ public partial class UserService
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             // Email is NOT stored in Domain User - resolve via Identity using IdentityUserId
-            // Audit fields
-            CreatedDateTime = DateTimeOffset.UtcNow,
-            CreatedByUserId = currentIdentityUserId
+            // Audit fields (CreatedDateTime, CreatedByUserId) are set automatically by AppDbContext.SaveChangesAsync
         };
 
         await _userRepository.AddAsync(domainUser, ct);
