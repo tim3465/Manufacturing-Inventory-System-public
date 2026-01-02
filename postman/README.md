@@ -9,7 +9,6 @@ This repository includes a Postman collection for testing all API endpoints in t
 - **Auth**: Login and Ping endpoints
 - **Machines**: Create, List, Get by ID, Inactivate, and List All
 - **Users**: Create user (admin-only)
-- **WeatherForecast**: Get weather forecast (template endpoint)
 
 ### How to use
 1. Start the API using the `CncApp.Api (https)` profile.

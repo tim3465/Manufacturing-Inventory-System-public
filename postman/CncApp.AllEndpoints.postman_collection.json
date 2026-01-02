@@ -1,7 +1,7 @@
 {
 	"info": {
 		"name": "CncApp - All Endpoints",
-		"description": "Complete collection for testing all API endpoints in the CNC App: Auth, Machines, Users, and WeatherForecast.",
+		"description": "Complete collection for testing all API endpoints in the CNC App: Auth, Machines, and Users.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -332,37 +332,6 @@
 									"  const jsonData = pm.response.json();",
 									"  pm.expect(jsonData).to.have.property(\"domainUserId\");",
 									"  pm.collectionVariables.set(\"userId\", jsonData.domainUserId);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "WeatherForecast",
-			"item": [
-				{
-					"name": "GET Get Weather Forecast",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/weatherforecast",
-							"host": ["{{baseUrl}}"],
-							"path": ["weatherforecast"]
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"  pm.response.to.have.status(200);",
 									"});"
 								],
 								"type": "text/javascript"
