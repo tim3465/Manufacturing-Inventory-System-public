@@ -32,8 +32,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.LastName)
             .HasMaxLength(200);
 
-        builder.Property(u => u.Email)
-            .HasMaxLength(320);
+        // Email is NOT stored in Domain User - Identity owns email as source of truth
 
         // Navigation Properties
         builder.HasMany(u => u.UserRoles)

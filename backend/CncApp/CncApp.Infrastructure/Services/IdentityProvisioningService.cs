@@ -18,9 +18,10 @@ public class IdentityProvisioningService : IIdentityProvisioningService
     /// <inheritdoc />
     public async Task<int> CreateIdentityUserAsync(string email, string userName, string password, CancellationToken ct = default)
     {
+        // Identity UserName must equal Email (same value)
         var identityUser = new IdentityUser<int>
         {
-            UserName = userName,
+            UserName = email, // UserName equals Email
             Email = email,
             EmailConfirmed = true // Skip email confirmation for admin-provisioned users
         };

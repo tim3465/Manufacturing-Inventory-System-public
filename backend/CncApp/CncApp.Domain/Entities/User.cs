@@ -12,7 +12,8 @@ public class User : AuditableEntityBase
 
     public string? LastName { get; set; }
 
-    public string? Email { get; set; }
+    // Email is NOT stored in Domain User - Identity owns email as source of truth
+    // To get email, resolve via Identity using IdentityUserId
 
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 

@@ -14,10 +14,11 @@ public partial class UserService
     /// <returns>The created user information including both Identity and Domain UserIds.</returns>
     public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto dto, CancellationToken ct = default)
     {
-        // Step 1: Create Identity user (email, username, password)
+        // Step 1: Create Identity user (UserName = Email, password)
+        // Identity UserName must equal Email (same value)
         var identityUserId = await _identityProvisioningService.CreateIdentityUserAsync(
             dto.Email,
-            dto.UserName,
+            dto.Email, // UserName equals Email
             dto.TemporaryPassword,
             ct);
 
@@ -29,14 +30,15 @@ public partial class UserService
 
         // Step 3: Create Domain User linked via IdentityUserId
         // Note: IdentityUserId is created internally, never from client
+        // Domain User does NOT store Email - Identity owns email as source of truth
         var currentIdentityUserId = _currentUserService.GetCurrentUserId();
         var domainUser = new User
         {
             IdentityUserId = identityUserId, // Link to Identity user
-            UserName = dto.UserName,
+            UserName = dto.Email, // Domain UserName matches Identity UserName (which equals Email)
             FirstName = dto.FirstName,
             LastName = dto.LastName,
-            // Email is NOT stored in Domain User (Identity owns email as source of truth)
+            // Email is NOT stored in Domain User - resolve via Identity using IdentityUserId
             // Audit fields
             CreatedDateTime = DateTimeOffset.UtcNow,
             CreatedByUserId = currentIdentityUserId
@@ -49,8 +51,8 @@ public partial class UserService
         {
             IdentityUserId = identityUserId,
             DomainUserId = domainUser.Id,
-            Email = dto.Email,
-            UserName = dto.UserName
+            Email = dto.Email, // Email from Identity (source of truth)
+            UserName = dto.Email // UserName equals Email in Identity
         };
     }
 }

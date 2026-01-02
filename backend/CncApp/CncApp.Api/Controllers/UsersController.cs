@@ -43,11 +43,6 @@ public class UsersController : ControllerBase
             return BadRequest(new { error = "Email is required." });
         }
 
-        if (string.IsNullOrWhiteSpace(dto.UserName))
-        {
-            return BadRequest(new { error = "UserName is required." });
-        }
-
         if (string.IsNullOrWhiteSpace(dto.TemporaryPassword))
         {
             return BadRequest(new { error = "TemporaryPassword is required." });

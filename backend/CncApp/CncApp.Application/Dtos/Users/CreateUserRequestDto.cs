@@ -7,13 +7,9 @@ public class CreateUserRequestDto
 {
     /// <summary>
     /// Email address for the Identity user (required, used for authentication).
+    /// This will also be used as the UserName in Identity (UserName = Email).
     /// </summary>
     public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Username for the Identity user (can be same as email).
-    /// </summary>
-    public string UserName { get; set; } = string.Empty;
 
     /// <summary>
     /// First name for the Domain user.
