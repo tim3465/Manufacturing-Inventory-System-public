@@ -11,6 +11,9 @@ namespace CncApp.Infrastructure.Persistence;
 
 public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
 {
+    private int? _cachedCurrentDomainUserId;
+    private bool _hasResolvedCurrentDomainUserId;
+
     private readonly ICurrentUserService? _currentUserService;
 
     public AppDbContext(
@@ -51,32 +54,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
     /// </summary>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        int? currentDomainUserId = null;
-
-        // Resolve DomainUserId from IdentityUserId if authenticated user exists
-        if (_currentUserService != null)
-        {
-            try
-            {
-                var identityUserId = _currentUserService.GetCurrentUserId();
-                var domainUser = await DomainUsers
-                    .FirstOrDefaultAsync(u => u.IdentityUserId == identityUserId, cancellationToken);
-
-                if (domainUser == null)
-                {
-                    throw new InvalidOperationException(
-                        $"No Domain User found for the current authenticated Identity user (IdentityUserId: {identityUserId}). " +
-                        "Domain User must be provisioned by an administrator before performing operations that require audit tracking.");
-                }
-
-                currentDomainUserId = domainUser.Id;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // No authenticated user - audit fields will remain null (system operations)
-                currentDomainUserId = null;
-            }
-        }
+        var currentDomainUserId = await GetCurrentDomainUserIdAsync(cancellationToken);
 
         var now = DateTimeOffset.UtcNow;
 
@@ -119,4 +97,50 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
 
         return await base.SaveChangesAsync(cancellationToken);
     }
+
+
+    private async Task<int?> GetCurrentDomainUserIdAsync(CancellationToken ct)
+    {
+
+        if (_hasResolvedCurrentDomainUserId)
+        {
+            return _cachedCurrentDomainUserId;
+        }
+
+        _hasResolvedCurrentDomainUserId = true;
+
+        if (_currentUserService == null)
+        {
+            _cachedCurrentDomainUserId = null;
+            return null;
+        }
+
+        try
+        {
+            var identityUserId = _currentUserService.GetCurrentUserId();
+
+            var domainUserId = await DomainUsers
+                .AsNoTracking()
+                .Where(u => u.IdentityUserId == identityUserId)
+                .Select(u => (int?)u.Id)
+                .SingleOrDefaultAsync(ct);
+
+
+            if (domainUserId == null)
+            {
+                throw new InvalidOperationException(
+                    $"No Domain User found for the current authenticated Identity user (IdentityUserId: {identityUserId}). " +
+                    "Domain User must be provisioned by an administrator before performing operations that require audit tracking.");
+            }
+
+            _cachedCurrentDomainUserId = domainUserId.Value;
+            return _cachedCurrentDomainUserId;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            _cachedCurrentDomainUserId = null;
+            return null;
+        }
+    }
+
 }
