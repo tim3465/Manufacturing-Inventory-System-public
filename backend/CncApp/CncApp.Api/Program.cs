@@ -1,10 +1,13 @@
+using System.Diagnostics;
 using System.Text;
+using CncApp.Api.Middleware;
 using CncApp.Application;
 using CncApp.Infrastructure;
 using CncApp.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add ProblemDetails support and register global exception handler
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Register Application and Infrastructure services
 builder.Services.AddApplicationServices();
@@ -64,6 +71,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable exception handling middleware
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();

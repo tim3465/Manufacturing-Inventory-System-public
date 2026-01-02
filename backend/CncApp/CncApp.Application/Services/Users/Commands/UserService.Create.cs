@@ -48,7 +48,6 @@ public partial class UserService
         {
             IdentityUserId = identityUserId,
             DomainUserId = domainUser.Id,
-            Email = dto.Email, // Email from Identity (source of truth)
             UserName = dto.Email // UserName equals Email in Identity
         };
     }

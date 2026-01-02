@@ -37,27 +37,8 @@ public class UsersController : ControllerBase
         [FromBody] CreateUserRequestDto dto,
         CancellationToken ct = default)
     {
-        // Basic validation
-        if (string.IsNullOrWhiteSpace(dto.Email))
-        {
-            return BadRequest(new { error = "Email is required." });
-        }
-
-        if (string.IsNullOrWhiteSpace(dto.TemporaryPassword))
-        {
-            return BadRequest(new { error = "TemporaryPassword is required." });
-        }
-
-        try
-        {
-            var result = await _userService.CreateAsync(dto, ct);
-
-            return StatusCode(StatusCodes.Status201Created, result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var result = await _userService.CreateAsync(dto, ct);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
 }
 
