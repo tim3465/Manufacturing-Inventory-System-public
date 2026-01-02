@@ -12,19 +12,19 @@ public class CreateUserResponseDto
     /// <summary>
     /// The Identity UserId (from ASP.NET Core Identity).
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "IdentityUserId is required.")]
     public int IdentityUserId { get; set; }
 
     /// <summary>
     /// The Domain UserId (from Domain User entity).
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "DomainUserId is required.")]
     public int DomainUserId { get; set; }
 
     /// <summary>
     /// Username of the created user.
     /// </summary>
-    [MaxLength(200)]
+    [MaxLength(200, ErrorMessage = "UserName cannot exceed 200 characters.")]
     public string UserName { get; set; } = string.Empty;
 }
 

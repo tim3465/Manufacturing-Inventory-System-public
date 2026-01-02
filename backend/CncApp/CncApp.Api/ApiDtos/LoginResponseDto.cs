@@ -1,4 +1,4 @@
-namespace CncApp.Api.Dtos;
+namespace CncApp.Api.ApiDtos;
 
 public class LoginResponseDto
 {

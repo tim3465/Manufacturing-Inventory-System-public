@@ -7,12 +7,12 @@ public class MachineDto
 {
     public int Id { get; set; }
 
-    [Required]
-    [MaxLength(100)]
+    [Required(ErrorMessage = "SerialNumber is required.")]
+    [MaxLength(100, ErrorMessage = "SerialNumber cannot exceed 100 characters.")]
     public string SerialNumber { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(100)]
+    [Required(ErrorMessage = "ModelNumber is required.")]
+    [MaxLength(100, ErrorMessage = "ModelNumber cannot exceed 100 characters.")]
     public string ModelNumber { get; set; } = string.Empty;
 }
 

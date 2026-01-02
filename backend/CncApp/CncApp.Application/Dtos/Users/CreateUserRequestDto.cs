@@ -13,28 +13,28 @@ public class CreateUserRequestDto
     /// Email address for the Identity user (required, used for authentication).
     /// This will also be used as the UserName in Identity (UserName = Email).
     /// </summary>
-    [Required]
-    [EmailAddress]
-    [MaxLength(256)]
+    [Required(ErrorMessage = "Email is required.")]
+    [EmailAddress(ErrorMessage = "Email must be a valid email address.")]
+    [MaxLength(256, ErrorMessage = "Email cannot exceed 256 characters.")]
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
     /// First name for the Domain user.
     /// </summary>
-    [MaxLength(200)]
+    [MaxLength(200, ErrorMessage = "FirstName cannot exceed 200 characters.")]
     public string? FirstName { get; set; }
 
     /// <summary>
     /// Last name for the Domain user.
     /// </summary>
-    [MaxLength(200)]
+    [MaxLength(200, ErrorMessage = "LastName cannot exceed 200 characters.")]
     public string? LastName { get; set; }
 
     /// <summary>
     /// Temporary password for the Identity user.
     /// In production, this should be generated securely or sent via secure channel.
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "TemporaryPassword is required.")]
     public string TemporaryPassword { get; set; } = string.Empty;
 
     /// <summary>
