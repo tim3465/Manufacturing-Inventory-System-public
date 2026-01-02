@@ -15,6 +15,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(u => u.Id);
 
         // Properties
+        builder.Property(u => u.IdentityUserId)
+            .IsRequired();
+
+        // Unique index for 1:1 relationship with Identity
+        builder.HasIndex(u => u.IdentityUserId)
+            .IsUnique();
+
         builder.Property(u => u.UserName)
             .IsRequired()
             .HasMaxLength(200);
@@ -25,8 +32,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.LastName)
             .HasMaxLength(200);
 
-        builder.Property(u => u.Email)
-            .HasMaxLength(320);
+        // Email is NOT stored in Domain User - Identity owns email as source of truth
 
         // Navigation Properties
         builder.HasMany(u => u.UserRoles)

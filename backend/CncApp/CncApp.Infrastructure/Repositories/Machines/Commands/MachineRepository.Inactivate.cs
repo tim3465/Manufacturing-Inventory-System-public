@@ -14,7 +14,6 @@ public partial class MachineRepository : IMachineRepository
             return false;
 
         machine.InactivatedDateTime = DateTimeOffset.UtcNow;
-        machine.InactivatedByUserId = inactivatedByUserId;
 
         return true;
     }
