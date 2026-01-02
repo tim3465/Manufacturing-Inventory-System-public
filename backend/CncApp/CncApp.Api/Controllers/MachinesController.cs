@@ -33,17 +33,6 @@ public class MachinesController : ControllerBase
         [FromBody] CreateMachineRequestDto dto,
         CancellationToken ct = default)
     {
-        // Basic validation
-        if (string.IsNullOrWhiteSpace(dto.SerialNumber))
-        {
-            return BadRequest(new { error = "SerialNumber is required." });
-        }
-
-        if (string.IsNullOrWhiteSpace(dto.ModelNumber))
-        {
-            return BadRequest(new { error = "ModelNumber is required." });
-        }
-
         var id = await _machineService.CreateAsync(dto, ct);
 
         return CreatedAtRoute(
