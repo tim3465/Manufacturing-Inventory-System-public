@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace CncApp.Api.Middleware;
 
@@ -32,17 +30,27 @@ public class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status400BadRequest,
                 "Bad Request",
                 exception.Message,
-                traceId),
+                traceId,
+                "INVALID_OPERATION"),
             _ => CreateProblemDetails(
                 httpContext,
                 StatusCodes.Status500InternalServerError,
                 "Internal Server Error",
                 "An error occurred while processing your request.",
-                traceId)
+                traceId,
+                "INTERNAL_SERVER_ERROR")
         };
 
         // Log the exception
-        _logger.LogError(
+        if ((problemDetails.Status ?? 500) >= 500)
+            _logger.LogError(
+            exception,
+            "Exception occurred: {ExceptionType} - {Message}. TraceId: {TraceId}",
+            exception.GetType().Name,
+            exception.Message,
+            traceId);
+        else
+            _logger.LogWarning(
             exception,
             "Exception occurred: {ExceptionType} - {Message}. TraceId: {TraceId}",
             exception.GetType().Name,
@@ -62,7 +70,8 @@ public class GlobalExceptionHandler : IExceptionHandler
         int statusCode,
         string title,
         string detail,
-        string traceId)
+        string traceId,
+        string errorCode)
     {
         return new ProblemDetails
         {
@@ -73,7 +82,8 @@ public class GlobalExceptionHandler : IExceptionHandler
             Instance = httpContext.Request.Path,
             Extensions =
             {
-                ["traceId"] = traceId
+                ["traceId"] = traceId,
+                ["errorCode"] = errorCode
             }
         };
     }
@@ -82,9 +92,9 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         return statusCode switch
         {
-            400 => "4",  // Client Error (4xx) - RFC 7231 section 6.5.4
-            500 => "5",  // Server Error (5xx) - RFC 7231 section 6.5.5
-            _ => "1"     // Fallback (shouldn't occur with current exception mapping)
+            >= 400 and < 500 => "4",
+            >= 500 => "5", 
+            _ => "1"
         };
     }
 }

@@ -37,18 +37,8 @@ public class UsersController : ControllerBase
         [FromBody] CreateUserRequestDto dto,
         CancellationToken ct = default)
     {
-        // TODO: Move InvalidOperationException handling to global exception handling middleware (ProblemDetails)
-        // to provide consistent error responses across the API.
-        try
-        {
-            var result = await _userService.CreateAsync(dto, ct);
-
-            return StatusCode(StatusCodes.Status201Created, result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        var result = await _userService.CreateAsync(dto, ct);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
 }
 
