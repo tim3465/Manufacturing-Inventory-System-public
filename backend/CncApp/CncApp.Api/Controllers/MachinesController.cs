@@ -34,11 +34,7 @@ public class MachinesController : ControllerBase
         CancellationToken ct = default)
     {
         var id = await _machineService.CreateAsync(dto, ct);
-
-        return CreatedAtRoute(
-            routeName: "GetMachine",
-            routeValues: new { id },
-            value: new { id });
+        return CreatedAtRoute( routeName: "GetMachine", routeValues: new { id }, value: new { id });
     }
 
     /// <summary>
