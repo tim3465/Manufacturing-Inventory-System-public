@@ -16,6 +16,10 @@ public class Job : AuditableEntityBase
 
     public TimeSpan BarCycleTime { get; set; }
 
+    public int BarsInJob { get; set; }
+
+    public int? EstimatedPartsPerBar { get; set; }
+
     public Order Order { get; set; } = null!;
 
     public StockLot StockLot { get; set; } = null!;

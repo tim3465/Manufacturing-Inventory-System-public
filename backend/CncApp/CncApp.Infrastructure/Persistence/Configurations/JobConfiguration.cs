@@ -30,6 +30,12 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.BarCycleTime)
             .IsRequired();
 
+        builder.Property(j => j.BarsInJob)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(j => j.EstimatedPartsPerBar);
+
         // Relationships
         builder.HasOne(j => j.Order)
             .WithMany(o => o.Jobs)

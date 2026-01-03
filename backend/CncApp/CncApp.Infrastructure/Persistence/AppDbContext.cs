@@ -34,7 +34,6 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
 
     // Domain Users (distinct from Identity Users)
     public DbSet<User> DomainUsers => Set<User>();
-    public DbSet<UserRole> DomainUserRoles => Set<UserRole>();
 
     // Inventory
     public DbSet<Material> Materials => Set<Material>();

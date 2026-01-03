@@ -4,6 +4,7 @@ using CncApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CncApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260103120943_RemoveDomainUserRolesTable")]
+    partial class RemoveDomainUserRolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,7 +77,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("StockLotId");
 
-                    b.ToTable("Jobs", (string)null);
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Machine", b =>
@@ -115,7 +118,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Machines", (string)null);
+                    b.ToTable("Machines");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Material", b =>
@@ -156,7 +159,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Materials", (string)null);
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Order", b =>
@@ -201,7 +204,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("PartId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Part", b =>
@@ -238,7 +241,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Parts", (string)null);
+                    b.ToTable("Parts");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Shift", b =>
@@ -294,7 +297,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("OperatorId");
 
-                    b.ToTable("Shifts", (string)null);
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLot", b =>
@@ -352,7 +355,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("MaterialId");
 
-                    b.ToTable("StockLots", (string)null);
+                    b.ToTable("StockLots");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLotAdjustment", b =>
@@ -401,7 +404,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("StockLotId");
 
-                    b.ToTable("StockLotAdjustments", (string)null);
+                    b.ToTable("StockLotAdjustments");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.User", b =>
