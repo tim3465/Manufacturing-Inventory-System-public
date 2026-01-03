@@ -28,7 +28,7 @@ public class GetMachineTests
         var machineId = 1;
         var cancellationToken = CancellationToken.None;
 
-        var machine = new Machine
+        var machine = new Machine("SN-TEST-001", "MODEL-TEST-001")
         {
             Id = machineId,
             SerialNumber = "SN-12345",

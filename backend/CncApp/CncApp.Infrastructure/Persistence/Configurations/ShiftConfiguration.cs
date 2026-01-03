@@ -22,6 +22,12 @@ public class ShiftConfiguration : IEntityTypeConfiguration<Shift>
 
         builder.Property(s => s.Scrap);
 
+        builder.Property(s => s.BarsConsumed)
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(s => s.PartsPerBar);
+
         builder.Property(s => s.StartTime)
             .IsRequired();
 

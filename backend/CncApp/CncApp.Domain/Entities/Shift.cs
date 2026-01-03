@@ -12,6 +12,10 @@ public class Shift : AuditableEntityBase
 
     public int Scrap { get; set; }
 
+    public int BarsConsumed { get; set; }
+
+    public int? PartsPerBar { get; set; }
+
     public DateTime StartTime { get; set; }
 
     public DateTime? StopTime { get; set; }
