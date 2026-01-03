@@ -35,10 +35,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Email is NOT stored in Domain User - Identity owns email as source of truth
 
         // Navigation Properties
-        builder.HasMany(u => u.UserRoles)
-            .WithOne(ur => ur.User)
-            .HasForeignKey(ur => ur.UserId);
-
         builder.HasMany(u => u.Shifts)
             .WithOne(s => s.Operator)
             .HasForeignKey(s => s.OperatorId);
