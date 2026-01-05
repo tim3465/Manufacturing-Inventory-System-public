@@ -521,3 +521,122 @@ PR description should include:
 - Verification steps run (build/tests)
 
 ---
+### Phase 5 — Postman Smoke-Test Collection (Regenerate + Version)
+
+**Goal**  
+Create (or update) a **reusable Postman collection** for this slice so a developer can run an end-to-end smoke test quickly (auth → create → get → list → update/inactivate, as applicable).
+
+This phase exists to keep manual verification **repeatable** and **low-friction**, without forcing the AI to “patch” an older collection in risky ways.
+
+---
+
+## Strategy (Versioned, Safe-by-Default)
+
+**Default behavior (recommended):**
+- **Keep the existing Postman collection file**
+- Generate a **new** collection file with a **timestamp** suffix
+- Do not attempt to “merge” or “repair” the old one
+
+**Why:** avoids drift and avoids the AI trying to reinterpret old structure.
+
+---
+
+## File Location and Naming
+
+- Folder: `/postman/` at repo root (or your existing Postman folder name)
+- Output filename pattern (reusable):
+  - `{EntityPlural}.SmokeTests.{YYYYMMDD-HHmm}.postman_collection.json`
+
+**Examples:**
+- `StockLots.SmokeTests.20260105-1432.postman_collection.json`
+- `Jobs.SmokeTests.20260105-1432.postman_collection.json`
+
+---
+
+## Inputs Required Before Generating
+
+Phase 5 generation must reference:
+- The slice **intent** document (which operations exist)
+- The actual API routes implemented (controller)
+- The app’s auth workflow requirements
+
+If intent says an operation does **not** exist, it must **not** appear in the collection.
+
+---
+
+## Required Collection Contents (Reusable Template)
+
+### 1) Environment Variables (collection-level or environment file)
+
+Must define variables so this works across machines:
+- `baseUrl`
+- `adminEmail` (or username)
+- `adminPassword`
+- `token` (or cookie/session value depending on your auth)
+- `entityId` (captured from Create)
+- Any required foreign key IDs (e.g., `materialId`) if needed for Create
+
+---
+
+### 2) Auth / Admin Login (First)
+
+- One request that logs in as admin
+- A test script that captures auth output into variables (token/cookie)
+- Every write request must use that auth variable
+
+---
+
+### 3) Slice Smoke Tests (Only What Exists)
+
+Include folders (or request groups) like:
+- **Create** (if supported)
+- **Get** (if supported)
+- **ListActive** (if supported)
+- **ListAll** (if supported)
+- **Update** (PUT or PATCH, if supported)
+- **Inactivate** (if supported)
+
+Each request should:
+- Assert expected HTTP status code
+- Capture any IDs needed for later steps (Create → `entityId`)
+- Avoid excessive assertions (smoke tests are minimal)
+
+---
+
+### 4) Edge Cases (Optional, Lightweight)
+
+Only include a few if they’re stable and cheap:
+- Get non-existent ID → 404
+- Update non-existent ID → 404
+- Inactivate non-existent ID → 404
+
+---
+
+## “Keep Old vs Regenerate From Old” Rule
+
+- **Preferred:** Generate a **new** collection from scratch every time (versioned file)
+- **Allowed (optional):** If you have a known-good login workflow already, you may:
+  - Copy the **Auth/Login** request as-is
+  - Regenerate the slice requests fresh
+
+**Explicitly forbidden:** Editing the existing collection in place unless explicitly requested.
+
+---
+
+## Deliverable
+
+- A new Postman collection JSON file saved under the Postman folder with a timestamped filename
+- Collection includes:
+  - Admin login step
+  - Only the endpoints defined by slice intent
+  - Minimal tests (status codes + variable capture)
+
+---
+
+## Completion Criteria
+
+Phase 5 is complete when:
+- A developer can import the new collection
+- Set environment variables once
+- Click **Run Collection** (or run requests in order)
+- And confirm the slice works end-to-end in minutes
