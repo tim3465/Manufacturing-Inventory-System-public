@@ -85,17 +85,306 @@ Audit must include:
 
 ---
 
-### Phase 2 — Structural Cleanup (Minimal, Mechanical)
-Goal: remove blockers that would cause drift or compile issues later.
+### Phase 2A — Structural Cleanup (Filesystem Only, No Contracts)
 
-Typical cleanup actions:
-- Delete placeholder files and replace with correctly named method files (empty skeletons are OK)
-- Fix namespaces to match SliceMap rules
-- Ensure Application.Tests base file has shared setup consistent with Machines test base
-- Ensure DI registrations exist (Application + Infrastructure)
+Goal:
+Prepare the slice’s folder and file layout so later phases can proceed without drift, without committing to behavior, workflows, or endpoints.
 
-Deliverable:
-- Slice compiles after cleanup (even if methods are TODO).
+This phase is intentionally non-semantic.
+You are organizing where things will go, not what they do.
+
+Allowed actions (ONLY these)
+
+Delete placeholder / example files
+(e.g. files with Placeholder, PlaceFolder, Example, Template in the name)
+
+Create empty files with correct final names
+
+Files may contain:
+
+namespace
+
+partial class declaration
+
+TODO comments
+
+Files must NOT contain:
+
+method bodies
+
+logic
+
+signatures that imply behavior
+
+Fix namespaces to match SliceMap.md
+
+No .Commands or .Queries in namespaces
+
+All partials share the slice root namespace
+
+Ensure folder structure mirrors Machines:
+
+Commands / Queries folders exist where required
+
+Test folders mirror Application.Services structure
+
+Ensure base test file exists (shared setup only)
+
+Mocks may be declared
+
+No test methods
+
+Explicitly NOT allowed in Phase 2
+
+❌ No DTO properties
+
+❌ No repository interfaces or method signatures
+
+❌ No service method signatures
+
+❌ No EF / DbContext usage
+
+❌ No mapping profiles or CreateMap calls
+
+❌ No DI registrations
+
+❌ No controller endpoints
+
+❌ No tests with assertions
+
+❌ No logic of any kind
+
+If a change implies “this operation exists”, it does not belong in Phase 2.
+
+Deliverable
+
+The slice:
+
+Has correct folders
+
+Has correctly named empty files
+
+Has correct namespaces
+
+The solution may compile or may not compile
+(compilation is NOT a requirement at this phase)
+
+Completion criteria:
+
+“There is now a correct place for everything — but nothing meaningful exists yet.”
+
+Guardrail (very important)
+
+If you are unsure whether an action is structural or behavioral:
+
+Assume it is behavioral and defer it to a later phase.
+
+
+---
+
+### Phase 2B — Contract Definition (No Behavior, No Persistence)
+
+Goal
+Define the explicit contracts for this slice based on intent, without implementing behavior, workflows, or persistence.
+
+This phase answers:
+
+“What operations exist for this slice?”
+not
+“How do they work?”
+
+Preconditions
+
+Before starting Phase 2B:
+
+Phase 2A is complete
+
+Placeholder / example files have been removed
+
+Correct empty files exist with correct final names
+
+Slice intent has been defined (which Commands / Queries exist)
+
+If slice intent is unclear, stop and define it before proceeding.
+
+Allowed actions (ONLY these)
+1) DTO contracts
+
+Create or complete DTO classes:
+
+{Entity}Dto
+
+Create{Entity}RequestDto (only if Create exists)
+
+Update{Entity}RequestDto (only if Update exists)
+
+DTOs may include:
+
+Properties
+
+DataAnnotations validation
+
+DTO rules:
+
+DTOs must reflect domain constraints
+
+Do not speculate about UI behavior
+
+Do not add fields “just in case”
+
+2) Repository interface (signatures only)
+
+Define method signatures in:
+
+I{Entity}Repository
+
+Allowed:
+
+Method names
+
+Parameters
+
+Return types
+
+NOT allowed:
+
+EF Core usage
+
+DbContext access
+
+Any implementation logic
+
+Important:
+Repository interfaces define what persistence is required, not how it is done.
+
+3) Service method signatures (optional, shape only)
+
+Service partial files may contain:
+
+Method signatures
+
+Empty bodies
+
+throw new NotImplementedException();
+
+Purpose:
+
+Define workflow entry points
+
+Reserve names and parameters
+
+Enable later phases to plug in behavior
+
+Rules:
+
+One method per file
+
+No logic
+
+No repository calls
+
+No mapping usage
+
+4) Mapping contracts
+
+Create or complete mapping profiles.
+
+Allowed:
+
+CreateMap<,>() declarations only
+
+NOT allowed:
+
+Custom mapping logic
+
+Value transformations
+
+Conditional mapping
+
+Ignoring fields for behavioral reasons
+
+Mappings exist here only to define type relationships, not behavior.
+
+5) Test scaffolding (structure only)
+
+Ensure test files exist for each intended operation.
+
+Files may contain:
+
+Class declaration
+
+Constructor
+
+TODO comments
+
+NOT allowed:
+
+Assertions
+
+Test logic
+
+Mock setup beyond empty fields
+
+Purpose:
+
+Reserve the test surface
+
+Mirror the Application.Services structure
+
+Explicitly NOT allowed in Phase 2B
+
+❌ Repository implementations
+
+❌ Editing repository .cs method files
+
+❌ EF Core usage
+
+❌ DbContext access
+
+❌ SaveChangesAsync calls
+
+❌ Controller endpoints
+
+❌ Business logic
+
+❌ Domain invariants or domain behavior
+
+❌ Test assertions
+
+❌ DI registrations
+
+❌ “Fixing” compilation errors caused by unimplemented repositories
+
+If code does something, it does not belong in Phase 2B.
+
+Deliverable
+
+At the end of Phase 2B:
+
+DTOs define input/output shape
+
+Repository interfaces define persistence needs
+
+Service methods define workflow entry points
+
+Mapping profiles define type relationships
+
+No behavior exists
+
+No persistence exists
+
+Repository implementations are untouched
+
+Compilation is optional at this phase and must not be forced.
+
+Guardrail (Hard Stop)
+
+Phase 2B ends when you can say:
+
+“We know exactly what this slice is capable of —
+but nothing actually works yet.”
+
+If anything works, Phase 2B has gone too far.
 
 ---
 
