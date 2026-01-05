@@ -1,7 +1,12 @@
+using CncApp.Application.Dtos.StockLots;
+
 namespace CncApp.Application.Services.StockLots;
 
 public partial class StockLotService
 {
-    // TODO: Implement ListActiveAsync method
+    public async Task<List<StockLotDto>> ListActiveAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 
