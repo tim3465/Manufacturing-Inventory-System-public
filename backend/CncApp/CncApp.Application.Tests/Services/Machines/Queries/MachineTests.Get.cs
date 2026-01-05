@@ -1,26 +1,13 @@
 using AutoMapper;
 using CncApp.Application.Dtos.Machines;
-using CncApp.Application.Interfaces.Repositories;
-using CncApp.Application.Services.Machines;
 using CncApp.Domain.Entities;
 using Moq;
+
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Machines.Queries;
-
-public class GetMachineTests
+namespace CncApp.Application.Tests.Services.Machines;
+public partial class MachineTests
 {
-    private readonly Mock<IMachineRepository> _mockRepository;
-    private readonly Mock<IMapper> _mockMapper;
-    private readonly MachineService _machineService;
-
-    public GetMachineTests()
-    {
-        _mockRepository = new Mock<IMachineRepository>();
-        _mockMapper = new Mock<IMapper>();
-        _machineService = new MachineService(_mockRepository.Object, _mockMapper.Object);
-    }
-
     [Fact]
     public async Task GetAsync_WhenMachineExists_ReturnsMachineDto()
     {
@@ -42,16 +29,16 @@ public class GetMachineTests
             ModelNumber = "MODEL-001"
         };
 
-        _mockRepository
+        MockRepository
             .Setup(r => r.GetByIdAsync(machineId, cancellationToken))
             .ReturnsAsync(machine);
 
-        _mockMapper
+        MockMapper
             .Setup(m => m.Map<MachineDto>(machine))
             .Returns(expectedDto);
 
         // Act
-        var result = await _machineService.GetAsync(machineId, cancellationToken);
+        var result = await MachineService.GetAsync(machineId, cancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -59,8 +46,8 @@ public class GetMachineTests
         Assert.Equal("SN-12345", result.SerialNumber);
         Assert.Equal("MODEL-001", result.ModelNumber);
 
-        _mockRepository.Verify(r => r.GetByIdAsync(machineId, cancellationToken), Times.Once);
-        _mockMapper.Verify(m => m.Map<MachineDto>(machine), Times.Once);
+        MockRepository.Verify(r => r.GetByIdAsync(machineId, cancellationToken), Times.Once);
+        MockMapper.Verify(m => m.Map<MachineDto>(machine), Times.Once);
     }
 
     [Fact]
@@ -70,17 +57,18 @@ public class GetMachineTests
         var machineId = 999;
         var cancellationToken = CancellationToken.None;
 
-        _mockRepository
+        MockRepository
             .Setup(r => r.GetByIdAsync(machineId, cancellationToken))
             .ReturnsAsync((Machine?)null);
 
         // Act
-        var result = await _machineService.GetAsync(machineId, cancellationToken);
+        var result = await MachineService.GetAsync(machineId, cancellationToken);
 
         // Assert
         Assert.Null(result);
 
-        _mockRepository.Verify(r => r.GetByIdAsync(machineId, cancellationToken), Times.Once);
-        _mockMapper.Verify(m => m.Map<MachineDto>(It.IsAny<Machine>()), Times.Never());
+        MockRepository.Verify(r => r.GetByIdAsync(machineId, cancellationToken), Times.Once);
+        MockMapper.Verify(m => m.Map<MachineDto>(It.IsAny<Machine>()), Times.Never());
     }
 }
+

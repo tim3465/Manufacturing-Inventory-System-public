@@ -4,6 +4,35 @@ This document defines the **corrected and canonical cleanup steps** for aligning
 
 ---
 
+## Global C# File Header Rules (Prevents Namespace/Using Glitches)
+
+These rules apply to **all new and modified C# files created by this cleanup**:
+
+1. **All `using` statements must be at the very top of the file** (before the namespace).
+2. Each file must contain **exactly one** `namespace` declaration.
+3. Do **not** place `using` statements on the same line as `namespace`.
+4. Prefer the following header layout:
+
+```csharp
+using Xunit;
+
+namespace CncApp.Application.Tests.Services.Jobs.Commands;
+
+public partial class JobTests
+{
+    // ...
+}
+```
+
+**Verification step:** For every file touched by this cleanup, confirm the header order is:
+- `using ...`
+- blank line
+- `namespace ...;`
+- blank line
+- class declaration
+
+---
+
 ## CncApp.Application.Tests / Services
 
 ### 1. Machines — Align Tests With Application Services Structure
@@ -52,20 +81,22 @@ CncApp.Application.Tests
 └─ Services
    └─ Jobs
       ├─ Commands
-      │  └─ JobTests.Placeholder.cs
+      │  └─ JobTests.PlaceholderCommand.cs
       ├─ Queries
-      │  └─ JobTests.Placeholder.cs
+      │  └─ JobTests.PlaceholderQuery.cs
       └─ JobTests.cs
 ```
 
 #### Commands Placeholder Example
 
 ```csharp
+using Xunit;
+
 namespace CncApp.Application.Tests.Services.Jobs.Commands;
 
 // TODO: Replace with actual command tests when implementing Job commands.
 // Each file should contain tests for a single command.
-// File naming convention: JobTests.{CommandType}.cs
+// Future file naming convention: JobTests.{CommandType}.cs
 // Examples: Create, Inactivate, Delete.
 public partial class JobTests
 {
@@ -76,11 +107,13 @@ public partial class JobTests
 #### Queries Placeholder Example
 
 ```csharp
+using Xunit;
+
 namespace CncApp.Application.Tests.Services.Jobs.Queries;
 
 // TODO: Replace with actual query tests when implementing Job queries.
 // Each file should contain tests for a single query.
-// File naming convention: JobTests.{QueryType}.cs
+// Future file naming convention: JobTests.{QueryType}.cs
 // Examples: Get, ListActive, ListAll.
 public partial class JobTests
 {
@@ -94,7 +127,6 @@ public partial class JobTests
 using CncApp.Application.Interfaces.Repositories;
 using CncApp.Application.Services.Jobs;
 using Moq;
-using Xunit;
 
 namespace CncApp.Application.Tests.Services.Jobs;
 
@@ -131,12 +163,13 @@ public partial class JobTests
 
 #### Commands Placeholder
 
+File: `JobService.PlaceholderCommand.cs`
+
 ```csharp
 namespace CncApp.Application.Services.Jobs.Commands;
 
 // TODO: Replace with actual command methods when implementing Job commands.
-// Each file should contain a single command method.
-// File naming convention: JobService.{CommandType}.cs
+// Each placeholder contains no real logic.
 public partial class JobService
 {
     // TODO: Add command method
@@ -145,12 +178,13 @@ public partial class JobService
 
 #### Queries Placeholder
 
+File: `JobService.PlaceholderQuery.cs`
+
 ```csharp
 namespace CncApp.Application.Services.Jobs.Queries;
 
 // TODO: Replace with actual query methods when implementing Job queries.
-// Each file should contain a single query method.
-// File naming convention: JobService.{QueryType}.cs
+// Each placeholder contains no real logic.
 public partial class JobService
 {
     // TODO: Add query method
@@ -184,12 +218,13 @@ public partial class JobService
 
 #### Commands Placeholder
 
+File: `JobRepository.PlaceholderCommand.cs`
+
 ```csharp
 namespace CncApp.Infrastructure.Repositories.Jobs.Commands;
 
 // TODO: Replace with actual command methods when implementing Job repository commands.
-// Each file should contain a single command method.
-// File naming convention: JobRepository.{CommandType}.cs
+// Each placeholder contains no real logic.
 public partial class JobRepository
 {
     // TODO: Add command method
@@ -198,12 +233,13 @@ public partial class JobRepository
 
 #### Queries Placeholder
 
+File: `JobRepository.PlaceholderQuery.cs`
+
 ```csharp
 namespace CncApp.Infrastructure.Repositories.Jobs.Queries;
 
 // TODO: Replace with actual query methods when implementing Job repository queries.
-// Each file should contain a single query method.
-// File naming convention: JobRepository.{QueryType}.cs
+// Each placeholder contains no real logic.
 public partial class JobRepository
 {
     // TODO: Add query method
