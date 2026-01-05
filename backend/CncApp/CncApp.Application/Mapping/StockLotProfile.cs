@@ -11,7 +11,16 @@ public class StockLotProfile : Profile
         CreateMap<StockLot, StockLotDto>();
 
         // Create DTO maps only client-provided fields; audit/identity fields are server-controlled.
+        // Use constructor to create StockLot with validated invariants.
         CreateMap<CreateStockLotRequestDto, StockLot>()
+            .ConstructUsing(dto => new StockLot(
+                dto.LotNumber,
+                dto.MaterialId,
+                dto.AmountOfBars,
+                dto.Diameter,
+                dto.BarLength,
+                dto.Condition,
+                dto.CheckedInDateTime))
             .ForMember(dest => dest.StockLotAdjustments, opt => opt.Ignore());
 
         // Update DTO maps only client-provided fields; AmountOfBars is excluded (metadata only).
