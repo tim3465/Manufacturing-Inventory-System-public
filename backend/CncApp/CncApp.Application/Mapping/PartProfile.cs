@@ -1,15 +1,13 @@
 using AutoMapper;
-using CncApp.Application.Dtos.Parts;
-using CncApp.Domain.Entities;
 
 namespace CncApp.Application.Mapping;
 
+// TODO: add CreateMap calls when DTOs are defined
 public class PartProfile : Profile
 {
     public PartProfile()
     {
-        // TODO: Add CreateMap<Part, PartDto>()
-        // TODO: Add CreateMap<CreatePartRequestDto, Part>() with navigation property ignore
+        // TODO: add mappings
     }
 }
 

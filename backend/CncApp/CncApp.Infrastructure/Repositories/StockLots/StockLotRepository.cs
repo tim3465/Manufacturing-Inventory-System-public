@@ -1,4 +1,5 @@
 using CncApp.Application.Interfaces.Repositories;
+
 using CncApp.Infrastructure.Persistence;
 
 namespace CncApp.Infrastructure.Repositories;
@@ -12,3 +13,4 @@ public partial class StockLotRepository : IStockLotRepository
         _context = context;
     }
 }
+

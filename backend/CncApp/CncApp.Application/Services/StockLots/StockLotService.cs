@@ -1,4 +1,5 @@
 using AutoMapper;
+
 using CncApp.Application.Interfaces.Repositories;
 
 namespace CncApp.Application.Services.StockLots;
@@ -14,3 +15,4 @@ public partial class StockLotService
         _mapper = mapper;
     }
 }
+

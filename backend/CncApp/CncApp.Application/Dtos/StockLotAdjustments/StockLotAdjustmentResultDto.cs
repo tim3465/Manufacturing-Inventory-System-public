@@ -1,7 +1,7 @@
-namespace CncApp.Application.Dtos.Parts;
+namespace CncApp.Application.Dtos.StockLotAdjustments;
 
 // TODO: add DataAnnotations to mirror EF configuration when available
-public class PartDto
+public class StockLotAdjustmentResultDto
 {
     public int Id { get; set; }
 

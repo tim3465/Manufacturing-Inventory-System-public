@@ -1,6 +1,3 @@
-using CncApp.Domain.Common;
-using CncApp.Domain.Entities;
-
 namespace CncApp.Domain.Tests.Entities;
 
 /// <summary>
@@ -12,19 +9,19 @@ public class MaterialTests
 {
     #region Constructor Tests
 
-    // TODO: Add constructor validation tests
+    // TODO: add constructor tests
 
     #endregion
 
     #region Property Setter Tests
 
-    // TODO: Add property setter validation tests
+    // TODO: add property setter tests
 
     #endregion
 
     #region Method Tests
 
-    // TODO: Add domain method tests (if any)
+    // TODO: add method tests
 
     #endregion
 }

@@ -1,7 +1,7 @@
-namespace CncApp.Application.Dtos.Parts;
+namespace CncApp.Application.Dtos.Shifts;
 
 // TODO: add DataAnnotations to mirror EF configuration when available
-public class PartDto
+public class ShiftResultDto
 {
     public int Id { get; set; }
 

@@ -1,15 +1,13 @@
 using AutoMapper;
-using CncApp.Application.Dtos.Materials;
-using CncApp.Domain.Entities;
 
 namespace CncApp.Application.Mapping;
 
+// TODO: add CreateMap calls when DTOs are defined
 public class MaterialProfile : Profile
 {
     public MaterialProfile()
     {
-        // TODO: Add CreateMap<Material, MaterialDto>()
-        // TODO: Add CreateMap<CreateMaterialRequestDto, Material>() with navigation property ignore
+        // TODO: add mappings
     }
 }
 

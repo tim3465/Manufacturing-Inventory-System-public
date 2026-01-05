@@ -1,11 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace CncApp.Application.Dtos.Materials;
 
-/// Validation mirrored from Infrastructure.Persistence.Configurations.MaterialConfiguration where applicable.
+// TODO: add DataAnnotations to mirror EF configuration when available
 public class CreateMaterialRequestDto
 {
-    // TODO: Add properties based on Material entity
-    // TODO: Add validation attributes matching Infrastructure configuration
+    // TODO: add properties
 }
 
