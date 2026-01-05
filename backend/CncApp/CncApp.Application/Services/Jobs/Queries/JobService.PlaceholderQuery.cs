@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.Jobs.Queries;
+namespace CncApp.Application.Services.Jobs;
 
 // TODO: Replace with actual query methods when implementing Job queries.
 // Each placeholder contains no real logic.

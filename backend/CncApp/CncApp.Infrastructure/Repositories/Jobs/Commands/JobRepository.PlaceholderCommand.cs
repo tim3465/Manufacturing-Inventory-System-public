@@ -1,4 +1,4 @@
-namespace CncApp.Infrastructure.Repositories.Jobs.Commands;
+namespace CncApp.Infrastructure.Repositories;
 
 // TODO: Replace with actual command methods when implementing Job repository commands.
 // Each placeholder contains no real logic.

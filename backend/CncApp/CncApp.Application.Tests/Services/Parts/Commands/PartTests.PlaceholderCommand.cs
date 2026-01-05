@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Parts.Commands;
+namespace CncApp.Application.Tests.Services.Parts;
 
 // TODO: Replace with actual command tests when implementing Part commands.
 // Each file should contain tests for a single command.

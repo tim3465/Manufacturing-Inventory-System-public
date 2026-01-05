@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.StockLots.Commands;
+namespace CncApp.Application.Tests.Services.StockLots;
 
 // TODO: Replace with actual command tests when implementing StockLot commands.
 // Each file should contain tests for a single command.

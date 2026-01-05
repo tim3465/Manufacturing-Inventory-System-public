@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.Materials.Commands;
+namespace CncApp.Application.Services.Materials;
 
 // TODO: Replace with actual command methods when implementing Material commands.
 // Each placeholder contains no real logic.

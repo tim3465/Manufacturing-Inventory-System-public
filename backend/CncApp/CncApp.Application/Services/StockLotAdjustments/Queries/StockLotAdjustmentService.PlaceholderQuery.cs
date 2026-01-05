@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.StockLotAdjustments.Queries;
+namespace CncApp.Application.Services.StockLotAdjustments;
 
 // TODO: Replace with actual query methods when implementing StockLotAdjustment queries.
 // Each placeholder contains no real logic.

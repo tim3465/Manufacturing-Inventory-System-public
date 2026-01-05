@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Jobs.Queries;
+namespace CncApp.Application.Tests.Services.Jobs;
 
 // TODO: Replace with actual query tests when implementing Job queries.
 // Each file should contain tests for a single query.

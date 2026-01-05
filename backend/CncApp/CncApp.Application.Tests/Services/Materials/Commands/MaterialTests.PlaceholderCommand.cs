@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Materials.Commands;
+namespace CncApp.Application.Tests.Services.Materials;
 
 // TODO: Replace with actual command tests when implementing Material commands.
 // Each file should contain tests for a single command.

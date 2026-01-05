@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.Shifts.Queries;
+namespace CncApp.Application.Services.Shifts;
 
 // TODO: Replace with actual query methods when implementing Shift queries.
 // Each placeholder contains no real logic.

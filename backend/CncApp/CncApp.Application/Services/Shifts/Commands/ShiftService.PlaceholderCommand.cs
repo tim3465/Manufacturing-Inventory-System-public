@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.Shifts.Commands;
+namespace CncApp.Application.Services.Shifts;
 
 // TODO: Replace with actual command methods when implementing Shift commands.
 // Each placeholder contains no real logic.

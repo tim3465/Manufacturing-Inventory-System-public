@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Shifts.Commands;
+namespace CncApp.Application.Tests.Services.Shifts;
 
 // TODO: Replace with actual command tests when implementing Shift commands.
 // Each file should contain tests for a single command.

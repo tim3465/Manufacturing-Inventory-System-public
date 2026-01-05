@@ -1,4 +1,4 @@
-namespace CncApp.Application.Services.Jobs.Commands;
+namespace CncApp.Application.Services.Jobs;
 
 // TODO: Replace with actual command methods when implementing Job commands.
 // Each placeholder contains no real logic.

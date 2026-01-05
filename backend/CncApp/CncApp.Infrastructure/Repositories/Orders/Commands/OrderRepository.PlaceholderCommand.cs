@@ -1,4 +1,4 @@
-namespace CncApp.Infrastructure.Repositories.Orders.Commands;
+namespace CncApp.Infrastructure.Repositories;
 
 // TODO: Replace with actual command methods when implementing Order repository commands.
 // Each placeholder contains no real logic.

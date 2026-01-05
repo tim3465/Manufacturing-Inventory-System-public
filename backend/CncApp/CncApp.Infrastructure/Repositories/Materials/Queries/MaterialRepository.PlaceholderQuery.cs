@@ -1,4 +1,4 @@
-namespace CncApp.Infrastructure.Repositories.Materials.Queries;
+namespace CncApp.Infrastructure.Repositories;
 
 // TODO: Replace with actual query methods when implementing Material repository queries.
 // Each placeholder contains no real logic.

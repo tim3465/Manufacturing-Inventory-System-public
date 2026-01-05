@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.Parts.Queries;
+namespace CncApp.Application.Tests.Services.Parts;
 
 // TODO: Replace with actual query tests when implementing Part queries.
 // Each file should contain tests for a single query.

@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CncApp.Application.Tests.Services.StockLotAdjustments.Queries;
+namespace CncApp.Application.Tests.Services.StockLotAdjustments;
 
 // TODO: Replace with actual query tests when implementing StockLotAdjustment queries.
 // Each file should contain tests for a single query.
