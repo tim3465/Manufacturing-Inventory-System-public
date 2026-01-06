@@ -3,6 +3,13 @@
 
 ## Slice Intent — {EntityPlural}
 
+> **Pluralization note (important):**
+> `{EntityPlural}` is the plural form of `{Entity}`.
+> Use standard English pluralization conventions when deriving `{EntityPlural}` from `{Entity}`.
+> If the plural form is ambiguous or irregular, pause and confirm before proceeding.
+
+
+
 This section defines the **explicit behavioral contract** for this slice.
 All later phases must conform to this intent.
 
