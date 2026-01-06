@@ -1,7 +1,12 @@
+using CncApp.Application.Dtos.Materials;
+
 namespace CncApp.Application.Services.Materials;
 
-// TODO: Implement ListAllAsync method
 public partial class MaterialService
 {
+    public async Task<List<MaterialDto>> ListAllAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

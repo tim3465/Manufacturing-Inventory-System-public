@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace CncApp.Application.Dtos.Materials;
 
 /// Validation mirrored from Infrastructure.Persistence.Configurations.MaterialConfiguration where applicable.
-public class CreateMaterialRequestDto
+/// Update DTO for metadata-only updates (HeatNumber, MaterialName).
+public class UpdateMaterialRequestDto
 {
     [Required(ErrorMessage = "HeatNumber is required.")]
     [MaxLength(100, ErrorMessage = "HeatNumber cannot exceed 100 characters.")]

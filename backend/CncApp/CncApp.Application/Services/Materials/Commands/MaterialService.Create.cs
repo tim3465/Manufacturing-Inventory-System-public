@@ -1,7 +1,12 @@
+using CncApp.Application.Dtos.Materials;
+
 namespace CncApp.Application.Services.Materials;
 
-// TODO: Implement CreateAsync method
 public partial class MaterialService
 {
+    public async Task<int> CreateAsync(CreateMaterialRequestDto dto, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

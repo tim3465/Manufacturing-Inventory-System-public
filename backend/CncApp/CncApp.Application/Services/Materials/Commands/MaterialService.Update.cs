@@ -4,7 +4,7 @@ namespace CncApp.Application.Services.Materials;
 
 public partial class MaterialService
 {
-    public async Task<MaterialDto?> GetAsync(int id, CancellationToken ct = default)
+    public async Task<MaterialDto?> UpdateAsync(int id, UpdateMaterialRequestDto dto, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }

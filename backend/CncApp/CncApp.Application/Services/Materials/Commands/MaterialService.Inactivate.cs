@@ -1,7 +1,10 @@
 namespace CncApp.Application.Services.Materials;
 
-// TODO: Implement InactivateAsync method
 public partial class MaterialService
 {
+    public async Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 
