@@ -1,4 +1,5 @@
 using CncApp.Application.Services.Machines;
+using CncApp.Application.Services.StockLots;
 using CncApp.Application.Services.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,7 @@ public static class DependencyInjection
         // Register Application Services
         services.AddScoped<MachineService>();
         services.AddScoped<UserService>();
+        services.AddScoped<StockLotService>();
 
         // Register AutoMapper
         services.AddAutoMapper(typeof(DependencyInjection).Assembly);

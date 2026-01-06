@@ -4,19 +4,15 @@ using CncApp.Domain.Enums;
 namespace CncApp.Application.Dtos.StockLots;
 
 /// Validation mirrored from Infrastructure.Persistence.Configurations.StockLotConfiguration where applicable.
-public class StockLotDto
+/// Update is metadata only - no quantity changes (AmountOfBars is excluded).
+public class UpdateStockLotRequestDto
 {
-    public int Id { get; set; }
-
     [Required(ErrorMessage = "LotNumber is required.")]
     [MaxLength(100, ErrorMessage = "LotNumber cannot exceed 100 characters.")]
     public string LotNumber { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "MaterialId is required.")]
     public int MaterialId { get; set; }
-
-    [Required(ErrorMessage = "AmountOfBars is required.")]
-    public int AmountOfBars { get; set; }
 
     [Required(ErrorMessage = "Diameter is required.")]
     public decimal Diameter { get; set; }

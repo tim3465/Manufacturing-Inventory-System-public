@@ -1,0 +1,421 @@
+{
+	"info": {
+		"name": "StockLots - Smoke Tests",
+		"description": "End-to-end smoke tests for StockLots slice. Run in order: Auth → Create → Get → ListActive → Update → Inactivate.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_postman_id": "stocklots-smoke-tests-20260105"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7136",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "stockLotId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "materialId",
+			"value": "1",
+			"type": "string",
+			"description": "Material ID for creating/updating stock lots. Update this to a valid Material ID in your database."
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "POST Login (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@local.test\",\n  \"password\": \"Admin123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has accessToken\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"accessToken\");",
+									"  pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "StockLots - Create",
+			"item": [
+				{
+					"name": "POST Create StockLot",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lotNumber\": \"LOT-TEST-001\",\n  \"materialId\": {{materialId}},\n  \"amountOfBars\": 10,\n  \"diameter\": 25.5,\n  \"barLength\": 1000.0,\n  \"condition\": 1,\n  \"checkedInDateTime\": \"2025-01-05T10:00:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"  pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has id\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"id\");",
+									"  pm.collectionVariables.set(\"stockLotId\", jsonData.id.toString());",
+									"});",
+									"",
+									"pm.test(\"Location header is present\", function () {",
+									"  pm.expect(pm.response.headers.get(\"Location\")).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "StockLots - Get",
+			"item": [
+				{
+					"name": "GET StockLot by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "{{stockLotId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has StockLot data\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"id\");",
+									"  pm.expect(jsonData).to.have.property(\"lotNumber\");",
+									"  pm.expect(jsonData).to.have.property(\"materialId\");",
+									"  pm.expect(jsonData).to.have.property(\"amountOfBars\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "GET StockLot - Non-existent (404)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "99999"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "StockLots - ListActive",
+			"item": [
+				{
+					"name": "GET List Active StockLots",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Created stock lot is in list\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  const stockLotId = parseInt(pm.collectionVariables.get(\"stockLotId\"));",
+									"  const found = jsonData.find(item => item.id === stockLotId);",
+									"  pm.expect(found).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "StockLots - Update",
+			"item": [
+				{
+					"name": "PUT Update StockLot (Metadata Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lotNumber\": \"LOT-TEST-001-UPDATED\",\n  \"materialId\": {{materialId}},\n  \"diameter\": 30.0,\n  \"barLength\": 2000.0,\n  \"condition\": 2,\n  \"checkedInDateTime\": \"2025-01-05T14:00:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "{{stockLotId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"  pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "PUT Update StockLot - Non-existent (404)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lotNumber\": \"LOT-TEST-999\",\n  \"materialId\": {{materialId}},\n  \"diameter\": 30.0,\n  \"barLength\": 2000.0,\n  \"condition\": 2,\n  \"checkedInDateTime\": \"2025-01-05T14:00:00Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "99999"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "StockLots - Inactivate",
+			"item": [
+				{
+					"name": "DELETE Inactivate StockLot",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "{{stockLotId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"  pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "DELETE Inactivate StockLot - Non-existent (404)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/stocklots/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "stocklots", "99999"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
+
