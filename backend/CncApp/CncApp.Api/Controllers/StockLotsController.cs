@@ -103,7 +103,7 @@ public class StockLotsController : ControllerBase
     /// <param name="id">The stock lot ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:int}")]// ToDo this needs to be a patch
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

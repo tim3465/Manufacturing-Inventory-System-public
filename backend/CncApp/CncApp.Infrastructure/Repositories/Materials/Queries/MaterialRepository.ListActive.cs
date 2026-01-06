@@ -1,0 +1,7 @@
+namespace CncApp.Infrastructure.Repositories;
+
+// TODO: Implement ListActiveAsync method
+public partial class MaterialRepository
+{
+}
+
