@@ -2,6 +2,6 @@ namespace CncApp.Infrastructure.Repositories;
 
 public partial class StockLotAdjustmentRepository
 {
-    // TODO: Implement ListByParentAsync method
+    // TODO: Implement ListByStockLotAsync method
 }
 

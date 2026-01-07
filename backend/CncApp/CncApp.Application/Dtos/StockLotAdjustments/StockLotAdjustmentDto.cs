@@ -1,8 +1,25 @@
+using System.ComponentModel.DataAnnotations;
+using CncApp.Domain.Enums;
+
 namespace CncApp.Application.Dtos.StockLotAdjustments;
 
-// TODO: add DataAnnotations to mirror EF configuration when available
+/// Validation mirrored from Infrastructure.Persistence.Configurations.StockLotAdjustmentConfiguration where applicable.
 public class StockLotAdjustmentDto
 {
-    // TODO: add properties
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "StockLotId is required.")]
+    public int StockLotId { get; set; }
+
+    public int? JobId { get; set; }
+
+    [Required(ErrorMessage = "DeltaBars is required.")]
+    public int DeltaBars { get; set; }
+
+    [Required(ErrorMessage = "Reason is required.")]
+    public StockLotAdjustmentReasonEnum Reason { get; set; }
+
+    [MaxLength(2000, ErrorMessage = "Notes cannot exceed 2000 characters.")]
+    public string? Notes { get; set; }
 }
 

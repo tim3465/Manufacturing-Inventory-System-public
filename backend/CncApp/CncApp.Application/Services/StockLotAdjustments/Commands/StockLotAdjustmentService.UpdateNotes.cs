@@ -1,7 +1,12 @@
+using CncApp.Application.Dtos.StockLotAdjustments;
+
 namespace CncApp.Application.Services.StockLotAdjustments;
 
 public partial class StockLotAdjustmentService
 {
-    // TODO: Implement UpdateNotesAsync method
+    public async Task<StockLotAdjustmentDto?> UpdateNotesAsync(int id, UpdateStockLotAdjustmentNotesRequestDto dto, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 
