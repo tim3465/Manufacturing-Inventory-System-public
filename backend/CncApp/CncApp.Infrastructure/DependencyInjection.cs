@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IMaterialRepository, MaterialRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IStockLotRepository, StockLotRepository>();
+        services.AddScoped<IStockLotAdjustmentRepository, StockLotAdjustmentRepository>();
 
         // Register Current User Service
         services.AddHttpContextAccessor();

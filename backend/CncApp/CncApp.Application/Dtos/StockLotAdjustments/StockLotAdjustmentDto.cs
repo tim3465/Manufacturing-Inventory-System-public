@@ -4,8 +4,10 @@ using CncApp.Domain.Enums;
 namespace CncApp.Application.Dtos.StockLotAdjustments;
 
 /// Validation mirrored from Infrastructure.Persistence.Configurations.StockLotAdjustmentConfiguration where applicable.
-public class CreateStockLotAdjustmentRequestDto
+public class StockLotAdjustmentDto
 {
+    public int Id { get; set; }
+
     [Required(ErrorMessage = "StockLotId is required.")]
     public int StockLotId { get; set; }
 

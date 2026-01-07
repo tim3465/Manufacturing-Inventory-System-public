@@ -55,6 +55,22 @@ When anything conflicts:
 - **Queries** = reads (Get/ListActive/ListAll/etc.)
 - **Placeholder files** = seeded files that exist only to “hold a spot” and must be **deleted/replaced** with real method files (one method per file).
 
+### Foreign Key Query Naming Rule (Locked)
+
+When a query is keyed by a foreign key, name it explicitly after that key.
+
+- Route segment should include the table/parent name (not “parent”):
+  - ✅ `/by-stocklot/{stockLotId}`
+  - ❌ `/by-parent/{parentId}`
+
+- Parameter name must be `{ForeignKey}Id`:
+  - ✅ `stockLotId`, `jobId`, `materialId`
+  - ❌ `parentId`, `id` (when it’s not the entity’s primary key)
+
+- Method naming should follow the same pattern:
+  - ✅ `ListByStockLotAsync(int stockLotId, ...)`
+  - ✅ `ListByJobAsync(int jobId, ...)`
+
 ---
 
 ## Standard Execution Sequence (Do This Every Slice)
@@ -89,6 +105,20 @@ Audit must include:
 
 Goal:
 Prepare the slice’s folder and file layout so later phases can proceed without drift, without committing to behavior, workflows, or endpoints.
+
+### Phase 2 Template Rule (Hard Guardrail)
+
+`/docs/phase 2 templet.md` is the **master template** and must **never be edited**.
+
+Before Phase 2A, a human must create a **slice-specific intent file** by copying the master template and filling it out:
+
+- Create: `/docs/slices/{EntityPlural}.Intent.md` (preferred)
+  - OR: `/docs/slices/{EntityPlural}.Contract.md`
+
+Phase 2A and Phase 2B must reference the **slice-specific intent file**, not the master template.
+
+If the master template was edited by mistake, **STOP** and revert it before continuing.
+
 
 This phase is intentionally non-semantic.
 You are organizing where things will go, not what they do.

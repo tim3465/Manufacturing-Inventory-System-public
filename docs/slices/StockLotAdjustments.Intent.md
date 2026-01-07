@@ -1,4 +1,4 @@
-Initiate Phase 2A for the {Entity} slice.
+Initiate Phase 2A for the StockLotAdjustments slice.
 
 This phase is filesystem-only.
 Create empty files as structural placeholders only.
@@ -12,9 +12,9 @@ All later phases must conform to this intent.
 ### Commands
 
 #### Create
-- HTTP: POST /api/{entityPlural}
+- HTTP: POST /api/stocklotadjustments
 - Exists: Yes
-- Returns: {Entity}Dto
+- Returns: StockLotAdjustmentDto
 - Notes:
   - Creates a ledger event
   - Required fields include identifiers and delta values
@@ -26,7 +26,7 @@ All later phases must conform to this intent.
 #### Update (Notes Only)
 - Exists: Yes
 - HTTP Verb: PATCH
-- Route: /api/{entityPlural}/{id}/notes
+- Route: /api/stocklotadjustments/{id}/notes
 - Scope:
   - Metadata-only
   - Allowed fields: Notes
@@ -36,7 +36,7 @@ All later phases must conform to this intent.
     - Changing foreign keys
     - Any quantity or inventory semantics
 - Returns:
-  - {Entity}Dto
+  - StockLotAdjustmentDto
 - Notes:
   - Annotation only
   - Does not alter historical truth
@@ -47,7 +47,7 @@ All later phases must conform to this intent.
 #### Inactivate
 - Exists: Yes
 - HTTP: PATCH
-- Route: /api/{entityPlural}/{id}/inactivate
+- Route: /api/stocklotadjustments/{id}/inactivate
 - Returns: bool
 - Notes:
   - Soft-delete semantics (sets inactivation fields)
@@ -59,17 +59,17 @@ All later phases must conform to this intent.
 
 #### Get
 - Exists: Yes
-- HTTP: GET /api/{entityPlural}/{id}
-- Returns: {Entity}Dto | null
+- HTTP: GET /api/stocklotadjustments/{id}
+- Returns: StockLotAdjustmentDto | null
 - Notes:
   - Intended for admin or debugging scenarios
 
 ---
 
-#### ListByParent
+#### ListByStockLot
 - Exists: Yes
-- HTTP: GET /api/{entityPlural}/by-parent/{parentId}
-- Returns: List<{Entity}Dto>
+- HTTP: GET /api/stocklotadjustments/by-stocklot/{stockLotId}
+- Returns: List<StockLotAdjustmentDto>
 - Notes:
   - Active records only by default
   - Parent may represent a related aggregate (e.g., stock lot or job)
@@ -79,8 +79,8 @@ All later phases must conform to this intent.
 
 #### ListAll
 - Exists: Yes (Admin only)
-- HTTP: GET /api/{entityPlural}/all
-- Returns: List<{Entity}Dto>
+- HTTP: GET /api/stocklotadjustments/all
+- Returns: List<StockLotAdjustmentDto>
 - Notes:
   - Includes inactive records
   - Intended for auditing and diagnostics
@@ -106,3 +106,4 @@ All later phases must conform to this intent.
   - Services
   - Controllers
   - DTOs
+

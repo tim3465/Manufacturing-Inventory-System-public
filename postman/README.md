@@ -39,6 +39,20 @@ End-to-end smoke tests for Materials slice. Versioned with timestamp suffix.
 - **Materials - Update**: PATCH Update (metadata only), PATCH non-existent (404)
 - **Materials - Inactivate**: PATCH Inactivate, PATCH non-existent (404)
 
+#### StockLotAdjustments.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for StockLotAdjustments slice. Versioned with timestamp suffix.
+
+**Latest:** `StockLotAdjustments.SmokeTests.20260107-1600.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin)
+- **StockLotAdjustments - Create**: POST Create StockLotAdjustment
+- **StockLotAdjustments - Get**: GET by ID, GET non-existent (404)
+- **StockLotAdjustments - ListByStockLot**: GET List Adjustments by StockLot
+- **StockLotAdjustments - ListAll**: GET List All StockLotAdjustments (Admin)
+- **StockLotAdjustments - Update Notes**: PATCH Update Notes (metadata only), PATCH non-existent (404)
+- **StockLotAdjustments - Inactivate**: PATCH Inactivate, PATCH non-existent (404)
+
 ### How to Use
 
 1. Start the API using the `CncApp.Api (https)` profile.
@@ -46,6 +60,7 @@ End-to-end smoke tests for Materials slice. Versioned with timestamp suffix.
 3. Update collection variables if needed:
    - `baseUrl` - API base URL (default: `https://localhost:7136`)
    - `materialId` - Valid Material ID for creating/updating stock lots (default: `1`)
+   - `stockLotId` - Valid StockLot ID for creating/listing stock lot adjustments (default: `1`)
 4. Run **POST Login** first (in Auth folder) to authenticate and store the access token.
 5. Run the remaining requests in order, or use Postman's "Run Collection" feature.
 
@@ -61,6 +76,10 @@ End-to-end smoke tests for Materials slice. Versioned with timestamp suffix.
 
 **Materials Collection Variables:**
 - `materialId` - Material ID (automatically set by Create Material request)
+
+**StockLotAdjustments Collection Variables:**
+- `stockLotAdjustmentId` - StockLotAdjustment ID (automatically set by Create StockLotAdjustment request)
+- `stockLotId` - StockLot ID for creating/listing adjustments (default: 1, update to valid ID)
 
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)
@@ -83,6 +102,15 @@ End-to-end smoke tests for Materials slice. Versioned with timestamp suffix.
 - **Update** is metadata-only (HeatNumber, MaterialName only)
 - **ListAll** is supported (Admin only, includes inactive records)
 - **Hard Delete** is not supported (only soft delete via Inactivate)
+
+### StockLotAdjustments Slice Notes
+
+- **Update Notes** is metadata-only (Notes field only - does not alter historical ledger values)
+- **ListAll** is supported (Admin only, includes inactive records)
+- **ListByStockLot** returns active records only, ordered by creation time
+- **Hard Delete** is not supported (only soft delete via Inactivate)
+- This slice represents a **ledger table** - records are append-only by intent
+- Core ledger values (deltaBars, reason, stockLotId) cannot be changed after creation
 
 These collections are intended for local development and demonstration.
 
