@@ -640,3 +640,26 @@ Phase 5 is complete when:
 - Set environment variables once
 - Click **Run Collection** (or run requests in order)
 - And confirm the slice works end-to-end in minutes
+
+### Phase 6 — Postman README Sync (Documentation Only)
+
+**Goal**  
+Update `/postman/README.md` so humans can quickly find and run the latest smoke-test collection for the slice.
+
+**Inputs**
+- The newly generated file from Phase 5:
+  - `{EntityPlural}.SmokeTests.{timestamp}.postman_collection.json`
+
+**Allowed actions**
+- Edit `/postman/README.md` only
+- Add or update the `{EntityPlural}.SmokeTests.{timestamp}.postman_collection.json` section
+- Update the **Latest** line to point to the newest timestamped file
+- Update the slice’s collection variables list (if applicable)
+
+**Explicitly NOT allowed**
+- Do not modify any Postman collection JSON files
+- Do not change API code, tests, or slice contracts
+- Do not reorganize unrelated README sections
+
+**Deliverable**
+- `/postman/README.md` references the newest collection file and lists endpoints/variables.

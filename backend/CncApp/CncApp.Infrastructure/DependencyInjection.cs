@@ -21,6 +21,7 @@ public static class DependencyInjection
 
         // Register Repositories
         services.AddScoped<IMachineRepository, MachineRepository>();
+        services.AddScoped<IMaterialRepository, MaterialRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IStockLotRepository, StockLotRepository>();
 

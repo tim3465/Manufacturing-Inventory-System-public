@@ -1,7 +1,9 @@
-(This is for Phase 2A)
+Initiate Phase 2A for the {Entity} slice.
 
+This phase is filesystem-only.
+Create empty files as structural placeholders only.
+Do NOT define contracts, signatures, or DTO properties.
 
-## Slice Intent — {EntityPlural}
 
 This section defines the **explicit behavioral contract** for this slice.
 All later phases must conform to this intent.
@@ -12,26 +14,28 @@ All later phases must conform to this intent.
 - HTTP: POST /api/{entityPlural}
 - Exists: Yes
 - Returns: {Entity}Dto
-- Notes: Standard creation
+- Notes: Standard creation.
 
 #### Update
 - Exists: Yes
-- HTTP Verb: PUT | PATCH   ← choose one explicitly
+- HTTP Verb: PATCH
 - Route: /api/{entityPlural}/{id}
 - Scope:
-  - Metadata-only | Full replace | Partial update
+  - Metadata-only
+  - Allowed fields: HeatNumber, MaterialName
+  - Explicitly NOT allowed: any cross-table operations (no StockLot changes), no workflow orchestration
 - Returns:
-  - {Entity}Dto | bool | void   ← choose one explicitly
+  - {Entity}Dto
 - Notes:
-  - If metadata-only, fields excluded: {list}
-  - Quantity-changing operations explicitly excluded/included
+  - This is not a full replace.
+  - No quantity semantics exist for this entity.
 
 #### Inactivate
 - Exists: Yes
-- HTTP: POST | PATCH
+- HTTP: PATCH
 - Route: /api/{entityPlural}/{id}/inactivate
 - Returns: bool
-- Notes: Soft-delete semantics
+- Notes: Soft-delete semantics (sets inactivation fields).
 
 ---
 
@@ -48,14 +52,20 @@ All later phases must conform to this intent.
 - Returns: List<{Entity}Dto>
 
 #### ListAll
-- Exists: No | Yes (Admin only)
+- Exists: Yes (Admin only)
+- HTTP: GET /api/{entityPlural}/all
+- Returns: List<{Entity}Dto>
+- Notes:
+  - Includes inactive records.
 
 ---
 
 ### Explicitly NOT Supported
-- Delete
-- Hard update of quantity
-- {Anything else}
+- Delete (hard delete)
+- Any quantity operations (N/A for this entity)
+- Any combined / workflow endpoints (e.g., create material + create stock lot)
+- Any upsert / find-or-create behavior (deferred to workflow phase)
+- Any endpoint that mutates StockLots through Materials
 
 ---
 
