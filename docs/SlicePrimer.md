@@ -90,6 +90,20 @@ Audit must include:
 Goal:
 Prepare the slice’s folder and file layout so later phases can proceed without drift, without committing to behavior, workflows, or endpoints.
 
+### Phase 2 Template Rule (Hard Guardrail)
+
+`/docs/phase 2 templet.md` is the **master template** and must **never be edited**.
+
+Before Phase 2A, a human must create a **slice-specific intent file** by copying the master template and filling it out:
+
+- Create: `/docs/slices/{EntityPlural}.Intent.md` (preferred)
+  - OR: `/docs/slices/{EntityPlural}.Contract.md`
+
+Phase 2A and Phase 2B must reference the **slice-specific intent file**, not the master template.
+
+If the master template was edited by mistake, **STOP** and revert it before continuing.
+
+
 This phase is intentionally non-semantic.
 You are organizing where things will go, not what they do.
 
