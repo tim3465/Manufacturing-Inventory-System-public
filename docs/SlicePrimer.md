@@ -55,6 +55,22 @@ When anything conflicts:
 - **Queries** = reads (Get/ListActive/ListAll/etc.)
 - **Placeholder files** = seeded files that exist only to “hold a spot” and must be **deleted/replaced** with real method files (one method per file).
 
+### Foreign Key Query Naming Rule (Locked)
+
+When a query is keyed by a foreign key, name it explicitly after that key.
+
+- Route segment should include the table/parent name (not “parent”):
+  - ✅ `/by-stocklot/{stockLotId}`
+  - ❌ `/by-parent/{parentId}`
+
+- Parameter name must be `{ForeignKey}Id`:
+  - ✅ `stockLotId`, `jobId`, `materialId`
+  - ❌ `parentId`, `id` (when it’s not the entity’s primary key)
+
+- Method naming should follow the same pattern:
+  - ✅ `ListByStockLotAsync(int stockLotId, ...)`
+  - ✅ `ListByJobAsync(int jobId, ...)`
+
 ---
 
 ## Standard Execution Sequence (Do This Every Slice)

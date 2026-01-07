@@ -1,7 +1,14 @@
+using CncApp.Domain.Entities;
+using CncApp.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 namespace CncApp.Infrastructure.Repositories;
 
 public partial class StockLotAdjustmentRepository
 {
-    // TODO: Implement ListAllAsync method
+    public async Task<List<StockLotAdjustment>> ListAllAsync(CancellationToken ct = default)
+    {
+        return await _context.StockLotAdjustments.ToListAsync(ct);
+    }
 }
 

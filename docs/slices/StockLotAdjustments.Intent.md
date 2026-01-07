@@ -66,9 +66,9 @@ All later phases must conform to this intent.
 
 ---
 
-#### ListByParent
+#### ListByStockLot
 - Exists: Yes
-- HTTP: GET /api/stocklotadjustments/by-parent/{parentId}
+- HTTP: GET /api/stocklotadjustments/by-stocklot/{stockLotId}
 - Returns: List<StockLotAdjustmentDto>
 - Notes:
   - Active records only by default
