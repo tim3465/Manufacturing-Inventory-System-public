@@ -7,6 +7,12 @@ namespace CncApp.Application.Interfaces.Repositories;
 /// </summary>
 public interface IUserRepository
 {
+    Task<User?> GetByIdAsync(int id, CancellationToken ct = default);
+
+    Task<List<User>> ListActiveAsync(CancellationToken ct = default);
+
+    Task<List<User>> ListAllAsync(CancellationToken ct = default);
+
     /// <summary>
     /// Adds a new Domain User to the repository.
     /// </summary>
@@ -21,6 +27,8 @@ public interface IUserRepository
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The Domain User if found, null otherwise.</returns>
     Task<User?> GetByIdentityUserIdAsync(int identityUserId, CancellationToken ct = default);
+
+    Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default);
 
     /// <summary>
     /// Saves all pending changes to the database.

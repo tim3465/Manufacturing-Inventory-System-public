@@ -4,7 +4,7 @@ This phase is filesystem-only.
 Create empty files as structural placeholders only.
 Do NOT define contracts, signatures, or DTO properties.
 
-This section defines the **explicit behavioral contract** for this slice.
+This section defines the **explicit behavioral intent** for this slice.
 All later phases must conform to this intent.
 
 ---
@@ -17,44 +17,30 @@ All later phases must conform to this intent.
 - Returns: {Entity}Dto
 - Notes:
   - Creates a new {Entity} record
+  - Provisions Identity + Domain user when applicable
   - Required fields include:
-    - OrderId
-    - MachineId
-    - StockLotId
-    - PartAmountPlanned
-    - BarAmountPlanned
-    - BarCycleTime
-    - BarsInJob
-    - EstimatedPartsPerBar
-  - Represents a planned execution unit
-  - No shift creation occurs here
-  - No inventory adjustment occurs here
+    - UserName
+    - FirstName
+    - LastName
+    - Identity provisioning inputs (as defined by the slice)
+  - Admin-only
+  - No cross-slice workflow orchestration beyond Identity provisioning
+  - No related aggregate mutation
 
 ---
 
 #### Update
 - Exists: Yes
-- HTTP Verb: PATCH
+- HTTP: PATCH
 - Route: /api/{entityPlural}/{id}
-- Scope:
-  - Metadata-only (planning fields only)
-  - Allowed fields:
-    - MachineId
-    - StockLotId
-    - PartAmountPlanned
-    - BarAmountPlanned
-    - BarCycleTime
-    - BarsInJob
-    - EstimatedPartsPerBar
-  - Explicitly NOT allowed:
-    - Creating or modifying Shifts
-    - Adjusting inventory
-    - Triggering workflow chains
-- Returns:
-  - {Entity}Dto
+- Returns: {Entity}Dto 
 - Notes:
-  - Planning adjustments only
-  - Does not imply execution or completion
+  - Admin-only
+  - Updates are limited strictly to **role assignment changes**
+  - No updates to domain profile fields (UserName, FirstName, LastName)
+  - No updates to Identity credentials (email, password)
+  - Role updates are applied via Identity only
+  - No cross-slice workflow orchestration
 
 ---
 
@@ -64,9 +50,11 @@ All later phases must conform to this intent.
 - Route: /api/{entityPlural}/{id}/inactivate
 - Returns: bool
 - Notes:
+  - Admin-only
   - Soft-delete semantics (sets inactivation fields)
-  - Does not cascade to Shifts or Orders
-  - Preserves historical planning intent
+  - Intended to disable an operator for future Shift selection
+  - Does not cascade to Shifts
+  - Preserves historical records
 
 ---
 
@@ -77,7 +65,9 @@ All later phases must conform to this intent.
 - HTTP: GET /api/{entityPlural}/{id}
 - Returns: {Entity}Dto | null
 - Notes:
-  - Intended for admin, debugging, or planning review
+  - Intended for admin, debugging, or operator reference
+  - Domain-only representation (no Identity-sensitive data)
+  - Auth should align with Shifts create/edit access (not necessarily Admin-only)
 
 ---
 
@@ -87,7 +77,9 @@ All later phases must conform to this intent.
 - Returns: List<{Entity}Dto>
 - Notes:
   - Returns active records only
-  - Default ordering by creation time
+  - Intended for operator selection (e.g., Shifts.OperatorId)
+  - Auth should align with Shifts create/edit access (not necessarily Admin-only)
+  - Default ordering defined in later phases
 
 ---
 
@@ -98,25 +90,25 @@ All later phases must conform to this intent.
 - Notes:
   - Includes inactive records
   - Intended for auditing and diagnostics
+  - Admin-only
 
 ---
 
 ### Explicitly NOT Supported
 - Hard delete
-- Shift creation or modification
-- Inventory computation or adjustment
-- Combined planning + execution endpoints
-- Automatic workflow chaining
+- Editing Identity-sensitive data via this API (passwords, emails)
+- Updating domain profile fields (name, username)
+- Combined / workflow endpoints beyond Identity provisioning on Create
 - Upsert / find-or-create behavior
 - Any endpoint that mutates related aggregates
 
 ---
 
 ### Contract Notes
-- This slice represents a **planned execution table**
-- Records define intent, not outcome
-- Execution and results belong to Shifts
-- Inventory movement belongs to StockLotAdjustments
+- This slice represents a **domain operator / user reference table**
+- Identity is managed separately; this slice provides domain linkage and operator lookup
+- Role management is the **only supported update operation**
+- Inactivation controls whether a user is selectable for future Shifts
 - If an operation is not listed here, it must NOT appear in:
   - Commands folders
   - Queries folders

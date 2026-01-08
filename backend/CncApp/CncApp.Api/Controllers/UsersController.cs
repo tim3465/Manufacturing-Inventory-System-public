@@ -40,5 +40,34 @@ public class UsersController : ControllerBase
         var result = await _userService.CreateAsync(dto, ct);
         return StatusCode(StatusCodes.Status201Created, result);
     }
+
+    /// <summary>
+    /// Updates Identity roles for a user (Admin-only).
+    /// </summary>
+    [HttpPatch("{id:int}")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<bool>> UpdateRolesAsync(
+        int id,
+        [FromBody] UpdateUserRolesRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var result = await _userService.UpdateRolesAsync(id, dto, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Inactivates (soft-deletes) a user (Admin-only).
+    /// </summary>
+    [HttpPatch("{id:int}/inactivate")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<bool>> InactivateAsync(
+        int id,
+        CancellationToken ct = default)
+    {
+        var result = await _userService.InactivateAsync(id, null, ct);
+        return Ok(result);
+    }
 }
 
