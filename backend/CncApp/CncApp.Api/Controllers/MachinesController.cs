@@ -92,11 +92,11 @@ public class MachinesController : ControllerBase
     /// <param name="id">The machine ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpDelete("{id:int}")]
+    [HttpPatch("{id:int}/inactivate")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _machineService.InactivateAsync(id, null, ct);
         if (!result)

@@ -44,7 +44,7 @@ public class StockLotsController : ControllerBase
     /// <param name="dto">The stock lot update request.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpPut("{id:int}")]
+    [HttpPatch("{id:int}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -103,11 +103,11 @@ public class StockLotsController : ControllerBase
     /// <param name="id">The stock lot ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpDelete("{id:int}")]// ToDo this needs to be a patch
+    [HttpPatch("{id:int}/inactivate")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _stockLotService.InactivateAsync(id, null, ct);
         if (!result)
