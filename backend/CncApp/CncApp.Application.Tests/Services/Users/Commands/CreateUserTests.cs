@@ -1,31 +1,12 @@
 using CncApp.Application.Dtos.Users;
-using CncApp.Application.Interfaces;
-using CncApp.Application.Interfaces.Repositories;
 using CncApp.Application.Services.Users;
 using CncApp.Domain.Entities;
 using Moq;
-using Xunit;
 
-namespace CncApp.Application.Tests.Services.Users.Commands;
+namespace CncApp.Application.Tests.Services.Users;
 
-public class CreateUserTests
+public partial class UserTests
 {
-    private readonly Mock<IIdentityProvisioningService> _mockIdentityService;
-    private readonly Mock<IUserRepository> _mockRepository;
-    private readonly Mock<ICurrentUserService> _mockCurrentUserService;
-    private readonly UserService _userService;
-
-    public CreateUserTests()
-    {
-        _mockIdentityService = new Mock<IIdentityProvisioningService>();
-        _mockRepository = new Mock<IUserRepository>();
-        _mockCurrentUserService = new Mock<ICurrentUserService>();
-        _userService = new UserService(
-            _mockIdentityService.Object,
-            _mockRepository.Object,
-            _mockCurrentUserService.Object);
-    }
-
     [Fact]
     public async Task CreateAsync_WhenValidRequest_Succeeds()
     {
@@ -43,15 +24,15 @@ public class CreateUserTests
             Roles = new List<string> { "Admin", "User" }
         };
 
-        _mockIdentityService
+        MockIdentityProvisioningService
             .Setup(s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken))
             .ReturnsAsync(identityUserId);
 
-        _mockIdentityService
+        MockIdentityProvisioningService
             .Setup(s => s.AssignRolesAsync(identityUserId, requestDto.Roles, cancellationToken))
             .Returns(Task.CompletedTask);
 
-        _mockRepository
+        MockRepository
             .Setup(r => r.AddAsync(It.IsAny<User>(), cancellationToken))
             .Callback<User, CancellationToken>((user, ct) =>
             {
@@ -60,12 +41,12 @@ public class CreateUserTests
             })
             .Returns(Task.CompletedTask);
 
-        _mockRepository
+        MockRepository
             .Setup(r => r.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _userService.CreateAsync(requestDto, cancellationToken);
+        var result = await UserService.CreateAsync(requestDto, cancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -73,13 +54,13 @@ public class CreateUserTests
         Assert.Equal(domainUserId, result.DomainUserId);
         Assert.Equal(requestDto.Email, result.UserName);
 
-        _mockIdentityService.Verify(
+        MockIdentityProvisioningService.Verify(
             s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken),
             Times.Once);
-        _mockIdentityService.Verify(
+        MockIdentityProvisioningService.Verify(
             s => s.AssignRolesAsync(identityUserId, requestDto.Roles, cancellationToken),
             Times.Once);
-        _mockRepository.Verify(
+        MockRepository.Verify(
             r => r.AddAsync(It.Is<User>(u => 
                 u.IdentityUserId == identityUserId &&
                 u.UserName == requestDto.Email &&
@@ -87,7 +68,7 @@ public class CreateUserTests
                 u.LastName == requestDto.LastName),
             cancellationToken),
             Times.Once);
-        _mockRepository.Verify(r => r.SaveChangesAsync(cancellationToken), Times.Once);
+        MockRepository.Verify(r => r.SaveChangesAsync(cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -105,24 +86,24 @@ public class CreateUserTests
             Roles = new List<string>()
         };
 
-        _mockIdentityService
+        MockIdentityProvisioningService
             .Setup(s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken))
             .ThrowsAsync(new InvalidOperationException("Failed to create Identity user: Duplicate email address"));
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
-            _userService.CreateAsync(requestDto, cancellationToken));
+            UserService.CreateAsync(requestDto, cancellationToken));
 
-        _mockIdentityService.Verify(
+        MockIdentityProvisioningService.Verify(
             s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken),
             Times.Once);
-        _mockIdentityService.Verify(
+        MockIdentityProvisioningService.Verify(
             s => s.AssignRolesAsync(It.IsAny<int>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()),
             Times.Never());
-        _mockRepository.Verify(
+        MockRepository.Verify(
             r => r.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()),
             Times.Never());
-        _mockRepository.Verify(
+        MockRepository.Verify(
             r => r.SaveChangesAsync(It.IsAny<CancellationToken>()),
             Times.Never());
     }

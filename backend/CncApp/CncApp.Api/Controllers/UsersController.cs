@@ -7,11 +7,10 @@ namespace CncApp.Api.Controllers;
 
 /// <summary>
 /// Controller for user management operations.
-/// All endpoints require Admin role authorization.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly UserService _userService;
@@ -29,6 +28,7 @@ public class UsersController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created user information.</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(CreateUserResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -45,6 +45,7 @@ public class UsersController : ControllerBase
     /// Updates Identity roles for a user (Admin-only).
     /// </summary>
     [HttpPatch("{id:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<bool>> UpdateRolesAsync(
@@ -60,6 +61,7 @@ public class UsersController : ControllerBase
     /// Inactivates (soft-deletes) a user (Admin-only).
     /// </summary>
     [HttpPatch("{id:int}/inactivate")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<bool>> InactivateAsync(
@@ -68,6 +70,46 @@ public class UsersController : ControllerBase
     {
         var result = await _userService.InactivateAsync(id, null, ct);
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Lists active users (operators). Active when InactivatedDateTime is null.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<UserDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var users = await _userService.ListActiveAsync(ct);
+        return Ok(users);
+    }
+
+    /// <summary>
+    /// Lists all users including inactive (Admin-only).
+    /// </summary>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<UserDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var users = await _userService.ListAllAsync(ct);
+        return Ok(users);
+    }
+
+    /// <summary>
+    /// Gets a user by id.
+    /// </summary>
+    [HttpGet("{id:int}", Name = "GetUser")]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var user = await _userService.GetAsync(id, ct);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
     }
 }
 

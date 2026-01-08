@@ -4,9 +4,11 @@ namespace CncApp.Application.Services.Users;
 
 public partial class UserService
 {
-    public Task<List<UserDto>> ListActiveAsync(CancellationToken ct = default)
+    public async Task<List<UserDto>> ListActiveAsync(CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.ListActiveAsync(ct);
+
+        return _mapper.Map<List<UserDto>>(users);
     }
 }
 
