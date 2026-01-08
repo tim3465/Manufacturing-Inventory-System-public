@@ -1,9 +1,3 @@
-Initiate Phase 2A for the {Entity} slice.
-
-This phase is filesystem-only.
-Create empty files as structural placeholders only.
-Do NOT define contracts, signatures, or DTO properties.
-
 This section defines the **explicit behavioral contract** for this slice.
 All later phases must conform to this intent.
 
@@ -12,11 +6,11 @@ All later phases must conform to this intent.
 ### Commands
 
 #### Create
-- HTTP: POST /api/{entityPlural}
+- HTTP: POST /api/jobs
 - Exists: Yes
-- Returns: {Entity}Dto
+- Returns: JobDto
 - Notes:
-  - Creates a new {Entity} record
+  - Creates a new Job record
   - Required fields include:
     - OrderId
     - MachineId
@@ -35,7 +29,7 @@ All later phases must conform to this intent.
 #### Update
 - Exists: Yes
 - HTTP Verb: PATCH
-- Route: /api/{entityPlural}/{id}
+- Route: /api/jobs/{id}
 - Scope:
   - Metadata-only (planning fields only)
   - Allowed fields:
@@ -51,7 +45,7 @@ All later phases must conform to this intent.
     - Adjusting inventory
     - Triggering workflow chains
 - Returns:
-  - {Entity}Dto
+  - JobDto
 - Notes:
   - Planning adjustments only
   - Does not imply execution or completion
@@ -61,7 +55,7 @@ All later phases must conform to this intent.
 #### Inactivate
 - Exists: Yes
 - HTTP: PATCH
-- Route: /api/{entityPlural}/{id}/inactivate
+- Route: /api/jobs/{id}/inactivate
 - Returns: bool
 - Notes:
   - Soft-delete semantics (sets inactivation fields)
@@ -74,8 +68,8 @@ All later phases must conform to this intent.
 
 #### Get
 - Exists: Yes
-- HTTP: GET /api/{entityPlural}/{id}
-- Returns: {Entity}Dto | null
+- HTTP: GET /api/jobs/{id}
+- Returns: JobDto | null
 - Notes:
   - Intended for admin, debugging, or planning review
 
@@ -83,8 +77,8 @@ All later phases must conform to this intent.
 
 #### List
 - Exists: Yes
-- HTTP: GET /api/{entityPlural}
-- Returns: List<{Entity}Dto>
+- HTTP: GET /api/jobs
+- Returns: List<JobDto>
 - Notes:
   - Returns active records only
   - Default ordering by creation time
@@ -93,8 +87,8 @@ All later phases must conform to this intent.
 
 #### ListAll
 - Exists: Yes (Admin only)
-- HTTP: GET /api/{entityPlural}/all
-- Returns: List<{Entity}Dto>
+- HTTP: GET /api/jobs/all
+- Returns: List<JobDto>
 - Notes:
   - Includes inactive records
   - Intended for auditing and diagnostics
@@ -123,3 +117,4 @@ All later phases must conform to this intent.
   - Services
   - Controllers
   - DTOs
+

@@ -1,4 +1,5 @@
 using CncApp.Application.Services.Machines;
+using CncApp.Application.Services.Jobs;
 using CncApp.Application.Services.Materials;
 using CncApp.Application.Services.Orders;
 using CncApp.Application.Services.Parts;
@@ -15,6 +16,7 @@ public static class DependencyInjection
     {
         // Register Application Services
         services.AddScoped<MachineService>();
+        services.AddScoped<JobService>();
         services.AddScoped<MaterialService>();
         services.AddScoped<UserService>();
         services.AddScoped<StockLotService>();
