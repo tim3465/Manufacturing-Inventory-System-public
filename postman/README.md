@@ -12,6 +12,20 @@ Complete collection with all endpoints organized by controller.
 - **Machines**: Create, List, Get by ID, Inactivate, and List All
 - **Users**: Create user (admin-only)
 
+#### Users.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for Users slice. Versioned with timestamp suffix.
+
+**Latest:** `Users.SmokeTests.20260108-1557.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin) captures `token`
+- **Users - Create**: POST Create User (Admin) captures `userId` / `identityUserId`
+- **Users - Get**: GET by ID
+- **Users - ListActive**: GET List Active Users (operator lookup)
+- **Users - ListAll**: GET List All Users (Admin)
+- **Users - UpdateRoles**: PATCH Update Roles (Admin)
+- **Users - Inactivate**: PATCH Inactivate (Admin)
+
 #### StockLots.SmokeTests.{timestamp}.postman_collection.json
 End-to-end smoke tests for StockLots slice. Versioned with timestamp suffix.
 
@@ -128,7 +142,7 @@ End-to-end smoke tests for Shifts slice. Versioned with timestamp suffix.
 
 **Common Variables:**
 - `baseUrl` - API base URL (default: https://localhost:7136)
-- `accessToken` - JWT token (automatically set by Login request)
+- `accessToken` - JWT token (automatically set by Login request; some collections use `token`)
 
 **StockLots Collection Variables:**
 - `stockLotId` - StockLot ID (automatically set by Create StockLot request)
@@ -163,6 +177,15 @@ End-to-end smoke tests for Shifts slice. Versioned with timestamp suffix.
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)
 - `userId` - Domain User ID (automatically set by Create User request)
+
+**Users Collection Variables:**
+- `token` - JWT token captured by Auth/Login (Admin)
+- `userId` - Domain User ID captured by Create User
+- `identityUserId` - Identity User ID captured by Create User
+- `userEmail` - Email/UserName captured by Create User
+- `newUserEmail` - Email used for Create (can include {{timestamp}} to avoid collisions)
+- `newUserFirstName` / `newUserLastName`
+- `newUserTempPassword`
 
 ### Authentication
 
