@@ -16,31 +16,31 @@ All later phases must conform to this intent.
 - Exists: Yes
 - Returns: {Entity}Dto
 - Notes:
-  - Creates a ledger event
-  - Required fields include identifiers and delta values
-  - No inventory computation or validation occurs here
-  - No cross-table operations or workflow orchestration
+  - Creates a new {Entity} record
+  - Required fields include planning and definition values
+  - No workflow orchestration occurs here
+  - No cross-table operations
 
 ---
 
-#### Update (Notes Only)
+#### Update
 - Exists: Yes
 - HTTP Verb: PATCH
-- Route: /api/{entityPlural}/{id}/notes
+- Route: /api/{entityPlural}/{id}
 - Scope:
   - Metadata-only
-  - Allowed fields: Notes
+  - Allowed fields:
+    - ApproxPartCycleTime
+    - CheckPerPart
   - Explicitly NOT allowed:
-    - Changing delta values
-    - Changing reason
-    - Changing foreign keys
-    - Any quantity or inventory semantics
+    - Creating or modifying related entities
+    - Triggering workflows
+    - Inventory or execution semantics
 - Returns:
   - {Entity}Dto
 - Notes:
-  - Annotation only
-  - Does not alter historical truth
-  - Not a general update endpoint
+  - General update endpoint
+  - Does not imply execution or production
 
 ---
 
@@ -51,7 +51,8 @@ All later phases must conform to this intent.
 - Returns: bool
 - Notes:
   - Soft-delete semantics (sets inactivation fields)
-  - Does not recompute or cascade changes
+  - No cascade behavior
+  - Record remains queryable via admin routes
 
 ---
 
@@ -62,18 +63,16 @@ All later phases must conform to this intent.
 - HTTP: GET /api/{entityPlural}/{id}
 - Returns: {Entity}Dto | null
 - Notes:
-  - Intended for admin or debugging scenarios
 
 ---
 
-#### ListByParent
+#### List
 - Exists: Yes
-- HTTP: GET /api/{entityPlural}/by-parent/{parentId}
+- HTTP: GET /api/{entityPlural}
 - Returns: List<{Entity}Dto>
 - Notes:
-  - Active records only by default
-  - Parent may represent a related aggregate (e.g., stock lot or job)
-  - Ordering by creation time is expected
+  - Returns active records only
+  - Default ordering by creation time
 
 ---
 
@@ -89,20 +88,21 @@ All later phases must conform to this intent.
 
 ### Explicitly NOT Supported
 - Hard delete
-- Editing core ledger values after creation
-- Inventory recomputation or validation
-- Combined / workflow endpoints
+- Workflow orchestration
+- Inventory computation or validation
+- Combined / multi-aggregate endpoints
 - Upsert / find-or-create behavior
 - Any endpoint that mutates related aggregates
 
 ---
 
 ### Contract Notes
-- This slice represents a **ledger table**
-- Records are append-only by intent
-- Immutability is enforced except for annotations
+- This slice represents a **definition / planning table**
+- Records are mutable within defined bounds
+- No execution or inventory meaning is implied
 - If an operation is not listed here, it must NOT appear in:
-  - Commands/Queries folders
+  - Commands folders
+  - Queries folders
   - Services
   - Controllers
   - DTOs

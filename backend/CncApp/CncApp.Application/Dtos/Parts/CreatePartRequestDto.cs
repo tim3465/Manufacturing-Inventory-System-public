@@ -1,8 +1,9 @@
 namespace CncApp.Application.Dtos.Parts;
 
-// TODO: add DataAnnotations to mirror EF configuration when available
 public class CreatePartRequestDto
 {
-    // TODO: add properties
+    public TimeSpan ApproxPartCycleTime { get; set; }
+
+    public int CheckPerPart { get; set; }
 }
 
