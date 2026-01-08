@@ -18,12 +18,17 @@ All later phases must conform to this intent.
 - Notes:
   - Creates a new {Entity} record
   - Required fields include:
-    - PartId
-    - CustomerId
-    - PartAmountRequested
-    - PartsPerBar
-  - No workflow orchestration occurs here
-  - No cross-table operations (no automatic job creation, no inventory changes)
+    - OrderId
+    - MachineId
+    - StockLotId
+    - PartAmountPlanned
+    - BarAmountPlanned
+    - BarCycleTime
+    - BarsInJob
+    - EstimatedPartsPerBar
+  - Represents a planned execution unit
+  - No shift creation occurs here
+  - No inventory adjustment occurs here
 
 ---
 
@@ -34,19 +39,22 @@ All later phases must conform to this intent.
 - Scope:
   - Metadata-only (planning fields only)
   - Allowed fields:
-    - PartId
-    - CustomerId
-    - PartAmountRequested
-    - PartsPerBar
+    - MachineId
+    - StockLotId
+    - PartAmountPlanned
+    - BarAmountPlanned
+    - BarCycleTime
+    - BarsInJob
+    - EstimatedPartsPerBar
   - Explicitly NOT allowed:
-    - Creating or modifying related entities (no Jobs, no Shifts)
-    - Triggering workflows
-    - Inventory or execution semantics
+    - Creating or modifying Shifts
+    - Adjusting inventory
+    - Triggering workflow chains
 - Returns:
   - {Entity}Dto
 - Notes:
-  - General update endpoint
-  - Does not imply scheduling or execution
+  - Planning adjustments only
+  - Does not imply execution or completion
 
 ---
 
@@ -57,8 +65,8 @@ All later phases must conform to this intent.
 - Returns: bool
 - Notes:
   - Soft-delete semantics (sets inactivation fields)
-  - No cascade behavior
-  - Record remains queryable via admin routes
+  - Does not cascade to Shifts or Orders
+  - Preserves historical planning intent
 
 ---
 
@@ -69,7 +77,7 @@ All later phases must conform to this intent.
 - HTTP: GET /api/{entityPlural}/{id}
 - Returns: {Entity}Dto | null
 - Notes:
-  - Intended for admin, debugging, or reference scenarios
+  - Intended for admin, debugging, or planning review
 
 ---
 
@@ -95,18 +103,20 @@ All later phases must conform to this intent.
 
 ### Explicitly NOT Supported
 - Hard delete
-- Workflow orchestration (no automatic Job creation)
-- Inventory computation or validation
-- Combined / multi-aggregate endpoints
+- Shift creation or modification
+- Inventory computation or adjustment
+- Combined planning + execution endpoints
+- Automatic workflow chaining
 - Upsert / find-or-create behavior
 - Any endpoint that mutates related aggregates
 
 ---
 
 ### Contract Notes
-- This slice represents a **planning / request table**
-- Records are mutable within defined bounds
-- No execution or inventory meaning is implied
+- This slice represents a **planned execution table**
+- Records define intent, not outcome
+- Execution and results belong to Shifts
+- Inventory movement belongs to StockLotAdjustments
 - If an operation is not listed here, it must NOT appear in:
   - Commands folders
   - Queries folders
