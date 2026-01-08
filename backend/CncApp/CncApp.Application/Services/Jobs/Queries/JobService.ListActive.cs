@@ -6,7 +6,8 @@ public partial class JobService
 {
     public async Task<List<JobDto>> ListActiveAsync(CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var jobs = await _jobRepository.ListActiveAsync(ct);
+        return _mapper.Map<List<JobDto>>(jobs);
     }
 }
 

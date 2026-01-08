@@ -1,5 +1,6 @@
+using CncApp.Application.Dtos.Jobs;
 using CncApp.Application.Services.Jobs;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CncApp.Api.Controllers;
@@ -15,6 +16,83 @@ public class JobsController : ControllerBase
         _jobService = jobService;
     }
 
-    // TODO: add actions
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(JobDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<JobDto>> CreateAsync(
+        [FromBody] CreateJobRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var id = await _jobService.CreateAsync(dto, ct);
+        var job = await _jobService.GetAsync(id, ct);
+        return CreatedAtRoute(routeName: "GetJob", routeValues: new { id }, value: job);
+    }
+
+    [HttpPatch("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<JobDto>> UpdateAsync(
+        int id,
+        [FromBody] UpdateJobRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var job = await _jobService.UpdateAsync(id, dto, ct);
+        if (job == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(job);
+    }
+
+    [HttpPatch("{id:int}/inactivate")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
+    {
+        var result = await _jobService.InactivateAsync(id, null, ct);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListActiveAsync(ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListAllAsync(ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("{id:int}", Name = "GetJob")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<JobDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var job = await _jobService.GetAsync(id, ct);
+        if (job == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(job);
+    }
 }
 

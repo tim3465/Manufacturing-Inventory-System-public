@@ -6,7 +6,13 @@ public partial class JobService
 {
     public async Task<JobDto?> GetAsync(int id, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var job = await _jobRepository.GetByIdAsync(id, ct);
+        if (job == null)
+        {
+            return null;
+        }
+
+        return _mapper.Map<JobDto>(job);
     }
 }
 
