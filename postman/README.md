@@ -53,6 +53,20 @@ End-to-end smoke tests for StockLotAdjustments slice. Versioned with timestamp s
 - **StockLotAdjustments - Update Notes**: PATCH Update Notes (metadata only), PATCH non-existent (404)
 - **StockLotAdjustments - Inactivate**: PATCH Inactivate, PATCH non-existent (404)
 
+#### Parts.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for Parts slice. Versioned with timestamp suffix.
+
+**Latest:** `Parts.SmokeTests.20260108-0659.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin)
+- **Parts - Create**: POST Create Part
+- **Parts - Get**: GET by ID, GET non-existent (404)
+- **Parts - ListActive**: GET List Active Parts
+- **Parts - ListAll**: GET List All Parts (Admin)
+- **Parts - Update**: PATCH Update (metadata only, partial updates supported), PATCH non-existent (404)
+- **Parts - Inactivate**: PATCH Inactivate, PATCH non-existent (404), verification that inactivated part is excluded from active list but included in all list
+
 ### How to Use
 
 1. Start the API using the `CncApp.Api (https)` profile.
@@ -80,6 +94,9 @@ End-to-end smoke tests for StockLotAdjustments slice. Versioned with timestamp s
 **StockLotAdjustments Collection Variables:**
 - `stockLotAdjustmentId` - StockLotAdjustment ID (automatically set by Create StockLotAdjustment request)
 - `stockLotId` - StockLot ID for creating/listing adjustments (default: 1, update to valid ID)
+
+**Parts Collection Variables:**
+- `partId` - Part ID (automatically set by Create Part request)
 
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)
@@ -111,6 +128,16 @@ End-to-end smoke tests for StockLotAdjustments slice. Versioned with timestamp s
 - **Hard Delete** is not supported (only soft delete via Inactivate)
 - This slice represents a **ledger table** - records are append-only by intent
 - Core ledger values (deltaBars, reason, stockLotId) cannot be changed after creation
+
+### Parts Slice Notes
+
+- **Update** is metadata-only (ApproxPartCycleTime, CheckPerPart only)
+- **Update** supports partial updates (can update only ApproxPartCycleTime or only CheckPerPart)
+- **ListAll** is supported (Admin only, includes inactive records)
+- **ListActive** returns active records only, ordered by CreatedDateTime
+- **Hard Delete** is not supported (only soft delete via Inactivate)
+- ApproxPartCycleTime is a TimeSpan (formatted as "HH:mm:ss" in JSON, e.g., "00:05:00" for 5 minutes)
+- CheckPerPart must be non-negative integer
 
 These collections are intended for local development and demonstration.
 

@@ -1,5 +1,6 @@
 using CncApp.Application.Services.Machines;
 using CncApp.Application.Services.Materials;
+using CncApp.Application.Services.Parts;
 using CncApp.Application.Services.StockLotAdjustments;
 using CncApp.Application.Services.StockLots;
 using CncApp.Application.Services.Users;
@@ -17,7 +18,7 @@ public static class DependencyInjection
         services.AddScoped<UserService>();
         services.AddScoped<StockLotService>();
         services.AddScoped<StockLotAdjustmentService>();
-
+        services.AddScoped<PartService>();
         // Register AutoMapper
         services.AddAutoMapper(typeof(DependencyInjection).Assembly);
 
