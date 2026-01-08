@@ -2,9 +2,13 @@ using CncApp.Domain.Entities;
 
 namespace CncApp.Application.Interfaces.Repositories;
 
-// TODO: clarify interface methods
 public interface IShiftRepository
 {
-    // TODO: add method signatures
+    Task<Shift?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<List<Shift>> ListActiveAsync(CancellationToken ct = default);
+    Task<List<Shift>> ListAllAsync(CancellationToken ct = default);
+    Task AddAsync(Shift shift, CancellationToken ct = default);
+    Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default);
+    Task SaveChangesAsync(CancellationToken ct = default);
 }
 
