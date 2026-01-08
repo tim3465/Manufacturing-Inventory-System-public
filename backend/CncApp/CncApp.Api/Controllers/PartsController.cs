@@ -19,6 +19,59 @@ public class PartsController : ControllerBase
         _partService = partService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+    /// <summary>
+    /// Gets all active parts.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all active parts.</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<PartDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var parts = await _partService.ListActiveAsync(ct);
+        return Ok(parts);
+    }
+
+    /// <summary>
+    /// Gets a part by ID.
+    /// </summary>
+    /// <param name="id">The part ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The part if found, otherwise 404.</returns>
+    [HttpGet("{id:int}", Name = "GetPart")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(PartDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PartDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var part = await _partService.GetAsync(id, ct);
+        if (part == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(part);
+    }
+
+    /// <summary>
+    /// Gets all parts (including inactive).
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all parts.</returns>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<PartDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var parts = await _partService.ListAllAsync(ct);
+        return Ok(parts);
+    }
+
     /// <summary>
     /// Creates a new part.
     /// </summary>
@@ -82,55 +135,6 @@ public class PartsController : ControllerBase
         }
 
         return NoContent();
-    }
-
-    /// <summary>
-    /// Gets all active parts.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all active parts.</returns>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<PartDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var parts = await _partService.ListActiveAsync(ct);
-        return Ok(parts);
-    }
-
-    /// <summary>
-    /// Gets all parts (including inactive).
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all parts.</returns>
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<PartDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var parts = await _partService.ListAllAsync(ct);
-        return Ok(parts);
-    }
-
-    /// <summary>
-    /// Gets a part by ID.
-    /// </summary>
-    /// <param name="id">The part ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The part if found, otherwise 404.</returns>
-    [HttpGet("{id:int}", Name = "GetPart")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(PartDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PartDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var part = await _partService.GetAsync(id, ct);
-        if (part == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(part);
     }
 }
 

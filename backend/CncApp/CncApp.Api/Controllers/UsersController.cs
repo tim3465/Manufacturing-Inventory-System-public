@@ -20,6 +20,51 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+
+    /// <summary>
+    /// Lists active users (operators). Active when InactivatedDateTime is null.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<UserDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var users = await _userService.ListActiveAsync(ct);
+        return Ok(users);
+    }
+
+    /// <summary>
+    /// Gets a user by id.
+    /// </summary>
+    [HttpGet("{id:int}", Name = "GetUser")]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var user = await _userService.GetAsync(id, ct);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
+    }
+
+    /// <summary>
+    /// Lists all users including inactive (Admin-only).
+    /// </summary>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<UserDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var users = await _userService.ListAllAsync(ct);
+        return Ok(users);
+    }
+
     /// <summary>
     /// Creates a new user (both Identity and Domain user) in a single operation.
     /// This is an admin-only endpoint - no self-registration is allowed.
@@ -70,46 +115,6 @@ public class UsersController : ControllerBase
     {
         var result = await _userService.InactivateAsync(id, null, ct);
         return Ok(result);
-    }
-
-    /// <summary>
-    /// Lists active users (operators). Active when InactivatedDateTime is null.
-    /// </summary>
-    [HttpGet]
-    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<UserDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var users = await _userService.ListActiveAsync(ct);
-        return Ok(users);
-    }
-
-    /// <summary>
-    /// Lists all users including inactive (Admin-only).
-    /// </summary>
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<UserDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var users = await _userService.ListAllAsync(ct);
-        return Ok(users);
-    }
-
-    /// <summary>
-    /// Gets a user by id.
-    /// </summary>
-    [HttpGet("{id:int}", Name = "GetUser")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var user = await _userService.GetAsync(id, ct);
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(user);
     }
 }
 

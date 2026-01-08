@@ -22,6 +22,11 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+
     /// <summary>
     /// Login endpoint that validates credentials and returns a JWT access token.
     /// </summary>

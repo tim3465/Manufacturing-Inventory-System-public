@@ -19,6 +19,46 @@ public class StockLotsController : ControllerBase
         _stockLotService = stockLotService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+
+    /// <summary>
+    /// Gets all active stock lots.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all active stock lots.</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<StockLotDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<StockLotDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var stockLots = await _stockLotService.ListActiveAsync(ct);
+        return Ok(stockLots);
+    }
+
+    /// <summary>
+    /// Gets a stock lot by ID.
+    /// </summary>
+    /// <param name="id">The stock lot ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The stock lot if found, otherwise 404.</returns>
+    [HttpGet("{id:int}", Name = "GetStockLot")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(StockLotDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<StockLotDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var stockLot = await _stockLotService.GetAsync(id, ct);
+        if (stockLot == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(stockLot);
+    }
+
     /// <summary>
     /// Creates a new stock lot.
     /// </summary>
@@ -60,41 +100,6 @@ public class StockLotsController : ControllerBase
         }
 
         return NoContent();
-    }
-
-    /// <summary>
-    /// Gets all active stock lots.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all active stock lots.</returns>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(List<StockLotDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<StockLotDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var stockLots = await _stockLotService.ListActiveAsync(ct);
-        return Ok(stockLots);
-    }
-
-    /// <summary>
-    /// Gets a stock lot by ID.
-    /// </summary>
-    /// <param name="id">The stock lot ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The stock lot if found, otherwise 404.</returns>
-    [HttpGet("{id:int}", Name = "GetStockLot")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(StockLotDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<StockLotDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var stockLot = await _stockLotService.GetAsync(id, ct);
-        if (stockLot == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(stockLot);
     }
 
     /// <summary>

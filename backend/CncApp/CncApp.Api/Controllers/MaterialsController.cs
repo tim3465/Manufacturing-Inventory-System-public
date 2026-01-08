@@ -19,6 +19,60 @@ public class MaterialsController : ControllerBase
         _materialService = materialService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+
+    /// <summary>
+    /// Gets all active materials.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all active materials.</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MaterialDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var materials = await _materialService.ListActiveAsync(ct);
+        return Ok(materials);
+    }
+
+    /// <summary>
+    /// Gets a material by ID.
+    /// </summary>
+    /// <param name="id">The material ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The material if found, otherwise 404.</returns>
+    [HttpGet("{id:int}", Name = "GetMaterial")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<MaterialDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var material = await _materialService.GetAsync(id, ct);
+        if (material == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(material);
+    }
+
+    /// <summary>
+    /// Gets all materials.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all materials.</returns>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MaterialDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var materials = await _materialService.ListAllAsync(ct);
+        return Ok(materials);
+    }
+
     /// <summary>
     /// Creates a new material.
     /// </summary>
@@ -54,55 +108,6 @@ public class MaterialsController : ControllerBase
         CancellationToken ct = default)
     {
         var material = await _materialService.UpdateAsync(id, dto, ct);
-        if (material == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(material);
-    }
-
-    /// <summary>
-    /// Gets all active materials.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all active materials.</returns>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<MaterialDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var materials = await _materialService.ListActiveAsync(ct);
-        return Ok(materials);
-    }
-
-    /// <summary>
-    /// Gets all materials.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all materials.</returns>
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<MaterialDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var materials = await _materialService.ListAllAsync(ct);
-        return Ok(materials);
-    }
-
-    /// <summary>
-    /// Gets a material by ID.
-    /// </summary>
-    /// <param name="id">The material ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The material if found, otherwise 404.</returns>
-    [HttpGet("{id:int}", Name = "GetMaterial")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<MaterialDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var material = await _materialService.GetAsync(id, ct);
         if (material == null)
         {
             return NotFound();

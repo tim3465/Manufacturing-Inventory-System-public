@@ -16,6 +16,44 @@ public class JobsController : ControllerBase
         _jobService = jobService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListActiveAsync(ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("{id:int}", Name = "GetJob")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<JobDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var job = await _jobService.GetAsync(id, ct);
+        if (job == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(job);
+    }
+
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListAllAsync(ct);
+        return Ok(jobs);
+    }
+
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(JobDto), StatusCodes.Status201Created)]
@@ -60,39 +98,6 @@ public class JobsController : ControllerBase
         }
 
         return NoContent();
-    }
-
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<JobDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var jobs = await _jobService.ListActiveAsync(ct);
-        return Ok(jobs);
-    }
-
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<JobDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var jobs = await _jobService.ListAllAsync(ct);
-        return Ok(jobs);
-    }
-
-    [HttpGet("{id:int}", Name = "GetJob")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<JobDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var job = await _jobService.GetAsync(id, ct);
-        if (job == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(job);
     }
 }
 
