@@ -1,7 +1,12 @@
+using CncApp.Application.Dtos.Jobs;
+
 namespace CncApp.Application.Services.Jobs;
 
 public partial class JobService
 {
-    // TODO: Implement ListActiveAsync method
+    public async Task<List<JobDto>> ListActiveAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

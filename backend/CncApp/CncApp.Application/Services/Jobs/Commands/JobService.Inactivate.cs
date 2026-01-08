@@ -2,6 +2,9 @@ namespace CncApp.Application.Services.Jobs;
 
 public partial class JobService
 {
-    // TODO: Implement InactivateAsync method
+    public async Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 
