@@ -1,8 +1,13 @@
+using CncApp.Application.Interfaces.Repositories;
+using CncApp.Infrastructure.Persistence;
+
 namespace CncApp.Infrastructure.Repositories;
 
-// TODO: Implement SaveChangesAsync method
-public partial class OrderRepository
+public partial class OrderRepository : IOrderRepository
 {
-    // TODO: Add method implementation
+    public async Task SaveChangesAsync(CancellationToken ct = default)
+    {
+        await _context.SaveChangesAsync(ct);
+    }
 }
 
