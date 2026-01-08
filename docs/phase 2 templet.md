@@ -17,9 +17,13 @@ All later phases must conform to this intent.
 - Returns: {Entity}Dto
 - Notes:
   - Creates a new {Entity} record
-  - Required fields include planning and definition values
+  - Required fields include:
+    - PartId
+    - CustomerId
+    - PartAmountRequested
+    - PartsPerBar
   - No workflow orchestration occurs here
-  - No cross-table operations
+  - No cross-table operations (no automatic job creation, no inventory changes)
 
 ---
 
@@ -28,19 +32,21 @@ All later phases must conform to this intent.
 - HTTP Verb: PATCH
 - Route: /api/{entityPlural}/{id}
 - Scope:
-  - Metadata-only
+  - Metadata-only (planning fields only)
   - Allowed fields:
-    - ApproxPartCycleTime
-    - CheckPerPart
+    - PartId
+    - CustomerId
+    - PartAmountRequested
+    - PartsPerBar
   - Explicitly NOT allowed:
-    - Creating or modifying related entities
+    - Creating or modifying related entities (no Jobs, no Shifts)
     - Triggering workflows
     - Inventory or execution semantics
 - Returns:
   - {Entity}Dto
 - Notes:
   - General update endpoint
-  - Does not imply execution or production
+  - Does not imply scheduling or execution
 
 ---
 
@@ -63,6 +69,7 @@ All later phases must conform to this intent.
 - HTTP: GET /api/{entityPlural}/{id}
 - Returns: {Entity}Dto | null
 - Notes:
+  - Intended for admin, debugging, or reference scenarios
 
 ---
 
@@ -88,7 +95,7 @@ All later phases must conform to this intent.
 
 ### Explicitly NOT Supported
 - Hard delete
-- Workflow orchestration
+- Workflow orchestration (no automatic Job creation)
 - Inventory computation or validation
 - Combined / multi-aggregate endpoints
 - Upsert / find-or-create behavior
@@ -97,7 +104,7 @@ All later phases must conform to this intent.
 ---
 
 ### Contract Notes
-- This slice represents a **definition / planning table**
+- This slice represents a **planning / request table**
 - Records are mutable within defined bounds
 - No execution or inventory meaning is implied
 - If an operation is not listed here, it must NOT appear in:

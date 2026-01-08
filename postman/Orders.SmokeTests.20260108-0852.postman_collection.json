@@ -1,0 +1,475 @@
+{
+	"info": {
+		"name": "Orders - Smoke Tests",
+		"description": "End-to-end smoke tests for Orders slice. Run in order: Auth → Create → Get → ListActive → ListAll → Update → Inactivate.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_postman_id": "orders-smoke-tests-20260108"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7136",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "partId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "POST Login (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@local.test\",\n  \"password\": \"Admin123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has accessToken\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"accessToken\");",
+									"  pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - Create",
+			"item": [
+				{
+					"name": "POST Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"partId\": {{partId}},\n  \"customerId\": {{customerId}},\n  \"partAmountRequested\": 100,\n  \"partsPerBar\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"  pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has id\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"id\");",
+									"  pm.collectionVariables.set(\"orderId\", jsonData.id.toString());",
+									"});",
+									"",
+									"pm.test(\"Location header is present\", function () {",
+									"  pm.expect(pm.response.headers.get(\"Location\")).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - Get",
+			"item": [
+				{
+					"name": "GET Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{orderId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{orderId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has Order data\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"id\");",
+									"  pm.expect(jsonData).to.have.property(\"partId\");",
+									"  pm.expect(jsonData).to.have.property(\"customerId\");",
+									"  pm.expect(jsonData).to.have.property(\"partAmountRequested\");",
+									"  pm.expect(jsonData).to.have.property(\"partsPerBar\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "GET Order - Non-existent (404)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "99999"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - ListActive",
+			"item": [
+				{
+					"name": "GET List Active Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Created order is in list\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  const orderId = parseInt(pm.collectionVariables.get(\"orderId\"));",
+									"  const found = jsonData.find(item => item.id === orderId);",
+									"  pm.expect(found).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - ListAll",
+			"item": [
+				{
+					"name": "GET List All Orders (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/all",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "all"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - Update",
+			"item": [
+				{
+					"name": "PATCH Update Order (Metadata Only)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"partId\": {{partId}},\n  \"customerId\": {{customerId}},\n  \"partAmountRequested\": 200,\n  \"partsPerBar\": 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{orderId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{orderId}}"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has updated Order data\", function () {",
+									"  const jsonData = pm.response.json();",
+									"  pm.expect(jsonData).to.have.property(\"id\");",
+									"  pm.expect(jsonData.partAmountRequested).to.equal(200);",
+									"  pm.expect(jsonData.partsPerBar).to.equal(20);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "PATCH Update Order - Non-existent (404)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"partId\": {{partId}},\n  \"customerId\": {{customerId}},\n  \"partAmountRequested\": 200,\n  \"partsPerBar\": 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/99999",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "99999"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders - Inactivate",
+			"item": [
+				{
+					"name": "PATCH Inactivate Order",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/{{orderId}}/inactivate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "{{orderId}}", "inactivate"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"  pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "PATCH Inactivate Order - Non-existent (404)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/99999/inactivate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "99999", "inactivate"]
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"  pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
+

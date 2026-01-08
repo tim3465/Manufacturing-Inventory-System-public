@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace CncApp.Application.Dtos.Orders;
 
 /// Validation mirrored from Infrastructure.Persistence.Configurations.OrderConfiguration where applicable.
-public class CreateOrderRequestDto
+/// Update is metadata-only (planning fields only).
+public class UpdateOrderRequestDto
 {
     [Required(ErrorMessage = "PartId is required.")]
     public int PartId { get; set; }
