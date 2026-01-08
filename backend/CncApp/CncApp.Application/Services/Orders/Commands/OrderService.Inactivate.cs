@@ -1,8 +1,10 @@
 namespace CncApp.Application.Services.Orders;
 
-// TODO: Implement InactivateAsync method
 public partial class OrderService
 {
-    // TODO: Add method implementation
+    public async Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

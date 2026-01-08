@@ -1,8 +1,12 @@
+using CncApp.Application.Dtos.Orders;
+
 namespace CncApp.Application.Services.Orders;
 
-// TODO: Implement ListAllAsync method
 public partial class OrderService
 {
-    // TODO: Add method implementation
+    public async Task<List<OrderDto>> ListAllAsync(CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

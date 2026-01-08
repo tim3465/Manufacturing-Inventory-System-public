@@ -1,8 +1,12 @@
+using CncApp.Application.Dtos.Orders;
+
 namespace CncApp.Application.Services.Orders;
 
-// TODO: Implement GetAsync method
 public partial class OrderService
 {
-    // TODO: Add method implementation
+    public async Task<OrderDto?> GetAsync(int id, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }
 

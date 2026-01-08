@@ -1,10 +1,21 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CncApp.Application.Dtos.Orders;
 
-// TODO: add DataAnnotations to mirror EF configuration when available
+/// Validation mirrored from Infrastructure.Persistence.Configurations.OrderConfiguration where applicable.
 public class OrderDto
 {
     public int Id { get; set; }
 
-    // TODO: add properties
+    [Required(ErrorMessage = "PartId is required.")]
+    public int PartId { get; set; }
+
+    [Required(ErrorMessage = "CustomerId is required.")]
+    public int CustomerId { get; set; }
+
+    [Required(ErrorMessage = "PartAmountRequested is required.")]
+    public int PartAmountRequested { get; set; }
+
+    public int PartsPerBar { get; set; }
 }
 
