@@ -81,6 +81,20 @@ End-to-end smoke tests for Orders slice. Versioned with timestamp suffix.
 - **Orders - Update**: PATCH Update (metadata only), PATCH non-existent (404)
 - **Orders - Inactivate**: PATCH Inactivate, PATCH non-existent (404)
 
+#### Jobs.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for Jobs slice. Versioned with timestamp suffix.
+
+**Latest:** `Jobs.SmokeTests.20260108-1130.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin)
+- **Jobs - Create**: POST Create Job (captures `jobId`)
+- **Jobs - Get**: GET by ID, GET non-existent (404)
+- **Jobs - ListActive**: GET List Active Jobs
+- **Jobs - ListAll**: GET List All Jobs (Admin)
+- **Jobs - Update**: PATCH Update (planning fields only), PATCH non-existent (404)
+- **Jobs - Inactivate**: PATCH Inactivate (Admin), PATCH non-existent (404), verification that inactivated job is excluded from active list but included in all list
+
 ### How to Use
 
 1. Start the API using the `CncApp.Api (https)` profile.
@@ -90,6 +104,9 @@ End-to-end smoke tests for Orders slice. Versioned with timestamp suffix.
    - `materialId` - Valid Material ID for creating/updating stock lots (default: `1`)
    - `stockLotId` - Valid StockLot ID for creating/listing stock lot adjustments (default: `1`)
    - `partId` - Valid Part ID for creating orders (default: `1`)
+   - `jobId` - Set after Create Job (for Jobs smoke tests)
+   - `orderId` - Valid Order ID for creating jobs (default: `1`, update to a real ID)
+   - `machineId` - Valid Machine ID for creating jobs (default: `1`, update to a real ID)
    - `customerId` - Valid Customer ID for creating orders (default: `1`)
 4. Run **POST Login** first (in Auth folder) to authenticate and store the access token.
 5. Run the remaining requests in order, or use Postman's "Run Collection" feature.
@@ -118,6 +135,12 @@ End-to-end smoke tests for Orders slice. Versioned with timestamp suffix.
 - `orderId` - Order ID (automatically set by Create Order request)
 - `partId` - Part ID for creating/updating orders (default: 1, update to valid ID)
 - `customerId` - Customer ID for creating/updating orders (default: 1, update to valid ID)
+
+**Jobs Collection Variables:**
+- `jobId` - Job ID (automatically set by Create Job request)
+- `orderId` - Order ID for creating/updating jobs (default: 1, update to valid ID)
+- `machineId` - Machine ID for creating/updating jobs (default: 1, update to valid ID)
+- `stockLotId` - StockLot ID for creating/updating jobs (default: 1, update to valid ID)
 
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)
