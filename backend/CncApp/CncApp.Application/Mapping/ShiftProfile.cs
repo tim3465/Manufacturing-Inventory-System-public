@@ -8,6 +8,7 @@ public class ShiftProfile : Profile
 {
     public ShiftProfile()
     {
+        CreateMap<Shift, ShiftDto>();
         CreateMap<Shift, ShiftResultDto>();
         CreateMap<CreateShiftRequestDto, Shift>();
     }
