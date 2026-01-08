@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CncApp.Application.Dtos.Shifts;
 
-/// Validation mirrored from Infrastructure.Persistence.Configurations.ShiftConfiguration.
-public class ShiftResultDto
+/// Read/return model for Shifts (used by Get/List/ListAll).
+public class ShiftDto
 {
     public int Id { get; set; }
 

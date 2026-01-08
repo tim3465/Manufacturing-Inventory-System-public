@@ -95,6 +95,19 @@ End-to-end smoke tests for Jobs slice. Versioned with timestamp suffix.
 - **Jobs - Update**: PATCH Update (planning fields only), PATCH non-existent (404)
 - **Jobs - Inactivate**: PATCH Inactivate (Admin), PATCH non-existent (404), verification that inactivated job is excluded from active list but included in all list
 
+#### Shifts.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for Shifts slice. Versioned with timestamp suffix.
+
+**Latest:** `Shifts.SmokeTests.20260108-1200.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin)
+- **Shifts - Create**: POST Create Shift (captures `shiftId`)
+- **Shifts - Get**: GET by ID, GET non-existent (404)
+- **Shifts - ListActive**: GET List Active Shifts
+- **Shifts - ListAll**: GET List All Shifts (Admin)
+- **Shifts - Inactivate**: PATCH Inactivate (Admin), PATCH non-existent (404)
+
 ### How to Use
 
 1. Start the API using the `CncApp.Api (https)` profile.
@@ -141,6 +154,11 @@ End-to-end smoke tests for Jobs slice. Versioned with timestamp suffix.
 - `orderId` - Order ID for creating/updating jobs (default: 1, update to valid ID)
 - `machineId` - Machine ID for creating/updating jobs (default: 1, update to valid ID)
 - `stockLotId` - StockLot ID for creating/updating jobs (default: 1, update to valid ID)
+
+**Shifts Collection Variables:**
+- `shiftId` - Shift ID (automatically set by Create Shift request)
+- `jobId` - Job ID for creating shifts (default: 1, update to valid ID)
+- `operatorId` - Operator (Domain User) ID for creating shifts (default: 1, update to valid ID)
 
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)

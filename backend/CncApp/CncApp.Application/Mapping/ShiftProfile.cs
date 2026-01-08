@@ -1,13 +1,16 @@
 using AutoMapper;
+using CncApp.Application.Dtos.Shifts;
+using CncApp.Domain.Entities;
 
 namespace CncApp.Application.Mapping;
 
-// TODO: add CreateMap calls when DTOs are defined
 public class ShiftProfile : Profile
 {
     public ShiftProfile()
     {
-        // TODO: add mappings
+        CreateMap<Shift, ShiftDto>();
+        CreateMap<Shift, ShiftResultDto>();
+        CreateMap<CreateShiftRequestDto, Shift>();
     }
 }
 
