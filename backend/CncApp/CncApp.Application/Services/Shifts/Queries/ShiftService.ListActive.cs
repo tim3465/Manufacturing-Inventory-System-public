@@ -4,8 +4,11 @@ namespace CncApp.Application.Services.Shifts;
 
 public partial class ShiftService
 {
-    public Task<List<ShiftDto>> ListActiveAsync(CancellationToken ct = default) =>
-        throw new NotImplementedException();
+    public async Task<List<ShiftDto>> ListActiveAsync(CancellationToken ct = default)
+    {
+        var shifts = await _shiftRepository.ListActiveAsync(ct);
+        return _mapper.Map<List<ShiftDto>>(shifts);
+    }
 }
 
 

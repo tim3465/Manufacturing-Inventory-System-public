@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IStockLotAdjustmentRepository, StockLotAdjustmentRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IJobRepository, JobRepository>();
+        services.AddScoped<IShiftRepository, ShiftRepository>();
 
         // Register Current User Service
         services.AddHttpContextAccessor();

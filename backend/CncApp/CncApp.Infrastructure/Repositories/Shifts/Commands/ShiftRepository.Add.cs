@@ -1,8 +1,13 @@
+using CncApp.Domain.Entities;
+
 namespace CncApp.Infrastructure.Repositories;
 
-// Phase 2A placeholder: will be implemented in Phase 3
 public partial class ShiftRepository
 {
+    public async Task AddAsync(Shift shift, CancellationToken ct = default)
+    {
+        await _context.Shifts.AddAsync(shift, ct);
+    }
 }
 
 
