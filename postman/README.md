@@ -67,6 +67,20 @@ End-to-end smoke tests for Parts slice. Versioned with timestamp suffix.
 - **Parts - Update**: PATCH Update (metadata only, partial updates supported), PATCH non-existent (404)
 - **Parts - Inactivate**: PATCH Inactivate, PATCH non-existent (404), verification that inactivated part is excluded from active list but included in all list
 
+#### Orders.SmokeTests.{timestamp}.postman_collection.json
+End-to-end smoke tests for Orders slice. Versioned with timestamp suffix.
+
+**Latest:** `Orders.SmokeTests.20260108-0852.postman_collection.json`
+
+**Included Endpoints:**
+- **Auth**: Login (Admin)
+- **Orders - Create**: POST Create Order
+- **Orders - Get**: GET by ID, GET non-existent (404)
+- **Orders - ListActive**: GET List Active Orders
+- **Orders - ListAll**: GET List All Orders (Admin)
+- **Orders - Update**: PATCH Update (metadata only), PATCH non-existent (404)
+- **Orders - Inactivate**: PATCH Inactivate, PATCH non-existent (404)
+
 ### How to Use
 
 1. Start the API using the `CncApp.Api (https)` profile.
@@ -75,6 +89,8 @@ End-to-end smoke tests for Parts slice. Versioned with timestamp suffix.
    - `baseUrl` - API base URL (default: `https://localhost:7136`)
    - `materialId` - Valid Material ID for creating/updating stock lots (default: `1`)
    - `stockLotId` - Valid StockLot ID for creating/listing stock lot adjustments (default: `1`)
+   - `partId` - Valid Part ID for creating orders (default: `1`)
+   - `customerId` - Valid Customer ID for creating orders (default: `1`)
 4. Run **POST Login** first (in Auth folder) to authenticate and store the access token.
 5. Run the remaining requests in order, or use Postman's "Run Collection" feature.
 
@@ -97,6 +113,11 @@ End-to-end smoke tests for Parts slice. Versioned with timestamp suffix.
 
 **Parts Collection Variables:**
 - `partId` - Part ID (automatically set by Create Part request)
+
+**Orders Collection Variables:**
+- `orderId` - Order ID (automatically set by Create Order request)
+- `partId` - Part ID for creating/updating orders (default: 1, update to valid ID)
+- `customerId` - Customer ID for creating/updating orders (default: 1, update to valid ID)
 
 **Machines Collection Variables:**
 - `machineId` - Machine ID (automatically set by Create Machine request)
@@ -138,6 +159,19 @@ End-to-end smoke tests for Parts slice. Versioned with timestamp suffix.
 - **Hard Delete** is not supported (only soft delete via Inactivate)
 - ApproxPartCycleTime is a TimeSpan (formatted as "HH:mm:ss" in JSON, e.g., "00:05:00" for 5 minutes)
 - CheckPerPart must be non-negative integer
+
+### Orders Slice Notes
+
+- **Update** is metadata-only (PartId, CustomerId, PartAmountRequested, PartsPerBar only)
+- **ListAll** is supported (Admin only, includes inactive records)
+- **ListActive** returns active records only, ordered by CreatedDateTime
+- **Hard Delete** is not supported (only soft delete via Inactivate)
+- This slice represents a **planning / request table** - records are mutable within defined bounds
+- No workflow orchestration occurs (no automatic Job creation, no inventory changes)
+- PartId must be positive (must reference an existing Part)
+- CustomerId must be positive
+- PartAmountRequested must be positive
+- PartsPerBar must be non-negative (default: 0)
 
 These collections are intended for local development and demonstration.
 
