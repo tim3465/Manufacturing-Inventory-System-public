@@ -1,5 +1,7 @@
 CNC Shop Inventory Management – Backend Architecture Project
+
 Overview
+
 The primary focus of this project is the design and implementation of a SOLID, scalable backend architecture. Rather than starting with complex business rules, the project prioritizes clean separation of concerns, strong testing boundaries, and a structure that can evolve safely as domain complexity increases.
 SOLID principles in this project are applied primarily to structure, boundaries, and dependencies, even while business rules are intentionally minimal in early phases.
 The backend is organized into five clearly defined layers:
