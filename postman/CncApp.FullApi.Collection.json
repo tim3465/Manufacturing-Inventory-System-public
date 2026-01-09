@@ -36,8 +36,8 @@
   "variable": [
     { "key": "baseUrl", "value": "https://localhost:7136", "type": "string" },
     { "key": "jwt", "value": "", "type": "string" },
-    { "key": "adminEmail", "value": "admin@local.test", "type": "string" },
-    { "key": "adminPassword", "value": "Admin123!", "type": "string" },
+    { "key": "adminEmail", "value": "", "type": "string" },
+    { "key": "adminPassword", "value": "", "type": "string" },
     { "key": "customerId", "value": "1", "type": "string", "description": "No Customers endpoints exist; set to an existing CustomerId in your DB if needed." },
     { "key": "machineId", "value": "", "type": "string" },
     { "key": "materialId", "value": "", "type": "string" },

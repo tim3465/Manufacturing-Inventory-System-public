@@ -1,16 +1,16 @@
-using System.Diagnostics;
 using System.Text;
 using CncApp.Api.Middleware;
 using CncApp.Application;
 using CncApp.Infrastructure;
 using CncApp.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Optional local-only configuration for secrets not committed to source control
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 // Add services to the container.
 
@@ -91,7 +91,7 @@ if (app.Environment.IsDevelopment())
     await SeedRolesAsync(app.Services);
 
     //  DEV ONLY - Seed dev admin user (remove/disable in production)
-    await SeedDevAdminAsync(app.Services);
+    await SeedDevAdminAsync(app.Services, app.Configuration, app.Logger);
 }
 
 
@@ -125,13 +125,19 @@ static async Task SeedRolesAsync(IServiceProvider services)
 
 //  DEV ONLY - Seed dev admin user (remove/disable in production)
 // Creates admin@local.test with password Admin123! and assigns Admin role
-static async Task SeedDevAdminAsync(IServiceProvider services)
+static async Task SeedDevAdminAsync(IServiceProvider services, IConfiguration configuration, ILogger logger)
 {
+    var devAdminEmail = configuration["DevAdmin:Email"];
+    var devAdminPassword = configuration["DevAdmin:Password"];
+
+    if (string.IsNullOrWhiteSpace(devAdminEmail) || string.IsNullOrWhiteSpace(devAdminPassword))
+    {
+        logger.LogInformation("Dev admin seeding skipped (DevAdmin credentials not configured)");
+        return;
+    }
+
     using var scope = services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<int>>>();
-
-    const string devAdminEmail = "admin@local.test";
-    const string devAdminPassword = "Admin123!";
 
     // Check if user already exists
     var existingUser = await userManager.FindByEmailAsync(devAdminEmail);
