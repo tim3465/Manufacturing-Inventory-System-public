@@ -19,23 +19,10 @@ public class MachinesController : ControllerBase
         _machineService = machineService;
     }
 
-    /// <summary>
-    /// Creates a new machine.
-    /// </summary>
-    /// <param name="dto">The machine creation request.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The created machine ID with Location header.</returns>
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> CreateAsync(
-        [FromBody] CreateMachineRequestDto dto,
-        CancellationToken ct = default)
-    {
-        var id = await _machineService.CreateAsync(dto, ct);
-        return CreatedAtRoute( routeName: "GetMachine", routeValues: new { id }, value: new { id });
-    }
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
 
     /// <summary>
     /// Gets all active machines.
@@ -48,20 +35,6 @@ public class MachinesController : ControllerBase
     public async Task<ActionResult<List<MachineDto>>> ListAsync(CancellationToken ct = default)
     {
         var machines = await _machineService.ListActiveAsync(ct);
-        return Ok(machines);
-    }
-
-    /// <summary>
-    /// Gets all machines.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all machines.</returns>
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<MachineDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var machines = await _machineService.ListAllAsync(ct);
         return Ok(machines);
     }
 
@@ -87,16 +60,48 @@ public class MachinesController : ControllerBase
     }
 
     /// <summary>
+    /// Gets all machines.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all machines.</returns>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MachineDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var machines = await _machineService.ListAllAsync(ct);
+        return Ok(machines);
+    }
+
+    /// <summary>
+    /// Creates a new machine.
+    /// </summary>
+    /// <param name="dto">The machine creation request.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created machine ID with Location header.</returns>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> CreateAsync(
+        [FromBody] CreateMachineRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var id = await _machineService.CreateAsync(dto, ct);
+        return CreatedAtRoute( routeName: "GetMachine", routeValues: new { id }, value: new { id });
+    }
+
+    /// <summary>
     /// Inactivates (soft deletes) a machine by ID.
     /// </summary>
     /// <param name="id">The machine ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpDelete("{id:int}")]
+    [HttpPatch("{id:int}/inactivate")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _machineService.InactivateAsync(id, null, ct);
         if (!result)

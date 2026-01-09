@@ -1,0 +1,934 @@
+{
+  "info": {
+    "_postman_id": "cncapp-fullapi-collection",
+    "name": "CncApp - Full API End-to-End",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Unified end-to-end collection generated from CncApp.Api controllers and API-Recon.md. Run top-to-bottom."
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  pm.collectionVariables.set('runId', Date.now().toString());",
+          "}",
+          "pm.collectionVariables.set('timestamp', new Date().toISOString());",
+          "",
+          "// Default user-creation payload variables (stable per run)",
+          "if (!pm.collectionVariables.get('newUserEmail')) {",
+          "  pm.collectionVariables.set('newUserEmail', `user_${pm.collectionVariables.get('runId')}@local.test`);",
+          "}",
+          "if (!pm.collectionVariables.get('newUserFirstName')) {",
+          "  pm.collectionVariables.set('newUserFirstName', 'Postman');",
+          "}",
+          "if (!pm.collectionVariables.get('newUserLastName')) {",
+          "  pm.collectionVariables.set('newUserLastName', 'Runner');",
+          "}",
+          "if (!pm.collectionVariables.get('newUserTempPassword')) {",
+          "  pm.collectionVariables.set('newUserTempPassword', 'TempPass123!');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "https://localhost:7136", "type": "string" },
+    { "key": "jwt", "value": "", "type": "string" },
+    { "key": "adminEmail", "value": "", "type": "string" },
+    { "key": "adminPassword", "value": "", "type": "string" },
+    { "key": "customerId", "value": "1", "type": "string", "description": "No Customers endpoints exist; set to an existing CustomerId in your DB if needed." },
+    { "key": "machineId", "value": "", "type": "string" },
+    { "key": "materialId", "value": "", "type": "string" },
+    { "key": "stockLotId", "value": "", "type": "string" },
+    { "key": "stockLotAdjustmentId", "value": "", "type": "string" },
+    { "key": "orderId", "value": "", "type": "string" },
+    { "key": "partId", "value": "", "type": "string" },
+    { "key": "jobId", "value": "", "type": "string" },
+    { "key": "shiftId", "value": "", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" },
+    { "key": "operatorId", "value": "", "type": "string" },
+    { "key": "identityUserId", "value": "", "type": "string" },
+    { "key": "timestamp", "value": "", "type": "string" },
+    { "key": "runId", "value": "", "type": "string" },
+    { "key": "newUserEmail", "value": "", "type": "string" },
+    { "key": "newUserFirstName", "value": "", "type": "string" },
+    { "key": "newUserLastName", "value": "", "type": "string" },
+    { "key": "newUserTempPassword", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "POST Login (Admin) -> set jwt",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has access token', function () {",
+                  "  const token = jsonData.accessToken || jsonData.AccessToken;",
+                  "  pm.expect(token).to.exist;",
+                  "  pm.collectionVariables.set('jwt', token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Auth Ping (Authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/ping",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "ping"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Machines",
+      "item": [
+        {
+          "name": "POST Create Machine (Admin) -> set machineId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serialNumber\": \"SN-POSTMAN-{{runId}}\",\n  \"modelNumber\": \"MODEL-POSTMAN\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/machines",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "machines"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('machineId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Machine by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/machines/{{machineId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "machines", "{{machineId}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Machines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/machines", "host": ["{{baseUrl}}"], "path": ["api", "machines"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET List All Machines (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ],
+            "url": { "raw": "{{baseUrl}}/api/machines/all", "host": ["{{baseUrl}}"], "path": ["api", "machines", "all"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Machine (Admin) [disabled here]",
+          "disabled": true,
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ],
+            "url": { "raw": "{{baseUrl}}/api/machines/{{machineId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "machines", "{{machineId}}", "inactivate"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Materials",
+      "item": [
+        {
+          "name": "POST Create Material (Admin) -> set materialId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"heatNumber\": \"HN-{{runId}}\",\n  \"materialName\": \"Steel-A1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/materials", "host": ["{{baseUrl}}"], "path": ["api", "materials"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('materialId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Material by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/materials/{{materialId}}", "host": ["{{baseUrl}}"], "path": ["api", "materials", "{{materialId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Materials",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/materials", "host": ["{{baseUrl}}"], "path": ["api", "materials"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Materials (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/materials/all", "host": ["{{baseUrl}}"], "path": ["api", "materials", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update Material (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"heatNumber\": \"HN-{{runId}}-UPD\",\n  \"materialName\": \"Steel-A1-Updated\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/materials/{{materialId}}", "host": ["{{baseUrl}}"], "path": ["api", "materials", "{{materialId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Material (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/materials/{{materialId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "materials", "{{materialId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. StockLots",
+      "item": [
+        {
+          "name": "POST Create StockLot (Admin) -> set stockLotId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lotNumber\": \"LOT-{{runId}}\",\n  \"materialId\": {{materialId}},\n  \"amountOfBars\": 10,\n  \"diameter\": 25.5,\n  \"barLength\": 1000.0,\n  \"condition\": 1,\n  \"checkedInDateTime\": \"{{timestamp}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/stocklots", "host": ["{{baseUrl}}"], "path": ["api", "stocklots"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('stockLotId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET StockLot by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}", "host": ["{{baseUrl}}"], "path": ["api", "stocklots", "{{stockLotId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active StockLots",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/stocklots", "host": ["{{baseUrl}}"], "path": ["api", "stocklots"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update StockLot (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lotNumber\": \"LOT-{{runId}}-UPD\",\n  \"materialId\": {{materialId}},\n  \"diameter\": 30.0,\n  \"barLength\": 2000.0,\n  \"condition\": 2,\n  \"checkedInDateTime\": \"{{timestamp}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}", "host": ["{{baseUrl}}"], "path": ["api", "stocklots", "{{stockLotId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate StockLot (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "stocklots", "{{stockLotId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. StockLotAdjustments",
+      "item": [
+        {
+          "name": "POST Create StockLotAdjustment (Admin) -> set stockLotAdjustmentId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stockLotId\": {{stockLotId}},\n  \"deltaBars\": 1,\n  \"reason\": 1,\n  \"notes\": \"Initial receipt\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/stocklotadjustments", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('stockLotAdjustmentId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET StockLotAdjustment by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/{{stockLotAdjustmentId}}", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "{{stockLotAdjustmentId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Adjustments by StockLot",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/by-stocklot/{{stockLotId}}", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "by-stocklot", "{{stockLotId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All StockLotAdjustments (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/all", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update StockLotAdjustment Notes (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"notes\": \"Updated notes\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/{{stockLotAdjustmentId}}/notes", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "{{stockLotAdjustmentId}}", "notes"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate StockLotAdjustment (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/{{stockLotAdjustmentId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "{{stockLotAdjustmentId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Orders",
+      "item": [
+        {
+          "name": "PREREQ: POST Create Part (Admin) -> set partId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"approxPartCycleTime\": \"00:05:00\",\n  \"checkPerPart\": 10\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/parts", "host": ["{{baseUrl}}"], "path": ["api", "parts"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('partId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST Create Order (Admin) -> set orderId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partId\": {{partId}},\n  \"customerId\": {{customerId}},\n  \"partAmountRequested\": 100,\n  \"partsPerBar\": 10\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/orders", "host": ["{{baseUrl}}"], "path": ["api", "orders"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('orderId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Order by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api", "orders", "{{orderId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Orders",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/orders", "host": ["{{baseUrl}}"], "path": ["api", "orders"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Orders (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/orders/all", "host": ["{{baseUrl}}"], "path": ["api", "orders", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update Order (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partId\": {{partId}},\n  \"customerId\": {{customerId}},\n  \"partAmountRequested\": 120,\n  \"partsPerBar\": 12\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api", "orders", "{{orderId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Order (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/orders/{{orderId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "orders", "{{orderId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Parts",
+      "item": [
+        {
+          "name": "POST Create Part (Admin) [disabled - created earlier]",
+          "disabled": true,
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"approxPartCycleTime\": \"00:05:00\",\n  \"checkPerPart\": 10\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/parts", "host": ["{{baseUrl}}"], "path": ["api", "parts"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Part by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/parts/{{partId}}", "host": ["{{baseUrl}}"], "path": ["api", "parts", "{{partId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Parts",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/parts", "host": ["{{baseUrl}}"], "path": ["api", "parts"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Parts (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/parts/all", "host": ["{{baseUrl}}"], "path": ["api", "parts", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update Part (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"approxPartCycleTime\": \"00:06:00\",\n  \"checkPerPart\": 12\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/parts/{{partId}}", "host": ["{{baseUrl}}"], "path": ["api", "parts", "{{partId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Part (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/parts/{{partId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "parts", "{{partId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Jobs",
+      "item": [
+        {
+          "name": "POST Create Job (Admin) -> set jobId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"machineId\": {{machineId}},\n  \"stockLotId\": {{stockLotId}},\n  \"partAmountPlanned\": 10,\n  \"barAmountPlanned\": 5,\n  \"barCycleTime\": \"00:01:00\",\n  \"barsInJob\": 2,\n  \"estimatedPartsPerBar\": 5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/jobs", "host": ["{{baseUrl}}"], "path": ["api", "jobs"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('jobId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Job by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/jobs/{{jobId}}", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "{{jobId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Jobs",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/jobs", "host": ["{{baseUrl}}"], "path": ["api", "jobs"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Jobs (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/jobs/all", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update Job (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"partAmountPlanned\": 12,\n  \"barAmountPlanned\": 6\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/jobs/{{jobId}}", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "{{jobId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Job (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/jobs/{{jobId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "{{jobId}}", "inactivate"] } },
+          "response": []
+        },
+        {
+          "name": "PREREQ: POST Create Operator User (Admin) -> set userId/operatorId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{newUserEmail}}\",\n  \"firstName\": \"{{newUserFirstName}}\",\n  \"lastName\": \"{{newUserLastName}}\",\n  \"temporaryPassword\": \"{{newUserTempPassword}}\",\n  \"roles\": [\"User\"]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Capture domain/identity ids', function () {",
+                  "  pm.expect(jsonData).to.have.property('domainUserId');",
+                  "  pm.expect(jsonData).to.have.property('identityUserId');",
+                  "  pm.collectionVariables.set('userId', jsonData.domainUserId.toString());",
+                  "  pm.collectionVariables.set('operatorId', jsonData.domainUserId.toString());",
+                  "  pm.collectionVariables.set('identityUserId', jsonData.identityUserId.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Shifts",
+      "item": [
+        {
+          "name": "POST Create Shift (Admin) -> set shiftId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"operatorId\": {{operatorId}},\n  \"barsConsumed\": 1,\n  \"partsMade\": 5,\n  \"scrap\": 0,\n  \"partsPerBar\": 2,\n  \"startTime\": \"{{timestamp}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/shifts", "host": ["{{baseUrl}}"], "path": ["api", "shifts"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Response has id', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.collectionVariables.set('shiftId', jsonData.id.toString());",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET Shift by Id",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/shifts/{{shiftId}}", "host": ["{{baseUrl}}"], "path": ["api", "shifts", "{{shiftId}}"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Shifts",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/shifts", "host": ["{{baseUrl}}"], "path": ["api", "shifts"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Shifts (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/shifts/all", "host": ["{{baseUrl}}"], "path": ["api", "shifts", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Shift (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/shifts/{{shiftId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "shifts", "{{shiftId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10. Users (Admin-only)",
+      "item": [
+        {
+          "name": "POST Create User (Admin) [disabled - created earlier]",
+          "disabled": true,
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{newUserEmail}}\",\n  \"firstName\": \"{{newUserFirstName}}\",\n  \"lastName\": \"{{newUserLastName}}\",\n  \"temporaryPassword\": \"{{newUserTempPassword}}\",\n  \"roles\": [\"User\"]\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User by Id (Authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List Active Users (Authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ],
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "GET List All Users (Admin)",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/users/all", "host": ["{{baseUrl}}"], "path": ["api", "users", "all"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Update User Roles (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json", "type": "text" },
+              { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"roles\": [\"User\"]\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate User (Admin) [disabled here]",
+          "disabled": true,
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/users/{{userId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}", "inactivate"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11. Read / Validation (GETs)",
+      "item": [
+        { "name": "GET Jobs /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/jobs/all", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "all"] } }, "response": [] },
+        { "name": "GET Machines /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/machines/all", "host": ["{{baseUrl}}"], "path": ["api", "machines", "all"] } }, "response": [] },
+        { "name": "GET Materials /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/materials/all", "host": ["{{baseUrl}}"], "path": ["api", "materials", "all"] } }, "response": [] },
+        { "name": "GET Orders /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/orders/all", "host": ["{{baseUrl}}"], "path": ["api", "orders", "all"] } }, "response": [] },
+        { "name": "GET Parts /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/parts/all", "host": ["{{baseUrl}}"], "path": ["api", "parts", "all"] } }, "response": [] },
+        { "name": "GET Shifts /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/shifts/all", "host": ["{{baseUrl}}"], "path": ["api", "shifts", "all"] } }, "response": [] },
+        { "name": "GET Users /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/users/all", "host": ["{{baseUrl}}"], "path": ["api", "users", "all"] } }, "response": [] },
+        { "name": "GET StockLotAdjustments /all (Admin)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/all", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "all"] } }, "response": [] }
+      ]
+    },
+    {
+      "name": "12. Soft Deletes (PATCH /inactivate)",
+      "item": [
+        {
+          "name": "PATCH Inactivate Shift (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/shifts/{{shiftId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "shifts", "{{shiftId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Job (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/jobs/{{jobId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "jobs", "{{jobId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Order (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/orders/{{orderId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "orders", "{{orderId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Part (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/parts/{{partId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "parts", "{{partId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate StockLotAdjustment (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklotadjustments/{{stockLotAdjustmentId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "stocklotadjustments", "{{stockLotAdjustmentId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate StockLot (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/stocklots/{{stockLotId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "stocklots", "{{stockLotId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Material (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/materials/{{materialId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "materials", "{{materialId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate Machine (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/machines/{{machineId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "machines", "{{machineId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });" ] } } ],
+          "response": []
+        },
+        {
+          "name": "PATCH Inactivate User (Admin)",
+          "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ], "url": { "raw": "{{baseUrl}}/api/users/{{userId}}/inactivate", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}", "inactivate"] } },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+

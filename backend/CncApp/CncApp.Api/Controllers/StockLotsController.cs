@@ -19,48 +19,10 @@ public class StockLotsController : ControllerBase
         _stockLotService = stockLotService;
     }
 
-    /// <summary>
-    /// Creates a new stock lot.
-    /// </summary>
-    /// <param name="dto">The stock lot creation request.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The created stock lot ID with Location header.</returns>
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> CreateAsync(
-        [FromBody] CreateStockLotRequestDto dto,
-        CancellationToken ct = default)
-    {
-        var id = await _stockLotService.CreateAsync(dto, ct);
-        return CreatedAtRoute(routeName: "GetStockLot", routeValues: new { id }, value: new { id });
-    }
-
-    /// <summary>
-    /// Updates a stock lot (metadata only - no quantity changes).
-    /// </summary>
-    /// <param name="id">The stock lot ID.</param>
-    /// <param name="dto">The stock lot update request.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> UpdateAsync(
-        int id,
-        [FromBody] UpdateStockLotRequestDto dto,
-        CancellationToken ct = default)
-    {
-        var result = await _stockLotService.UpdateAsync(id, dto, ct);
-        if (!result)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
-    }
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
 
     /// <summary>
     /// Gets all active stock lots.
@@ -98,16 +60,59 @@ public class StockLotsController : ControllerBase
     }
 
     /// <summary>
+    /// Creates a new stock lot.
+    /// </summary>
+    /// <param name="dto">The stock lot creation request.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created stock lot ID with Location header.</returns>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> CreateAsync(
+        [FromBody] CreateStockLotRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var id = await _stockLotService.CreateAsync(dto, ct);
+        return CreatedAtRoute(routeName: "GetStockLot", routeValues: new { id }, value: new { id });
+    }
+
+    /// <summary>
+    /// Updates a stock lot (metadata only - no quantity changes).
+    /// </summary>
+    /// <param name="id">The stock lot ID.</param>
+    /// <param name="dto">The stock lot update request.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>204 NoContent if successful, otherwise 404.</returns>
+    [HttpPatch("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateAsync(
+        int id,
+        [FromBody] UpdateStockLotRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var result = await _stockLotService.UpdateAsync(id, dto, ct);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Inactivates (soft deletes) a stock lot by ID.
     /// </summary>
     /// <param name="id">The stock lot ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>204 NoContent if successful, otherwise 404.</returns>
-    [HttpDelete("{id:int}")]// ToDo this needs to be a patch
+    [HttpPatch("{id:int}/inactivate")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _stockLotService.InactivateAsync(id, null, ct);
         if (!result)

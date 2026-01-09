@@ -19,6 +19,60 @@ public class OrdersController : ControllerBase
         _orderService = orderService;
     }
 
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
+    
+    /// <summary>
+    /// Gets all active orders.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all active orders.</returns>
+    [HttpGet]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<OrderDto>>> ListAsync(CancellationToken ct = default)
+    {
+        var orders = await _orderService.ListActiveAsync(ct);
+        return Ok(orders);
+    }
+
+    /// <summary>
+    /// Gets an order by ID.
+    /// </summary>
+    /// <param name="id">The order ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The order if found, otherwise 404.</returns>
+    [HttpGet("{id:int}", Name = "GetOrder")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<OrderDto>> GetAsync(int id, CancellationToken ct = default)
+    {
+        var order = await _orderService.GetAsync(id, ct);
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(order);
+    }
+
+    /// <summary>
+    /// Gets all orders (including inactive).
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of all orders.</returns>
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<OrderDto>>> ListAllAsync(CancellationToken ct = default)
+    {
+        var orders = await _orderService.ListAllAsync(ct);
+        return Ok(orders);
+    }
+
     /// <summary>
     /// Creates a new order.
     /// </summary>
@@ -83,53 +137,5 @@ public class OrdersController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>
-    /// Gets all active orders.
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all active orders.</returns>
-    [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<OrderDto>>> ListAsync(CancellationToken ct = default)
-    {
-        var orders = await _orderService.ListActiveAsync(ct);
-        return Ok(orders);
-    }
-
-    /// <summary>
-    /// Gets all orders (including inactive).
-    /// </summary>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>List of all orders.</returns>
-    [HttpGet("all")]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<OrderDto>>> ListAllAsync(CancellationToken ct = default)
-    {
-        var orders = await _orderService.ListAllAsync(ct);
-        return Ok(orders);
-    }
-
-    /// <summary>
-    /// Gets an order by ID.
-    /// </summary>
-    /// <param name="id">The order ID.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The order if found, otherwise 404.</returns>
-    [HttpGet("{id:int}", Name = "GetOrder")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<OrderDto>> GetAsync(int id, CancellationToken ct = default)
-    {
-        var order = await _orderService.GetAsync(id, ct);
-        if (order == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(order);
-    }
 }
 

@@ -19,23 +19,10 @@ public class StockLotAdjustmentsController : ControllerBase
         _stockLotAdjustmentService = stockLotAdjustmentService;
     }
 
-    /// <summary>
-    /// Creates a new stock lot adjustment.
-    /// </summary>
-    /// <param name="dto">The stock lot adjustment creation request.</param>
-    /// <param name="ct">Cancellation token.</param>
-    /// <returns>The created stock lot adjustment ID with Location header.</returns>
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> CreateAsync(
-        [FromBody] CreateStockLotAdjustmentRequestDto dto,
-        CancellationToken ct = default)
-    {
-        var id = await _stockLotAdjustmentService.CreateAsync(dto, ct);
-        return CreatedAtRoute(routeName: "GetStockLotAdjustment", routeValues: new { id }, value: new { id });
-    }
+    // Conventions:
+    // - All deletes are soft deletes via PATCH /{id}/inactivate.
+    // - GET /all endpoints are Admin only and include inactive records.
+    // - Most resources allow anonymous read access; Users requires authentication.
 
     /// <summary>
     /// Gets a stock lot adjustment by ID.
@@ -85,6 +72,24 @@ public class StockLotAdjustmentsController : ControllerBase
     {
         var stockLotAdjustments = await _stockLotAdjustmentService.ListAllAsync(ct);
         return Ok(stockLotAdjustments);
+    }
+
+    /// <summary>
+    /// Creates a new stock lot adjustment.
+    /// </summary>
+    /// <param name="dto">The stock lot adjustment creation request.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created stock lot adjustment ID with Location header.</returns>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> CreateAsync(
+        [FromBody] CreateStockLotAdjustmentRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var id = await _stockLotAdjustmentService.CreateAsync(dto, ct);
+        return CreatedAtRoute(routeName: "GetStockLotAdjustment", routeValues: new { id }, value: new { id });
     }
 
     /// <summary>

@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Local-only config (do not commit secrets)
+appsettings.Local.json
+appsettings.Local.*.json
+.postman_environment.json
