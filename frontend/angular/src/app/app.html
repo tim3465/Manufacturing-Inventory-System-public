@@ -1,8 +1,16 @@
-<body class="theme-dark">
+<div class="p-6 space-x-2">
+  <button
+    class="px-3 py-2 rounded border"
+    (click)="themeService['applyTheme']('theme-light')"
+  >
+    Light
+  </button>
 
+  <button
+    class="px-3 py-2 rounded border"
+    (click)="themeService['applyTheme']('theme-dark')"
+  >
+    Dark
+  </button>
 
-<div class="p-6">
-  <div class="p-4 rounded border" style="background: var(--surface)">
-    Theme tokens are active ✅ this is the spot
-  </div>
 </div>
