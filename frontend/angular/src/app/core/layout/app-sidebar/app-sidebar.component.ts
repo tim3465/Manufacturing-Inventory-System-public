@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ROLE_LABELS, Role } from '../role.model';
 import { ROLE_NAV_GROUPS, TOP_NAV } from '../nav.config';
@@ -18,6 +18,8 @@ export class AppSidebarComponent {
   protected readonly topLinks = TOP_NAV;
   protected readonly roleLabels = ROLE_LABELS;
   protected readonly groups = ROLE_NAV_GROUPS;
+  @Input() mobileNavOpen = false;
+  @Output() closeMenu = new EventEmitter<void>();
 
   private readonly expandedRole = signal<Role | null>(null);
 
@@ -27,6 +29,10 @@ export class AppSidebarComponent {
 
   protected toggle(role: Role): void {
     this.expandedRole.set(this.expandedRole() === role ? null : role);
+  }
+
+  protected onClose(): void {
+    this.closeMenu.emit();
   }
 }
 

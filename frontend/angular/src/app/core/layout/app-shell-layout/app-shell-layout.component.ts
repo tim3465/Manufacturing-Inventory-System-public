@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppHeaderComponent } from '../app-header/app-header.component';
 import { AppSidebarComponent } from '../app-sidebar/app-sidebar.component';
@@ -13,5 +13,15 @@ import { AppSidebarComponent } from '../app-sidebar/app-sidebar.component';
     class: 'block min-h-screen bg-[var(--bg)] text-[var(--fg)]'
   }
 })
-export class AppShellLayoutComponent {}
+export class AppShellLayoutComponent {
+  protected readonly mobileNavOpen = signal(false);
+
+  protected toggleMobileNav(): void {
+    this.mobileNavOpen.set(!this.mobileNavOpen());
+  }
+
+  protected closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
+}
 

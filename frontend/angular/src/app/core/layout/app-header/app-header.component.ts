@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { ThemeName, ThemeService } from '../../theme/theme.service';
 
 @Component({
@@ -14,6 +14,8 @@ export class AppHeaderComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
 
   protected readonly currentTheme = signal<ThemeName>('theme-light');
+  @Input() mobileNavOpen = false;
+  @Output() menuToggle = new EventEmitter<void>();
 
   ngOnInit(): void {
     this.syncThemeFromDocument();
@@ -25,6 +27,10 @@ export class AppHeaderComponent implements OnInit {
 
     this.themeService.setTheme(next); // <-- public wrapper you added
     this.currentTheme.set(next);
+  }
+
+  onToggleMenu(): void {
+    this.menuToggle.emit();
   }
 
   private syncThemeFromDocument(): void {
