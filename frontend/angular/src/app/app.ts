@@ -1,6 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ThemeService } from './core/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -12,14 +11,7 @@ import { ThemeService } from './core/theme/theme.service';
 
 
 export class App {
-  public readonly themeService = inject(ThemeService);
-  protected readonly title = signal('angular');
 
   constructor() {
-    this.themeService.initialize();
   }
-
-
-
-
 }

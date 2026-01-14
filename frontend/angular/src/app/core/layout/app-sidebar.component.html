@@ -1,0 +1,35 @@
+<nav class="h-full flex flex-col gap-5 px-4 py-6 text-sm">
+  <div class="flex items-center gap-3">
+    <div
+      class="h-10 w-10 rounded-lg bg-[var(--border)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm tracking-wide"
+    >
+      CNC
+    </div>
+    <div>
+      <p class="text-sm text-slate-500">Console</p>
+      <p class="text-lg font-semibold leading-tight">CNC App</p>
+    </div>
+  </div>
+
+  <div class="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+    {{ role() }} role
+  </div>
+
+  <ng-container *ngFor="let section of sections()">
+    <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">
+      {{ section.title }}
+    </p>
+    <div class="space-y-1">
+      <a
+        *ngFor="let item of section.items"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+      >
+        <span>{{ item.label }}</span>
+        <span class="text-xs text-slate-400">›</span>
+      </a>
+    </div>
+  </ng-container>
+</nav>
+

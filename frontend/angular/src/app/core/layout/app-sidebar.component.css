@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+a.active {
+  background-color: var(--surface);
+  border-color: var(--border);
+  font-weight: 600;
+}
+
