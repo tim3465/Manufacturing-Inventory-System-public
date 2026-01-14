@@ -14,11 +14,11 @@
   --surface: #f9fafb;
   --border: #e5e7eb;
 
-  --primary: #2563eb;
+  --primary: #00a6e8;
   --primary-fg: #ffffff;
 
-  --secondary: #64748b;
-  --secondary-fg: #ffffff;
+  --secondary: #f4b400;
+  --secondary-fg: #0b1220;
 
   --danger: #dc2626;
   --danger-fg: #ffffff;
@@ -34,11 +34,11 @@ body.theme-light {
   --surface: #f9fafb;
   --border: #e5e7eb;
 
-  --primary: #2563eb;
+  --primary: #00a6e8;
   --primary-fg: #ffffff;
 
-  --secondary: #64748b;
-  --secondary-fg: #ffffff;
+  --secondary: #f4b400;
+  --secondary-fg: #0b1220;
 
   --danger: #dc2626;
   --danger-fg: #ffffff;
@@ -54,11 +54,11 @@ body.theme-dark {
   --surface: #111827;
   --border: #1f2937;
 
-  --primary: #60a5fa;
-  --primary-fg: #020617;
+  --primary: #38c7ff;
+  --primary-fg: #031018;
 
-  --secondary: #94a3b8;
-  --secondary-fg: #020617;
+  --secondary: #f4b400;
+  --secondary-fg: #0b1220;
 
   --danger: #f87171;
   --danger-fg: #020617;

@@ -14,16 +14,20 @@
     <app-sidebar (closeMenu)="closeMobileNav()" [mobileNavOpen]="mobileNavOpen()"></app-sidebar>
   </aside>
 
-<div class="flex-1 min-h-screen flex flex-col">
-    <app-header
-      class="sticky top-0 inset-x-0 z-30 shadow-sm"
-      [mobileNavOpen]="mobileNavOpen()"
-      (menuToggle)="toggleMobileNav()"
-    ></app-header>
+  <div class="flex-1 min-h-screen flex flex-col">
+    <div class="sticky top-0 inset-x-0 z-30 bg-[var(--bg)] px-3 md:px-6 pt-3 md:pt-4">
+      <app-header
+        class="shadow-sm border border-[var(--border)] bg-[var(--surface)] rounded-xl"
+        [mobileNavOpen]="mobileNavOpen()"
+        (menuToggle)="toggleMobileNav()"
+      ></app-header>
+    </div>
 
-    <main class="flex-1 w-full bg-[var(--bg)] text-[var(--fg)] px-4 md:px-8 pt-6 pb-12">
-      <div class="w-full">
-        <router-outlet></router-outlet>
+    <main class="flex-1 w-full bg-[var(--bg)] text-[var(--fg)] px-3 md:px-6 pt-6 pb-12">
+      <div class="max-w-8xl mx-auto">
+        <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-sm">
+          <router-outlet></router-outlet>
+        </div>
       </div>
     </main>
   </div>
