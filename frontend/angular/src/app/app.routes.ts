@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AppShellLayoutComponent } from './core/layout/app-shell-layout.component';
+import { AppShellLayoutComponent } from './core/layout/app-shell-layout/app-shell-layout.component';
 import { DashboardPageComponent } from './features/dashboard/dashboard.page';
 import { LogShiftPageComponent } from './features/machinist/log-shift.page';
 import { MyJobsPageComponent } from './features/machinist/my-jobs.page';

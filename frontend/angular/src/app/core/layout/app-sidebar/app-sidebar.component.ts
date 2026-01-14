@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ROLE_LABELS, Role } from './role.model';
-import { ROLE_NAV_GROUPS, TOP_NAV } from './nav.config';
+import { ROLE_LABELS, Role } from '../role.model';
+import { ROLE_NAV_GROUPS, TOP_NAV } from '../nav.config';
 
 @Component({
   selector: 'app-sidebar',
