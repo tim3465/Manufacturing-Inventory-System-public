@@ -1,4 +1,4 @@
-<nav class="h-full flex flex-col gap-5 px-4 py-6 text-sm">
+<nav class="h-full flex flex-col gap-4 px-4 py-6 text-sm">
   <div class="flex items-center gap-3">
     <div
       class="h-10 w-10 rounded-lg bg-[var(--border)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm tracking-wide"
@@ -11,25 +11,49 @@
     </div>
   </div>
 
-  <div class="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-    {{ role() }} role
+  <div class="space-y-1">
+    <a
+      *ngFor="let link of topLinks"
+      [routerLink]="link.path"
+      routerLinkActive="active"
+      class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+    >
+      <span>{{ link.label }}</span>
+      <span class="text-xs text-slate-400">›</span>
+    </a>
   </div>
 
-  <ng-container *ngFor="let section of sections()">
-    <p class="text-xs uppercase tracking-wide text-slate-500 mb-2">
-      {{ section.title }}
-    </p>
+  <div class="space-y-3 pt-2">
+    @for (group of groups; track group.role) {
     <div class="space-y-1">
-      <a
-        *ngFor="let item of section.items"
-        [routerLink]="item.path"
-        routerLinkActive="active"
-        class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+      <button
+        type="button"
+        (click)="toggle(group.role)"
+        class="w-full flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors text-left"
       >
-        <span>{{ item.label }}</span>
-        <span class="text-xs text-slate-400">›</span>
-      </a>
-    </div>
-  </ng-container>
-</nav>
+        <span class="font-semibold">{{ roleLabels[group.role] }}</span>
+        <span
+          class="text-xs text-slate-400 transition-transform"
+          [class.rotate-90]="isExpanded()(group.role)"
+        >
+          ›
+        </span>
+      </button>
+      @if (isExpanded()(group.role)) {
 
+      <div class="ml-2 border-l border-[var(--border)] pl-3 space-y-1">
+        <a
+          *ngFor="let item of group.items"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+        >
+          <span>{{ item.label }}</span>
+          <span class="text-xs text-slate-400">›</span>
+        </a>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</nav>

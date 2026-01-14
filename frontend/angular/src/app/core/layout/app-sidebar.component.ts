@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NAV_SECTIONS } from './nav.config';
-import { RoleService } from './role.service';
+import { ROLE_LABELS, Role } from './role.model';
+import { ROLE_NAV_GROUPS, TOP_NAV } from './nav.config';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,14 +15,18 @@ import { RoleService } from './role.service';
   }
 })
 export class AppSidebarComponent {
-  private readonly roleService = inject(RoleService);
-  protected readonly role = this.roleService.role;
+  protected readonly topLinks = TOP_NAV;
+  protected readonly roleLabels = ROLE_LABELS;
+  protected readonly groups = ROLE_NAV_GROUPS;
 
-  protected readonly sections = computed(() =>
-    NAV_SECTIONS.map((section) => ({
-      title: section.title,
-      items: section.items.filter((item) => item.roles.includes(this.role()))
-    })).filter((section) => section.items.length > 0)
+  private readonly expandedRole = signal<Role | null>(null);
+
+  protected isExpanded = computed(
+    () => (role: Role) => this.expandedRole() === role
   );
+
+  protected toggle(role: Role): void {
+    this.expandedRole.set(this.expandedRole() === role ? null : role);
+  }
 }
 

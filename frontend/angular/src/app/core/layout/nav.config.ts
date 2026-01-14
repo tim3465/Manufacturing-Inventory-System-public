@@ -1,90 +1,50 @@
-import { ALL_ROLES, Role } from './role.model';
+import { Role } from './role.model';
 
-export interface NavItem {
+export interface NavLink {
   label: string;
   path: string;
-  roles: Role[];
 }
 
-export interface NavSection {
-  title: string;
-  items: NavItem[];
+export interface RoleNavGroup {
+  role: Role;
+  items: NavLink[];
 }
 
-export const NAV_SECTIONS: NavSection[] = [
+export const TOP_NAV: NavLink[] = [
   {
-    title: 'Overview',
+    label: 'Dashboard',
+    path: '/dashboard'
+  }
+];
+
+export const ROLE_NAV_GROUPS: RoleNavGroup[] = [
+  {
+    role: 'Machinist',
     items: [
-      {
-        label: 'Dashboard',
-        path: '/dashboard',
-        roles: ALL_ROLES
-      }
+      { label: 'My Jobs', path: '/machinist/my-jobs' },
+      { label: 'Log Shift', path: '/machinist/log-shift' }
     ]
   },
   {
-    title: 'Machinist',
+    role: 'ShippingReceiving',
     items: [
-      {
-        label: 'My Jobs',
-        path: '/machinist/my-jobs',
-        roles: ['Machinist']
-      },
-      {
-        label: 'Log Shift',
-        path: '/machinist/log-shift',
-        roles: ['Machinist']
-      }
+      { label: 'Receive Material', path: '/shipping/receive-material' },
+      { label: 'Inventory', path: '/shipping/inventory' }
     ]
   },
   {
-    title: 'Shipping / Receiving',
+    role: 'Supervisor',
     items: [
-      {
-        label: 'Receive Material',
-        path: '/shipping/receive-material',
-        roles: ['ShippingReceiving']
-      },
-      {
-        label: 'Inventory',
-        path: '/shipping/inventory',
-        roles: ['ShippingReceiving']
-      }
+      { label: 'Orders', path: '/supervisor/orders' },
+      { label: 'Job Planning', path: '/supervisor/job-planning' }
     ]
   },
   {
-    title: 'Supervisor',
+    role: 'Admin',
     items: [
-      {
-        label: 'Orders',
-        path: '/supervisor/orders',
-        roles: ['Supervisor']
-      },
-      {
-        label: 'Job Planning',
-        path: '/supervisor/job-planning',
-        roles: ['Supervisor']
-      }
-    ]
-  },
-  {
-    title: 'Admin',
-    items: [
-      {
-        label: 'Machines',
-        path: '/admin/machines',
-        roles: ['Admin']
-      },
-      {
-        label: 'Users',
-        path: '/admin/users',
-        roles: ['Admin']
-      },
-      {
-        label: 'Settings',
-        path: '/admin/settings',
-        roles: ['Admin']
-      }
+      { label: 'Machines', path: '/admin/machines' },
+      { label: 'Users', path: '/admin/users' },
+      { label: 'Settings', path: '/admin/settings' }
     ]
   }
 ];

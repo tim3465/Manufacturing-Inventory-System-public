@@ -4,20 +4,7 @@
   <div
     class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-end gap-3 md:gap-4"
   >
-    <div
-      class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)]"
-    >
-      <span class="text-xs text-slate-500 uppercase tracking-wide">Role</span>
-      <select
-        class="bg-transparent text-sm focus:outline-none cursor-pointer"
-        [value]="selectedRole()"
-        (change)="onRoleChange($any($event.target).value)"
-      >
-        <option *ngFor="let role of roles" [value]="role">
-          {{ roleLabels[role] }}
-        </option>
-      </select>
-    </div>
+
 
     <button
       class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors"
