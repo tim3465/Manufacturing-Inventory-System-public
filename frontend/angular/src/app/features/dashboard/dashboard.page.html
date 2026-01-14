@@ -5,15 +5,14 @@
   </header>
 
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div
-      *ngFor="let stat of stats"
-      class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
-    >
+    @for (stat of stats; track stat.label) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
       <p class="text-sm text-slate-500">{{ stat.label }}</p>
       <p class="text-3xl font-semibold text-[var(--fg)] mt-2">
         {{ stat.value }}
       </p>
     </div>
+    }
   </div>
 
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">

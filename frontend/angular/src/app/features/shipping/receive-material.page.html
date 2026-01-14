@@ -9,10 +9,8 @@
       Incoming deliveries
     </div>
     <ul class="divide-y divide-[var(--border)]">
-      <li
-        *ngFor="let receipt of receipts"
-        class="px-4 py-3 flex items-center justify-between text-sm"
-      >
+      @for (receipt of receipts; track receipt.id) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
         <div>
           <p class="font-semibold text-[var(--fg)]">{{ receipt.id }}</p>
           <p class="text-slate-500">{{ receipt.supplier }}</p>
@@ -21,6 +19,7 @@
           {{ receipt.status }}
         </span>
       </li>
+      }
     </ul>
   </div>
 </section>

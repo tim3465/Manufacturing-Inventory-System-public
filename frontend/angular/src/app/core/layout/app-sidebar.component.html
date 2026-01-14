@@ -12,8 +12,8 @@
   </div>
 
   <div class="space-y-1">
+    @for (link of topLinks; track link.path) {
     <a
-      *ngFor="let link of topLinks"
       [routerLink]="link.path"
       routerLinkActive="active"
       class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
@@ -21,6 +21,7 @@
       <span>{{ link.label }}</span>
       <span class="text-xs text-slate-400">›</span>
     </a>
+    }
   </div>
 
   <div class="space-y-3 pt-2">
@@ -42,8 +43,8 @@
       @if (isExpanded()(group.role)) {
 
       <div class="ml-2 border-l border-[var(--border)] pl-3 space-y-1">
+        @for (item of group.items; track item.path) {
         <a
-          *ngFor="let item of group.items"
           [routerLink]="item.path"
           routerLinkActive="active"
           class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
@@ -51,6 +52,7 @@
           <span>{{ item.label }}</span>
           <span class="text-xs text-slate-400">›</span>
         </a>
+        }
       </div>
       }
     </div>

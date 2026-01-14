@@ -14,11 +14,13 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
-        <tr *ngFor="let item of items">
+        @for (item of items; track item.sku) {
+        <tr>
           <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ item.sku }}</td>
           <td class="px-4 py-3 text-slate-500">{{ item.description }}</td>
           <td class="px-4 py-3 text-right text-[var(--fg)]">{{ item.qty }}</td>
         </tr>
+        }
       </tbody>
     </table>
   </div>

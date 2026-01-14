@@ -9,10 +9,8 @@
       Fleet status
     </div>
     <ul class="divide-y divide-[var(--border)]">
-      <li
-        *ngFor="let machine of machines"
-        class="px-4 py-3 flex items-center justify-between text-sm"
-      >
+      @for (machine of machines; track machine.name) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
         <div>
           <p class="font-semibold text-[var(--fg)]">{{ machine.name }}</p>
           <p class="text-slate-500">Utilization: {{ machine.utilization }}</p>
@@ -21,6 +19,7 @@
           {{ machine.status }}
         </span>
       </li>
+      }
     </ul>
   </div>
 </section>

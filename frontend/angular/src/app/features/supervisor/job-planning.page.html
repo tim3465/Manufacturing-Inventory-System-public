@@ -5,10 +5,8 @@
   </header>
 
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3">
-    <div
-      *ngFor="let step of steps"
-      class="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2"
-    >
+    @for (step of steps; track step.title) {
+    <div class="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2">
       <div>
         <p class="font-semibold text-[var(--fg)]">{{ step.title }}</p>
         <p class="text-xs text-slate-500">Owner: {{ step.owner }}</p>
@@ -17,6 +15,7 @@
         {{ step.status }}
       </span>
     </div>
+    }
   </div>
 </section>
 

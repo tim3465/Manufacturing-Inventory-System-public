@@ -9,10 +9,8 @@
       Team members
     </div>
     <ul class="divide-y divide-[var(--border)]">
-      <li
-        *ngFor="let user of users"
-        class="px-4 py-3 flex items-center justify-between text-sm"
-      >
+      @for (user of users; track user.name) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
         <div>
           <p class="font-semibold text-[var(--fg)]">{{ user.name }}</p>
           <p class="text-slate-500">{{ user.role }}</p>
@@ -21,6 +19,7 @@
           {{ user.status }}
         </span>
       </li>
+      }
     </ul>
   </div>
 </section>

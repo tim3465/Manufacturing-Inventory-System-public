@@ -9,10 +9,8 @@
       Sales orders
     </div>
     <ul class="divide-y divide-[var(--border)]">
-      <li
-        *ngFor="let order of orders"
-        class="px-4 py-3 flex items-center justify-between text-sm"
-      >
+      @for (order of orders; track order.id) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
         <div>
           <p class="font-semibold text-[var(--fg)]">{{ order.id }}</p>
           <p class="text-slate-500">{{ order.customer }}</p>
@@ -21,6 +19,7 @@
           {{ order.status }}
         </span>
       </li>
+      }
     </ul>
   </div>
 </section>

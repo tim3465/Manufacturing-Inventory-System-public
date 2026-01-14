@@ -15,10 +15,8 @@
       </button>
     </div>
     <ul class="divide-y divide-[var(--border)]">
-      <li
-        *ngFor="let job of jobs"
-        class="px-4 py-3 flex items-center justify-between text-sm"
-      >
+      @for (job of jobs; track job.id) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
         <div>
           <p class="font-semibold text-[var(--fg)]">{{ job.id }}</p>
           <p class="text-slate-500">{{ job.part }}</p>
@@ -27,6 +25,7 @@
           {{ job.status }}
         </span>
       </li>
+      }
     </ul>
   </div>
 </section>

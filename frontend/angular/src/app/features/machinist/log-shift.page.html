@@ -11,13 +11,12 @@
     </div>
 
     <div class="grid sm:grid-cols-3 gap-3">
-      <div
-        *ngFor="let task of tasks"
-        class="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3"
-      >
+      @for (task of tasks; track task.label) {
+      <div class="rounded-lg border border-[var(--border)] bg-[var(--bg)] p-3">
         <p class="text-sm text-slate-500">{{ task.label }}</p>
         <p class="text-xl font-semibold text-[var(--fg)]">{{ task.value }}</p>
       </div>
+      }
     </div>
 
     <button
