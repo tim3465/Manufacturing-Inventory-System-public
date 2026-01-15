@@ -1,0 +1,43 @@
+<header
+>
+  <div
+    class="w-full h-full px-4 md:px-6 flex items-center justify-between gap-4"
+  >
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition"
+        aria-label="Toggle navigation"
+        (click)="onToggleMenu()"
+      >
+        <span class="sr-only">Toggle navigation</span>
+        <span class="flex flex-col gap-1">
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+        </span>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3 md:gap-4">
+      <button
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors"
+        type="button"
+        (click)="toggleTheme()"
+      >
+        <span class="h-2 w-2 rounded-full"
+              [class.bg-green-500]="currentTheme() === 'theme-light'"
+              [class.bg-blue-400]="currentTheme() === 'theme-dark'"></span>
+        <span>{{ currentTheme() === 'theme-dark' ? 'Dark' : 'Light' }} theme</span>
+      </button>
+
+      <div
+        class="h-10 w-10 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm"
+        title="User"
+      >
+        U
+      </div>
+    </div>
+  </div>
+</header>
+

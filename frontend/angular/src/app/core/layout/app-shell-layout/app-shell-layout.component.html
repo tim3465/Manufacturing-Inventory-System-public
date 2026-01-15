@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-[var(--bg)] text-[var(--fg)] flex">
+  @if (mobileNavOpen()) {
+  <div
+    class="fixed inset-0 bg-black/50 z-30 md:hidden"
+    (click)="closeMobileNav()"
+    aria-hidden="true"
+  ></div>
+  }
+
+  <aside
+    class="fixed inset-y-0 left-0 w-64 border-r border-[var(--border)] bg-[var(--surface)] transform transition-transform duration-200 ease-in-out -translate-x-full z-40 md:translate-x-0 md:static md:block"
+    [class.translate-x-0]="mobileNavOpen()"
+  >
+    <app-sidebar (closeMenu)="closeMobileNav()" [mobileNavOpen]="mobileNavOpen()"></app-sidebar>
+  </aside>
+
+  <div class="flex-1 min-h-screen flex flex-col">
+    <div class="sticky top-0 inset-x-0 z-30 bg-[var(--bg)] px-3 md:px-4 pt-3 md:pt-4 ">
+      <app-header
+        class="shadow-sm border border-[var(--border)] bg-[var(--surface)] rounded-xl py-4 md:py-3"
+        [mobileNavOpen]="mobileNavOpen()"
+        (menuToggle)="toggleMobileNav()"
+      ></app-header>
+    </div>
+
+    <main class="flex-1 w-full bg-[var(--bg)] text-[var(--fg)] md:px-4 pt-3 pb-12">
+      <div class="max-w-8xl mx-auto">
+        <div class="px-3 pt-3 pb-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-sm">
+          <router-outlet ></router-outlet>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+

@@ -1,0 +1,21 @@
+<section class="space-y-6">
+  <header class="space-y-1">
+    <p class="text-sm text-slate-500">Supervisor</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Job Planning</h1>
+  </header>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3">
+    @for (step of steps; track step.title) {
+    <div class="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2">
+      <div>
+        <p class="font-semibold text-[var(--fg)]">{{ step.title }}</p>
+        <p class="text-xs text-slate-500">Owner: {{ step.owner }}</p>
+      </div>
+      <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
+        {{ step.status }}
+      </span>
+    </div>
+    }
+  </div>
+</section>
+

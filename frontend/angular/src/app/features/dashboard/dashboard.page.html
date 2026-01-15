@@ -1,0 +1,44 @@
+<section class="space-y-6">
+  <header class="space-y-1">
+    <p class="text-sm text-slate-500">Overview</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Dashboard</h1>
+  </header>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (stat of stats; track stat.label) {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+      <p class="text-sm text-slate-500">{{ stat.label }}</p>
+      <p class="text-3xl font-semibold text-[var(--fg)] mt-2">
+        {{ stat.value }}
+      </p>
+    </div>
+    }
+  </div>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-[var(--fg)]">Activity</h2>
+      <button
+        type="button"
+        class="text-sm text-slate-500 hover:text-[var(--fg)] underline underline-offset-4"
+      >
+        View all
+      </button>
+    </div>
+    <ul class="mt-4 divide-y divide-[var(--border)]">
+      <li class="py-3 flex items-center justify-between text-sm">
+        <span>Job #182 moved to QA</span>
+        <span class="text-slate-500">2m ago</span>
+      </li>
+      <li class="py-3 flex items-center justify-between text-sm">
+        <span>Machine HA-01 is scheduled for maintenance</span>
+        <span class="text-slate-500">1h ago</span>
+      </li>
+      <li class="py-3 flex items-center justify-between text-sm">
+        <span>Order #5125 received</span>
+        <span class="text-slate-500">Yesterday</span>
+      </li>
+    </ul>
+  </div>
+</section>
+

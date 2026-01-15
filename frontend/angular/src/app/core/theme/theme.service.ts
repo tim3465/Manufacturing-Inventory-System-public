@@ -46,4 +46,17 @@ export class ThemeService {
       // best-effort
     }
   }
+  setTheme(theme: ThemeName): void {
+    this.applyTheme(theme);
+  }
+
+  toggleTheme(): void {
+    const isDark = document.body.classList.contains('theme-dark');
+    this.applyTheme(isDark ? 'theme-light' : 'theme-dark');
+  }
+
+
+
+
 }
+

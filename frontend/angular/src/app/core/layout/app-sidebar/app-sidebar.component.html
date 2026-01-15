@@ -1,0 +1,68 @@
+<nav class="h-full flex flex-col gap-4 px-4 py-6 text-sm">
+  <div class="flex items-center justify-center">
+  <p class="text-2xl font-semibold leading-tight text-center pt-2 pb-5">
+    CNC App
+  </p>
+</div>
+
+  <div class="space-y-1">
+    @for (link of topLinks; track link.path) {
+    <a
+      [routerLink]="link.path"
+      routerLinkActive="active"
+      class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+      (click)="onClose()"
+    >
+      <span>{{ link.label }}</span>
+    </a>
+    }
+  </div>
+
+  <div class="space-y-3 ">
+    <div class="flex items-center justify-between md:hidden">
+      <span class="text-xs text-slate-500 uppercase tracking-wide">Role</span>
+      <button
+        type="button"
+        class="text-xs text-slate-500 hover:text-[var(--fg)]"
+        (click)="onClose()"
+        aria-label="Close menu"
+      >
+        ✕
+      </button>
+    </div>
+
+    @for (group of groups; track group.role) {
+    <div class="space-y-1">
+      <button
+        type="button"
+        (click)="toggle(group.role)"
+        class="w-full flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors text-left"
+      >
+        <span class="font-semibold">{{ roleLabels[group.role] }}</span>
+        <span
+          class="text-xs text-slate-400 transition-transform"
+          [class.rotate-90]="isExpanded()(group.role)"
+        >
+          ›
+        </span>
+      </button>
+      @if (isExpanded()(group.role)) {
+
+      <div class="ml-2 border-l border-[var(--border)] pl-3 space-y-1">
+        @for (item of group.items; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors"
+          (click)="onClose()"
+        >
+          <span>{{ item.label }}</span>
+          <span class="text-xs text-slate-400">›</span>
+        </a>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+</nav>
