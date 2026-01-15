@@ -31,6 +31,14 @@
         <span>{{ currentTheme() === 'theme-dark' ? 'Dark' : 'Light' }} theme</span>
       </button>
 
+      <button
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors"
+        type="button"
+        (click)="logout()"
+      >
+        Logout
+      </button>
+
       <div
         class="h-10 w-10 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm"
         title="User"

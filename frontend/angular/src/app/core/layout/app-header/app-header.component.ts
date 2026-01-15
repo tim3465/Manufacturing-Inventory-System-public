@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { MockAuthService } from '../../auth/mock-auth.service';
 import { ThemeName, ThemeService } from '../../theme/theme.service';
 
 @Component({
@@ -12,6 +14,8 @@ import { ThemeName, ThemeService } from '../../theme/theme.service';
 })
 export class AppHeaderComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
+  private readonly router = inject(Router);
+  private readonly mockAuth = inject(MockAuthService);
 
   protected readonly currentTheme = signal<ThemeName>('theme-light');
   @Input() mobileNavOpen = false;
@@ -31,6 +35,11 @@ export class AppHeaderComponent implements OnInit {
 
   onToggleMenu(): void {
     this.menuToggle.emit();
+  }
+
+  logout(): void {
+    this.mockAuth.logout();
+    void this.router.navigateByUrl('/login');
   }
 
   private syncThemeFromDocument(): void {
