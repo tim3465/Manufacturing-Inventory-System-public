@@ -1,15 +1,9 @@
 <nav class="h-full flex flex-col gap-4 px-4 py-6 text-sm">
-  <div class="flex items-center gap-3">
-    <div
-      class="h-10 w-10 rounded-lg bg-[var(--border)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm tracking-wide"
-    >
-      CNC
-    </div>
-    <div>
-      <p class="text-sm text-slate-500">Console</p>
-      <p class="text-lg font-semibold leading-tight">CNC App</p>
-    </div>
-  </div>
+  <div class="flex items-center justify-center">
+  <p class="text-2xl font-semibold leading-tight text-center pt-2 pb-5">
+    CNC App
+  </p>
+</div>
 
   <div class="space-y-1">
     @for (link of topLinks; track link.path) {
@@ -20,12 +14,11 @@
       (click)="onClose()"
     >
       <span>{{ link.label }}</span>
-      <span class="text-xs text-slate-400">›</span>
     </a>
     }
   </div>
 
-  <div class="space-y-3 pt-2">
+  <div class="space-y-3 ">
     <div class="flex items-center justify-between md:hidden">
       <span class="text-xs text-slate-500 uppercase tracking-wide">Role</span>
       <button
