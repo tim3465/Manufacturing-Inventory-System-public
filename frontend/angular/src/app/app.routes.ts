@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AppShellLayoutComponent } from './core/layout/app-shell-layout/app-shell-layout.component';
+import { authGuard } from './core/auth/auth.guard';
 import { MockAuthLoginPageComponent } from './features/auth/login.page';
 import { DashboardPageComponent } from './features/dashboard/dashboard.page';
 import { LogShiftPageComponent } from './features/machinist/log-shift.page';
@@ -25,6 +26,7 @@ export const routes: Routes = [
   {
     path: '',
     component: AppShellLayoutComponent,
+    canMatch: [authGuard],
     children: [
       { path: 'dashboard', component: DashboardPageComponent },
       { path: 'machinist/my-jobs', component: MyJobsPageComponent },

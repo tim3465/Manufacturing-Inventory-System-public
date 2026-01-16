@@ -7,17 +7,21 @@
     </div>
 
     <form class="space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (authError) {
+        <p class="text-sm text-red-500">{{ authError }}</p>
+      }
+
       <div class="space-y-1">
-        <label class="text-sm font-medium text-[var(--fg)]" for="username">Username</label>
+        <label class="text-sm font-medium text-[var(--fg)]" for="email">Email</label>
         <input
-          id="username"
-          type="text"
+          id="email"
+          type="email"
           class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-[var(--fg)] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-          formControlName="username"
+          formControlName="email"
           autocomplete="username"
         />
-        @if (showError('username')) {
-          <p class="text-sm text-red-500">Username required</p>
+        @if (showError('email')) {
+          <p class="text-sm text-red-500">Email required</p>
         }
       </div>
 
