@@ -1,13 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthApi } from '../../core/api/auth.api';
 import { AuthService } from '../../core/auth/auth.service';
-
-type LoginResponseDto = {
-  accessToken: string;
-};
 
 @Component({
   selector: 'app-mock-auth-login-page',
@@ -23,7 +20,7 @@ export class MockAuthLoginPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly http = inject(HttpClient);
+  private readonly authApi = inject(AuthApi);
   private readonly auth = inject(AuthService);
 
   protected submitted = false;
@@ -51,7 +48,7 @@ export class MockAuthLoginPageComponent implements OnInit {
 
     const { email, password } = this.form.getRawValue();
 
-    this.http.post<LoginResponseDto>('/api/auth/login', { email, password }).subscribe({
+    this.authApi.login({ email, password }).subscribe({
       next: (res) => {
         this.auth.setToken(res.accessToken);
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
