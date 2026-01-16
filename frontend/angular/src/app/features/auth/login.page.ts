@@ -1,16 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
-type LoginResponseDto = {
-  accessToken: string;
-};
-
 @Component({
-  selector: 'app-mock-auth-login-page',
+  selector: 'app-auth-login-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.page.html',
@@ -19,11 +14,10 @@ type LoginResponseDto = {
     class: 'block min-h-screen bg-[var(--bg)] text-[var(--fg)]'
   }
 })
-export class MockAuthLoginPageComponent implements OnInit {
+export class AuthLoginPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
 
   protected submitted = false;
@@ -48,25 +42,13 @@ export class MockAuthLoginPageComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    const { email, password} = this.form.getRawValue();
 
-    const { email, password } = this.form.getRawValue();
-
-    this.http.post<LoginResponseDto>('/api/auth/login', { email, password }).subscribe({
-      next: (res) => {
-        this.auth.setToken(res.accessToken);
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        const target =
-          returnUrl && returnUrl.startsWith('/') ? returnUrl : '/dashboard';
-        void this.router.navigateByUrl(target);
-      },
-      error: (err: unknown) => {
-        if (err instanceof HttpErrorResponse && err.status === 401) {
-          this.authError = 'Invalid email or password';
-          return;
-        }
-        // TODO: optionally surface a generic error message; keep minimal for now
-      }
+    this.auth.login(email,password,returnUrl ).subscribe((errorMessage)=>{
+      this.authError = errorMessage;
     });
+
   }
 
   protected showError(controlName: 'email' | 'password'): boolean {
