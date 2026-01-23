@@ -6,7 +6,7 @@
 </div>
 
   <div class="space-y-1">
-    @for (link of topLinks; track link.path) {
+    @for (link of visibleTopLinks(); track link.path) {
     <a
       [routerLink]="link.path"
       routerLinkActive="active"
@@ -31,22 +31,22 @@
       </button>
     </div>
 
-    @for (group of groups; track group.role) {
+    @for (group of visibleGroups(); track group.title) {
     <div class="space-y-1">
       <button
         type="button"
-        (click)="toggle(group.role)"
+        (click)="toggle(group.title)"
         class="w-full flex items-center justify-between rounded-lg px-3 py-2 text-[var(--fg)] border border-transparent hover:border-[var(--border)] hover:bg-[var(--surface)] transition-colors text-left"
       >
-        <span class="font-semibold">{{ roleLabels[group.role] }}</span>
+        <span class="font-semibold">{{ roleLabels[group.title] }}</span>
         <span
           class="text-xs text-slate-400 transition-transform"
-          [class.rotate-90]="isExpanded()(group.role)"
+          [class.rotate-90]="isExpanded()(group.title)"
         >
           ›
         </span>
       </button>
-      @if (isExpanded()(group.role)) {
+      @if (isExpanded()(group.title)) {
 
       <div class="ml-2 border-l border-[var(--border)] pl-3 space-y-1">
         @for (item of group.items; track item.path) {

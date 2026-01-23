@@ -4,14 +4,15 @@ import { AuthApi } from '../api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { ToastService } from '../ui/toast/toast.service';
+import { Role, Roles } from './roles';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly router = inject(Router);
   private readonly storageKey = 'cncapp.accessToken';
   private readonly authApi = inject(AuthApi);
-  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
+  private cachedRoles: Role[] | null = null;
 
 
 
@@ -44,16 +45,80 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
 
   setToken(token: string): void {
     localStorage.setItem(this.storageKey, token);
+    this.cachedRoles = this.parseRolesFromToken(token);
   }
 
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
+  getRoles(): Role[] {
+    if (this.cachedRoles) return this.cachedRoles;
+
+    const token = this.getToken();
+    this.cachedRoles = token ? this.parseRolesFromToken(token) : [];
+    return this.cachedRoles;
+  }
+
+
+  isAdmin(): boolean {
+    return this.getRoles().includes(Roles.Admin);
+  }
+
+  hasAnyRole(roles: Role[]): boolean {
+    if (this.isAdmin()) return true;
+    const current = this.getRoles();
+    return roles.some((role) => current.includes(role));
+  }
+
   logout(): void {
     localStorage.removeItem(this.storageKey);
+    this.clearCache();
     this.toast.info('Logged out');
     void this.router.navigateByUrl('/login');
+  }
+
+  clearCache(): void {
+    this.cachedRoles = null;
+  }
+
+
+  private parseRolesFromToken(token: string): Role[] {
+    const payload = this.decodeJwtPayload(token);
+    if (!payload || typeof payload !== 'object') return [];
+
+    const rawRoles =
+      payload['role'] ??
+      payload['roles'] ??
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+    if (!rawRoles) return [];
+
+    const roles = Array.isArray(rawRoles) ? rawRoles : [rawRoles];
+    return roles
+      .filter((role): role is string => typeof role === 'string')
+      .map((role) => role.trim())
+      .filter((role) => role.length > 0) as Role[];
+  }
+
+
+  private decodeJwtPayload(token: string): Record<string, unknown> | null {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const payload = parts[1];
+    try {
+      const decoded = this.decodeBase64Url(payload);
+      return JSON.parse(decoded) as Record<string, unknown>;
+    } catch {
+      return null;
+    }
+  }
+
+  private decodeBase64Url(value: string): string {
+    const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+    return atob(padded);
   }
 }
 

@@ -1,18 +1,22 @@
-export type Role = 'Machinist' | 'ShippingReceiving' | 'Supervisor' | 'Admin';
+import { Role as AuthRole, Roles } from '../auth/roles';
+
+export type Role = AuthRole;
 
 export const ROLE_LABELS: Record<Role, string> = {
-  Machinist: 'Machinist',
-  ShippingReceiving: 'Shipping / Receiving',
-  Supervisor: 'Supervisor',
-  Admin: 'Admin'
+  [Roles.Admin]: 'Admin',
+  [Roles.Machinist]: 'Machinist',
+  [Roles.Shipping]: 'Shipping / Receiving',
+  [Roles.Supervisor]: 'Supervisor',
+  [Roles.User]: 'User'
 };
 
 export const ALL_ROLES: Role[] = [
-  'Machinist',
-  'ShippingReceiving',
-  'Supervisor',
-  'Admin'
+  Roles.Admin,
+  Roles.Machinist,
+  Roles.Shipping,
+  Roles.Supervisor,
+  Roles.User
 ];
 
-export const DEFAULT_ROLE: Role = 'Machinist';
+export const DEFAULT_ROLE: Role = Roles.Machinist;
 
