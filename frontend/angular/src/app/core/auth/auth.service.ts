@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthApi } from '../api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { ToastService } from '../ui/toast/toast.service';
 import { Role, Roles } from './roles';
+import { ApiCacheService } from '../api/api-cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
   private readonly storageKey = 'cncapp.accessToken';
   private readonly authApi = inject(AuthApi);
   private readonly toast = inject(ToastService);
+  private readonly apiCache = inject(ApiCacheService);
   private cachedRoles: Role[] | null = null;
   private cachedDisplayName: string | null = null;
 
@@ -45,6 +47,7 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
   }
 
   setToken(token: string): void {
+    this.apiCache.clear();
     localStorage.setItem(this.storageKey, token);
     this.cachedRoles = this.parseRolesFromToken(token);
     this.cachedDisplayName = this.parseDisplayNameFromToken(token);
@@ -88,6 +91,7 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
   }
 
   clearCache(): void {
+    this.apiCache.clear();
     this.cachedRoles = null;
     this.cachedDisplayName = null;
   }
