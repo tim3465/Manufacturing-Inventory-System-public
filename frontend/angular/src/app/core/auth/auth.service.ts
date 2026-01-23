@@ -13,6 +13,7 @@ export class AuthService {
   private readonly authApi = inject(AuthApi);
   private readonly toast = inject(ToastService);
   private cachedRoles: Role[] | null = null;
+  private cachedDisplayName: string | null = null;
 
 
 
@@ -46,6 +47,7 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
   setToken(token: string): void {
     localStorage.setItem(this.storageKey, token);
     this.cachedRoles = this.parseRolesFromToken(token);
+    this.cachedDisplayName = this.parseDisplayNameFromToken(token);
   }
 
   isLoggedIn(): boolean {
@@ -58,6 +60,13 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
     const token = this.getToken();
     this.cachedRoles = token ? this.parseRolesFromToken(token) : [];
     return this.cachedRoles;
+  }
+
+  getDisplayName(): string | null {
+    if (this.cachedDisplayName) return this.cachedDisplayName;
+    const token = this.getToken();
+    this.cachedDisplayName = token ? this.parseDisplayNameFromToken(token) : null;
+    return this.cachedDisplayName;
   }
 
 
@@ -80,6 +89,7 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
 
   clearCache(): void {
     this.cachedRoles = null;
+    this.cachedDisplayName = null;
   }
 
 
@@ -99,6 +109,23 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
       .filter((role): role is string => typeof role === 'string')
       .map((role) => role.trim())
       .filter((role) => role.length > 0) as Role[];
+  }
+
+  private parseDisplayNameFromToken(token: string): string | null {
+    const payload = this.decodeJwtPayload(token);
+    if (!payload || typeof payload !== 'object') return null;
+
+    const rawName =
+      payload['name'] ??
+      payload['unique_name'] ??
+      payload['preferred_username'] ??
+      payload['email'] ??
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ??
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+
+    if (typeof rawName !== 'string') return null;
+    const trimmed = rawName.trim();
+    return trimmed.length > 0 ? trimmed : null;
   }
 
 

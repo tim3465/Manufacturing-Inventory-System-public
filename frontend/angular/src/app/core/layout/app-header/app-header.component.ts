@@ -39,6 +39,15 @@ export class AppHeaderComponent implements OnInit {
     this.auth.logout();
   }
 
+  protected displayName(): string {
+    return this.auth.getDisplayName() ?? 'User';
+  }
+
+  protected displayInitial(): string {
+    const name = this.displayName().trim();
+    return name ? name[0].toUpperCase() : 'U';
+  }
+
   private syncThemeFromDocument(): void {
     const body = document.body;
     const theme: ThemeName = body.classList.contains('theme-dark')
