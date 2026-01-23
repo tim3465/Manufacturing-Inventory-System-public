@@ -78,7 +78,7 @@ clearGetCache(path: string, params?: QueryParams): void {
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
     return `${cleanBase}${cleanPath}`;
   }
-  
+
   private toHttpParams(params?: QueryParams): HttpParams | undefined {
     if (!params) return undefined;
     if (params instanceof HttpParams) return params;
