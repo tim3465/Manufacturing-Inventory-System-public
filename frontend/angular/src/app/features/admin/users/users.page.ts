@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { UsersApi } from '../../core/api/users.api';
-import { UserDto } from '../../core/dtos/users';
-import { ToastService } from '../../core/ui/toast/toast.service';
-import { AuthService } from '../../core/auth/auth.service';
+import { UsersApi } from '../../../core/api/users.api';
+import { UserDto } from '../../../core/dtos/users';
+import { ToastService } from '../../../core/ui/toast/toast.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
 
 @Component({
   selector: 'app-users-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AddUserModalComponent],
   templateUrl: './users.page.html',
   styleUrl: './users.page.css'
 })
@@ -22,6 +23,7 @@ export class UsersPageComponent implements OnInit {
   protected readonly users = signal<UserDto[]>([]);
   protected readonly showAll = signal<boolean>(false);
   protected readonly canShowAllToggle = computed(() => this.auth.isAdmin());
+  protected readonly isAddUserOpen = signal<boolean>(false);
 
   protected readonly userRows = computed(() =>
     this.users().map((u) => ({
@@ -34,6 +36,14 @@ export class UsersPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+  }
+
+  protected openAddUser(): void {
+    this.isAddUserOpen.set(true);
+  }
+
+  protected closeAddUser(): void {
+    this.isAddUserOpen.set(false);
   }
 
   protected onToggleAllUsers(event: Event): void {

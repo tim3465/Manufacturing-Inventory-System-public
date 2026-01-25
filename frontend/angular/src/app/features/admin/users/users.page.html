@@ -5,29 +5,39 @@
       <h1 class="text-2xl font-semibold text-[var(--fg)]">Users</h1>
     </div>
 
-    @if (canShowAllToggle()) {
-      <label class="inline-flex items-center gap-3 select-none">
-        <span class="text-sm text-slate-500">All users</span>
-        <span class="relative inline-flex">
-          <input
-            type="checkbox"
-            class="sr-only"
-            [checked]="showAll()"
-            (change)="onToggleAllUsers($event)"
-          />
-          <span
-            class="relative inline-flex h-6 w-11 items-center rounded-full border border-[var(--border)] transition-colors"
-            [ngClass]="showAll() ? 'bg-blue-600' : 'bg-[var(--surface)]'"
-            aria-hidden="true"
-          >
+    <div class="flex items-center gap-4">
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm"
+        (click)="openAddUser()"
+      >
+        Add user
+      </button>
+
+      @if (canShowAllToggle()) {
+        <label class="inline-flex items-center gap-3 select-none">
+          <span class="text-sm text-slate-500">All users</span>
+          <span class="relative inline-flex">
+            <input
+              type="checkbox"
+              class="sr-only"
+              [checked]="showAll()"
+              (change)="onToggleAllUsers($event)"
+            />
             <span
-              class="inline-block h-5 w-5 transform rounded-full bg-[var(--bg)] transition-transform"
-              [ngClass]="showAll() ? 'translate-x-5' : 'translate-x-1'"
-            ></span>
+              class="relative inline-flex h-6 w-11 items-center rounded-full border border-[var(--border)] transition-colors"
+              [ngClass]="showAll() ? 'bg-blue-600' : 'bg-[var(--surface)]'"
+              aria-hidden="true"
+            >
+              <span
+                class="inline-block h-5 w-5 transform rounded-full bg-[var(--bg)] transition-transform"
+                [ngClass]="showAll() ? 'translate-x-5' : 'translate-x-1'"
+              ></span>
+            </span>
           </span>
-        </span>
-      </label>
-    }
+        </label>
+      }
+    </div>
   </header>
 
   <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
@@ -54,5 +64,12 @@
       </ul>
     }
   </div>
+
+  @if (isAddUserOpen()) {
+    <app-add-user-modal
+      (closed)="closeAddUser()"
+      (created)="loadUsers()"
+    />
+  }
 </section>
 
