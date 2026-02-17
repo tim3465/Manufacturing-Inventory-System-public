@@ -6,6 +6,14 @@ namespace CncApp.Application.Interfaces;
 public interface IIdentityProvisioningService
 {
     /// <summary>
+    /// Validates that all provided roles exist in the Identity role store.
+    /// This is intended to be called before user creation to prevent partial provisioning.
+    /// </summary>
+    /// <param name="roles">Roles to validate.</param>
+    /// <exception cref="InvalidOperationException">Thrown when one or more roles do not exist.</exception>
+    Task ValidateRolesExistAsync(IEnumerable<string> roles);
+
+    /// <summary>
     /// Creates a new Identity user with the specified email, username, and password.
     /// Note: Identity UserName will be set to Email (UserName = Email).
     /// </summary>
