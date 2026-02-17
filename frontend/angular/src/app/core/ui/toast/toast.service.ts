@@ -1,4 +1,5 @@
 import { Injectable, Signal, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Toast, ToastPhase, ToastType } from './toast.model';
 
 const DEFAULT_DURATION_MS = 4000;
@@ -18,6 +19,11 @@ export class ToastService {
 
   error(message: string, durationMs?: number) {
     this.add('error', message, durationMs);
+  }
+
+
+  errorMessage(err: unknown, durationMs?: number, fallbackMessage = 'Request failed') {
+    this.add('error', this.extractErrorMessage(err, fallbackMessage), durationMs);
   }
 
   info(message: string, durationMs?: number) {
@@ -67,6 +73,56 @@ export class ToastService {
     this._toasts.update((curr) =>
       curr.map((toast) => (toast.id === id ? { ...toast, phase } : toast))
     );
+  }
+
+  private extractErrorMessage(err: unknown, fallbackMessage: string): string {
+    // Angular HttpClient errors
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error as unknown;
+
+      // backend returns a string body (sometimes for non-JSON errors)
+      if (typeof body === 'string') {
+        const trimmed = body.trim();
+        if (trimmed) return trimmed;
+      }
+
+      // RFC7807 ProblemDetails
+      if (body && typeof body === 'object') {
+        const anyBody = body as Record<string, unknown>;
+        const detail = anyBody['detail'];
+        if (typeof detail === 'string' && detail.trim()) return detail.trim();
+
+        const title = anyBody['title'];
+        if (typeof title === 'string' && title.trim()) return title.trim();
+
+        // common validation shape: { errors: { Field: ["msg"] } }
+        const errors = anyBody['errors'];
+        if (errors && typeof errors === 'object') {
+          const msgs: string[] = [];
+          for (const value of Object.values(errors as Record<string, unknown>)) {
+            if (typeof value === 'string' && value.trim()) msgs.push(value.trim());
+            if (Array.isArray(value)) {
+              for (const item of value) {
+                if (typeof item === 'string' && item.trim()) msgs.push(item.trim());
+              }
+            }
+          }
+          if (msgs.length) return msgs.join('\n');
+        }
+
+        // common shape: { message: "..." }
+        const message = anyBody['message'];
+        if (typeof message === 'string' && message.trim()) return message.trim();
+      }
+
+      // last-resort HttpErrorResponse message
+      if (typeof err.message === 'string' && err.message.trim()) return err.message.trim();
+    }
+
+    // Some callers might pass a string directly
+    if (typeof err === 'string' && err.trim()) return err.trim();
+
+    return fallbackMessage;
   }
 
   private createId(): string {

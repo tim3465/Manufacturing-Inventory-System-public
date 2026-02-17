@@ -66,8 +66,8 @@ export class AddUserModalComponent {
         this.created.emit();
         this.closed.emit();
       },
-      error: () => {
-        this.toast.error('Failed to create user');
+      error: (err: unknown) => {
+        this.toast.errorMessage(err, undefined, 'Failed to create user');
         this.submitting.set(false);
       }
     });
