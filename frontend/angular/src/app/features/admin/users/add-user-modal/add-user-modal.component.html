@@ -82,8 +82,8 @@
               class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
               formControlName="role"
             >
-              @for (r of roleOptions; track r.value) {
-                <option [value]="r.value">{{ r.label }}</option>
+              @for (r of roleOptions(); track r) {
+                <option [value]="r">{{ roleLabels[r] }}</option>
               }
             </select>
             @if (form.controls.role.touched && form.controls.role.invalid) {
