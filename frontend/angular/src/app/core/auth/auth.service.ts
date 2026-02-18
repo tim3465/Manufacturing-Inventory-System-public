@@ -54,7 +54,16 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+
+    if (this.isTokenExpired(token)) {
+      localStorage.removeItem(this.storageKey);
+      this.clearCache();
+      return false;
+    }
+
+    return true;
   }
 
   getRoles(): Role[] {
@@ -150,6 +159,14 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
     const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
     const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
     return atob(padded);
+  }
+
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodeJwtPayload(token);
+    const exp = payload?.['exp'];
+
+    if (typeof exp !== 'number') return true;
+    return Date.now() >= exp * 1000;
   }
 }
 
