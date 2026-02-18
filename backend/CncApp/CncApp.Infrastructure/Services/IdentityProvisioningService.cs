@@ -101,5 +101,18 @@ public class IdentityProvisioningService : IIdentityProvisioningService
             }
         }
     }
+
+    /// <inheritdoc />
+    public async Task<List<string>> GetRolesAsync(int identityUserId, CancellationToken ct = default)
+    {
+        var identityUser = await _userManager.FindByIdAsync(identityUserId.ToString());
+        if (identityUser == null)
+        {
+            throw new InvalidOperationException($"Identity user with ID {identityUserId} not found.");
+        }
+
+        var roles = await _userManager.GetRolesAsync(identityUser);
+        return roles.ToList();
+    }
 }
 

@@ -33,5 +33,14 @@ public interface IIdentityProvisioningService
     /// <param name="ct">Cancellation token.</param>
     /// <exception cref="InvalidOperationException">Thrown when role assignment fails.</exception>
     Task AssignRolesAsync(int identityUserId, IEnumerable<string> roles, CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets Identity roles assigned to an Identity user.
+    /// </summary>
+    /// <param name="identityUserId">The Identity UserId.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of role names assigned to the user.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the Identity user is not found.</exception>
+    Task<List<string>> GetRolesAsync(int identityUserId, CancellationToken ct = default);
 }
 
