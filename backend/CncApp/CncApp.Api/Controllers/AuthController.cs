@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CncApp.Api.ApiDtos;
+using CncApp.Application.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,16 @@ public class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
     private readonly IConfiguration _configuration;
+    private readonly IUserRepository _userRepository;
 
-    public AuthController(UserManager<IdentityUser<int>> userManager, IConfiguration configuration)
+    public AuthController(
+        UserManager<IdentityUser<int>> userManager,
+        IConfiguration configuration,
+        IUserRepository userRepository)
     {
         _userManager = userManager;
         _configuration = configuration;
+        _userRepository = userRepository;
     }
 
     // Conventions:
@@ -35,8 +41,15 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
     {
+        if (string.IsNullOrWhiteSpace(request.Email))
+        {
+            return Unauthorized();
+        }
+
+        var email = request.Email.Trim();
+
         // Find user by email
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
             return Unauthorized();
@@ -45,6 +58,12 @@ public class AuthController : ControllerBase
         // Check password
         var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!passwordValid)
+        {
+            return Unauthorized();
+        }
+
+        var domainUser = await _userRepository.GetByIdentityUserIdAsync(user.Id);
+        if (domainUser == null || domainUser.InactivatedDateTime != null)
         {
             return Unauthorized();
         }
@@ -107,6 +126,7 @@ public class AuthController : ControllerBase
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
 }
 
 

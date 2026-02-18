@@ -6,6 +6,7 @@ import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
 import { ManageUserRolesModalComponent } from './manage-user-roles-modal/manage-user-roles-modal.component';
+import { InactivateUserModalComponent } from './inactivate-user-modal/inactivate-user-modal.component';
 
 interface UserRow {
   id: number;
@@ -17,7 +18,7 @@ interface UserRow {
 @Component({
   selector: 'app-users-page',
   standalone: true,
-  imports: [CommonModule, AddUserModalComponent, ManageUserRolesModalComponent],
+  imports: [CommonModule, AddUserModalComponent, ManageUserRolesModalComponent, InactivateUserModalComponent],
   templateUrl: './users.page.html',
   styleUrl: './users.page.css'
 })
@@ -33,7 +34,9 @@ export class UsersPageComponent implements OnInit {
   protected readonly canShowAllToggle = computed(() => this.auth.isAdmin());
   protected readonly isAddUserOpen = signal<boolean>(false);
   protected readonly isManageRolesOpen = signal<boolean>(false);
+  protected readonly isInactivateUserOpen = signal<boolean>(false);
   protected readonly selectedUserForRoles = signal<UserRow | null>(null);
+  protected readonly selectedUserForInactivate = signal<UserRow | null>(null);
 
   protected readonly userRows = computed(() =>
     this.users().map((u) => ({
@@ -64,6 +67,16 @@ export class UsersPageComponent implements OnInit {
   protected closeManageRoles(): void {
     this.isManageRolesOpen.set(false);
     this.selectedUserForRoles.set(null);
+  }
+
+  protected openInactivateUser(user: UserRow): void {
+    this.selectedUserForInactivate.set(user);
+    this.isInactivateUserOpen.set(true);
+  }
+
+  protected closeInactivateUser(): void {
+    this.isInactivateUserOpen.set(false);
+    this.selectedUserForInactivate.set(null);
   }
 
   protected onToggleAllUsers(event: Event): void {

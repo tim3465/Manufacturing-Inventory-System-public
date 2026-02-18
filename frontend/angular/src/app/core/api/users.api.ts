@@ -50,6 +50,16 @@ export class UsersApi {
       })
     );
   }
+
+  /** PATCH /api/users/{id}/inactivate - inactivate user (Admin-only) */
+  inactivate(id: number): Observable<boolean> {
+    return this.api.patch<boolean>(`${_PATH}/${id}/inactivate`, {}).pipe(
+      tap(() => {
+        this.api.clearGetCache(`${_PATH}`);
+        this.api.clearGetCache(`${_PATH}/all`);
+      })
+    );
+  }
 }
 
 

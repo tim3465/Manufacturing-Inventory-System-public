@@ -57,9 +57,19 @@
               <p class="text-slate-500">{{ user.email }}</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
-                {{ user.status }}
-              </span>
+              @if (user.status === 'Active') {
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border border-red-300 text-red-700 hover:bg-red-50 transition text-xs"
+                  (click)="openInactivateUser(user)"
+                >
+                  Inactivate
+                </button>
+              } @else {
+                <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
+                  Inactive
+                </span>
+              }
               <button
                 type="button"
                 class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
@@ -88,6 +98,16 @@
       [email]="selectedUserForRoles()!.email"
       (closed)="closeManageRoles()"
       (updated)="loadUsers()"
+    />
+  }
+
+  @if (isInactivateUserOpen() && selectedUserForInactivate()) {
+    <app-inactivate-user-modal
+      [userId]="selectedUserForInactivate()!.id"
+      [fullName]="selectedUserForInactivate()!.name"
+      [email]="selectedUserForInactivate()!.email"
+      (closed)="closeInactivateUser()"
+      (inactivated)="loadUsers()"
     />
   }
 </section>
