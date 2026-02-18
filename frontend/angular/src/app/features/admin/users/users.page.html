@@ -54,11 +54,20 @@
           <li class="px-4 py-3 flex items-center justify-between text-sm">
             <div>
               <p class="font-semibold text-[var(--fg)]">{{ user.name }}</p>
-              <p class="text-slate-500">{{ user.userName }}</p>
+              <p class="text-slate-500">{{ user.email }}</p>
             </div>
-            <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
-              {{ user.status }}
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
+                {{ user.status }}
+              </span>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
+                (click)="openManageRoles(user)"
+              >
+                Manage roles
+              </button>
+            </div>
           </li>
         }
       </ul>
@@ -69,6 +78,16 @@
     <app-add-user-modal
       (closed)="closeAddUser()"
       (created)="loadUsers()"
+    />
+  }
+
+  @if (isManageRolesOpen() && selectedUserForRoles()) {
+    <app-manage-user-roles-modal
+      [userId]="selectedUserForRoles()!.id"
+      [fullName]="selectedUserForRoles()!.name"
+      [email]="selectedUserForRoles()!.email"
+      (closed)="closeManageRoles()"
+      (updated)="loadUsers()"
     />
   }
 </section>

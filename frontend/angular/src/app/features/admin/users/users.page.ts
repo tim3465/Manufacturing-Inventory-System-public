@@ -5,11 +5,19 @@ import { UserDto } from '../../../core/dtos/users';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AddUserModalComponent } from './add-user-modal/add-user-modal.component';
+import { ManageUserRolesModalComponent } from './manage-user-roles-modal/manage-user-roles-modal.component';
+
+interface UserRow {
+  id: number;
+  name: string;
+  email: string;
+  status: 'Active' | 'Inactive';
+}
 
 @Component({
   selector: 'app-users-page',
   standalone: true,
-  imports: [CommonModule, AddUserModalComponent],
+  imports: [CommonModule, AddUserModalComponent, ManageUserRolesModalComponent],
   templateUrl: './users.page.html',
   styleUrl: './users.page.css'
 })
@@ -24,12 +32,14 @@ export class UsersPageComponent implements OnInit {
   protected readonly showAll = signal<boolean>(false);
   protected readonly canShowAllToggle = computed(() => this.auth.isAdmin());
   protected readonly isAddUserOpen = signal<boolean>(false);
+  protected readonly isManageRolesOpen = signal<boolean>(false);
+  protected readonly selectedUserForRoles = signal<UserRow | null>(null);
 
   protected readonly userRows = computed(() =>
     this.users().map((u) => ({
       id: u.id,
       name: this.displayName(u),
-      userName: u.userName,
+      email: u.userName,
       status: u.inactivatedDateTime ? ('Inactive' as const) : ('Active' as const)
     }))
   );
@@ -44,6 +54,16 @@ export class UsersPageComponent implements OnInit {
 
   protected closeAddUser(): void {
     this.isAddUserOpen.set(false);
+  }
+
+  protected openManageRoles(user: UserRow): void {
+    this.selectedUserForRoles.set(user);
+    this.isManageRolesOpen.set(true);
+  }
+
+  protected closeManageRoles(): void {
+    this.isManageRolesOpen.set(false);
+    this.selectedUserForRoles.set(null);
   }
 
   protected onToggleAllUsers(event: Event): void {

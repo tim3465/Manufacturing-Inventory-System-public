@@ -2,7 +2,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { CreateUserRequestDto, CreateUserResponseDto, UserDto } from '../dtos/users';
+import {
+  CreateUserRequestDto,
+  CreateUserResponseDto,
+  UpdateUserRolesRequestDto,
+  UserDto,
+  UserRolesDto
+} from '../dtos/users';
 import { ApiClient } from './api-client.service';
 
 const _PATH = '/users';
@@ -27,6 +33,20 @@ export class UsersApi {
       tap(() => {
         this.api.clearGetCache(`${_PATH}`);
         this.api.clearGetCache(`${_PATH}/all`);
+      })
+    );
+  }
+
+  /** GET /api/users/{id}/roles - get user's assigned roles (Admin-only) */
+  getRoles(id: number): Observable<UserRolesDto> {
+    return this.api.getCached<UserRolesDto>(`${_PATH}/${id}/roles`);
+  }
+
+  /** PATCH /api/users/{id} - replace user's roles (Admin-only) */
+  updateRoles(id: number, dto: UpdateUserRolesRequestDto): Observable<boolean> {
+    return this.api.patch<boolean>(`${_PATH}/${id}`, dto).pipe(
+      tap(()=>{
+        this.api.clearGetCache(`${_PATH}/${id}/roles`);
       })
     );
   }

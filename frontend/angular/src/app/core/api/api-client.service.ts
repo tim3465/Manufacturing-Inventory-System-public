@@ -66,6 +66,10 @@ clearGetCache(path: string, params?: QueryParams): void {
     return this.http.put<T>(this.url(path), body, { headers });
   }
 
+  patch<T>(path: string, body: unknown, headers?: HttpHeaders): Observable<T> {
+    return this.http.patch<T>(this.url(path), body, { headers });
+  }
+
   delete<T>(path: string, params?: QueryParams, headers?: HttpHeaders): Observable<T> {
     return this.http.delete<T>(this.url(path), {
       params: this.toHttpParams(params),
