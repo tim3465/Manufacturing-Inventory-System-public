@@ -32,40 +32,40 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardPageComponent },
       {
-        path: '',
+        path: 'machinist',
         canMatch: [roleGuard],
         data: { roles: [Roles.Machinist, Roles.Admin] },
         children: [
-          { path: 'machinist/my-jobs', component: MyJobsPageComponent },
-          { path: 'machinist/log-shift', component: LogShiftPageComponent }
+          { path: 'my-jobs', component: MyJobsPageComponent },
+          { path: 'log-shift', component: LogShiftPageComponent }
         ]
       },
       {
-        path: '',
+        path: 'shipping',
         canMatch: [roleGuard],
         data: { roles: [Roles.Shipping, Roles.Admin] },
         children: [
-          { path: 'shipping/receive-material', component: ReceiveMaterialPageComponent },
-          { path: 'shipping/inventory', component: InventoryPageComponent }
+          { path: 'receive-material', component: ReceiveMaterialPageComponent },
+          { path: 'inventory', component: InventoryPageComponent }
         ]
       },
       {
-        path: '',
+        path: 'supervisor',
         canMatch: [roleGuard],
         data: { roles: [Roles.Supervisor, Roles.Admin] },
         children: [
-          { path: 'supervisor/orders', component: OrdersPageComponent },
-          { path: 'supervisor/job-planning', component: JobPlanningPageComponent }
+          { path: 'orders', component: OrdersPageComponent },
+          { path: 'job-planning', component: JobPlanningPageComponent }
         ]
       },
       {
-        path: '',
+        path: 'admin',
         canMatch: [roleGuard],
         data: { roles: [Roles.Admin] },
         children: [
-          { path: 'admin/machines', component: MachinesPageComponent },
-          { path: 'admin/users', component: UsersPageComponent },
-          { path: 'admin/settings', component: SettingsPageComponent }
+          { path: 'machines', component: MachinesPageComponent },
+          { path: 'users', component: UsersPageComponent },
+          { path: 'settings', component: SettingsPageComponent }
         ]
       }
     ]
