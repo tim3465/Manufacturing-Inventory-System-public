@@ -11,7 +11,10 @@ Unified end-to-end collection that runs the API top-to-bottom (Auth → prerequi
 
 **Included Endpoints:**
 - **Auth**: Login captures `jwt`, Ping validates authentication
-- **Machines / Materials / StockLots / StockLotAdjustments / Orders / Parts / Jobs / Shifts / Users**: Create, Get by ID, ListActive, ListAll (Admin-only where supported), Update (where supported), Inactivate (via Soft Deletes folder)
+- **Machines / Materials / Orders / Parts / Jobs / Shifts**: Create, Get by ID, ListActive, ListAll (Admin-only), Update (where supported), Inactivate (via Soft Deletes folder)
+- **StockLots**: Create, Get by ID, ListActive, Update, Inactivate (no ListAll endpoint)
+- **StockLotAdjustments**: Create, Get by ID, ListByStockLot, ListAll (Admin-only), UpdateNotes, Inactivate (no general ListActive endpoint)
+- **Users**: Create, Get by ID, GetRoles (Admin-only), ListActive (authenticated), ListAll (Admin-only), UpdateRoles (Admin-only), Inactivate
 
 Legacy slice-level smoke test collections were removed in favor of a single unified end-to-end Postman collection.
 
@@ -28,6 +31,8 @@ Legacy slice-level smoke test collections were removed in favor of a single unif
 ### Collection Variables
 
 **Authentication:**
+- `adminEmail` - Admin email used by Login (must be set manually)
+- `adminPassword` - Admin password used by Login (must be set manually)
 - `jwt` - JWT token (automatically set by Login request)
 
 **IDs captured during the run:**
@@ -53,7 +58,7 @@ Legacy slice-level smoke test collections were removed in favor of a single unif
 
 - Most endpoints require authentication using `Bearer {{jwt}}`.
 - Admin-only endpoints require the "Admin" role
-- Public endpoints (like List Active) don't require authentication
+- Most List Active / Get by ID endpoints are public, except Users endpoints
 
 These collections are intended for local development and demonstration.
 
