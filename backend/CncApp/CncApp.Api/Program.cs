@@ -34,7 +34,8 @@ builder.Services.AddIdentityCore<IdentityUser<int>>(options =>
     // Identity options can be configured here if needed
 })
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -82,5 +83,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 await IdentityRoleSeeder.SeedAsync(app.Services, app.Configuration, app.Logger);
+await IdentityUserSeeder.SeedAsync(app.Services, app.Configuration, app.Logger);
 
 app.Run();
