@@ -54,6 +54,24 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
+    /// Gets Identity roles assigned to a user by domain user id (Admin-only).
+    /// </summary>
+    [HttpGet("{id:int}/roles")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(UserRolesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserRolesDto>> GetRolesAsync(int id, CancellationToken ct = default)
+    {
+        var userRoles = await _userService.GetRolesAsync(id, ct);
+        if (userRoles == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(userRoles);
+    }
+
+    /// <summary>
     /// Lists all users including inactive (Admin-only).
     /// </summary>
     [HttpGet("all")]

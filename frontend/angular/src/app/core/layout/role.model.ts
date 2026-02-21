@@ -1,18 +1,4 @@
-export type Role = 'Machinist' | 'ShippingReceiving' | 'Supervisor' | 'Admin';
+export { Roles, ALL_ROLES, ROLE_LABELS, DEFAULT_ROLE, roleLabel } from '../auth/roles';
+export type { Role } from '../auth/roles';
 
-export const ROLE_LABELS: Record<Role, string> = {
-  Machinist: 'Machinist',
-  ShippingReceiving: 'Shipping / Receiving',
-  Supervisor: 'Supervisor',
-  Admin: 'Admin'
-};
-
-export const ALL_ROLES: Role[] = [
-  'Machinist',
-  'ShippingReceiving',
-  'Supervisor',
-  'Admin'
-];
-
-export const DEFAULT_ROLE: Role = 'Machinist';
 

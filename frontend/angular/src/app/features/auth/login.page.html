@@ -1,0 +1,51 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+  <div class="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-lg px-6 py-8 md:px-8 space-y-6">
+    <div class="text-center space-y-1">
+      <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">CNC App</p>
+      <h1 class="text-2xl font-semibold text-[var(--fg)]">Login</h1>
+      <p class="text-sm text-slate-500">Enter your credentials to continue</p>
+    </div>
+
+    <form class="space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (authError) {
+        <p class="text-sm text-red-500">{{ authError }}</p>
+      }
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-[var(--fg)]" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-[var(--fg)] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+          formControlName="email"
+          autocomplete="username"
+        />
+        @if (showError('email')) {
+          <p class="text-sm text-red-500">Email required</p>
+        }
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-[var(--fg)]" for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-[var(--fg)] placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+        @if (showError('password')) {
+          <p class="text-sm text-red-500">Password required</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 text-white px-4 py-2.5 text-sm font-medium hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 transition"
+      >
+        Login
+      </button>
+    </form>
+  </div>
+</div>
+

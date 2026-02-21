@@ -1,0 +1,13 @@
+:host {
+  display: contents;
+}
+
+.toast-host {
+  @apply fixed top-4 right-4 z-50 flex w-80 flex-col gap-2 pointer-events-none;
+}
+
+.toast-item {
+  @apply pointer-events-auto rounded-lg shadow-lg ring-1 ring-black/5 backdrop-blur px-4 py-3 transition-all duration-1000 ease-out transform;
+}
+
+

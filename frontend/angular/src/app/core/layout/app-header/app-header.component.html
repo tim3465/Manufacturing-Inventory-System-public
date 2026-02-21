@@ -1,12 +1,9 @@
-<header
->
-  <div
-    class="w-full h-full px-4 md:px-6 flex items-center justify-between gap-4"
-  >
-    <div class="flex items-center gap-3">
+<header>
+  <div class="app-header__bar">
+    <div class="app-header__left">
       <button
         type="button"
-        class="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition"
+        class="app-header__menu-toggle"
         aria-label="Toggle navigation"
         (click)="onToggleMenu()"
       >
@@ -19,23 +16,47 @@
       </button>
     </div>
 
-    <div class="flex items-center gap-3 md:gap-4">
-      <button
-        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors"
+    <div class="app-header__actions">
+      <div class="app-header__menu">
+        <button
+          type="button"
+          class="app-header__menu-button"
+          aria-haspopup="menu"
+          aria-label="User menu"
+        >
+          <span class="app-header__avatar">
+            {{ displayInitial() }}
+          </span>
+          <span class="app-header__menu-label">
+            {{ displayName() }}
+          </span>
+        </button>
+
+        <div
+          class="app-header__menu-panel"
+          role="menu"
+        >
+
+        <button
+        class="app-header__menu-item"
         type="button"
-        (click)="toggleTheme()"
+        (click)="logout()"
+        role="menuitem"
       >
-        <span class="h-2 w-2 rounded-full"
-              [class.bg-green-500]="currentTheme() === 'theme-light'"
-              [class.bg-blue-400]="currentTheme() === 'theme-dark'"></span>
-        <span>{{ currentTheme() === 'theme-dark' ? 'Dark' : 'Light' }} theme</span>
+        Logout
       </button>
 
-      <div
-        class="h-10 w-10 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] flex items-center justify-center font-semibold text-sm"
-        title="User"
-      >
-        U
+          <button
+            class="app-header__menu-item"
+            type="button"
+            (click)="toggleTheme()"
+            role="menuitem"
+          >
+            <span>{{ currentTheme() === 'theme-dark' ? 'Dark' : 'Light' }} theme</span>
+          </button>
+
+
+        </div>
       </div>
     </div>
   </div>
