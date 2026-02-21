@@ -25,6 +25,10 @@ public partial class UserTests
         };
 
         MockIdentityProvisioningService
+            .Setup(s => s.ValidateRolesExistAsync(requestDto.Roles))
+            .Returns(Task.CompletedTask);
+
+        MockIdentityProvisioningService
             .Setup(s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken))
             .ReturnsAsync(identityUserId);
 
@@ -54,6 +58,9 @@ public partial class UserTests
         Assert.Equal(domainUserId, result.DomainUserId);
         Assert.Equal(requestDto.Email, result.UserName);
 
+        MockIdentityProvisioningService.Verify(
+            s => s.ValidateRolesExistAsync(requestDto.Roles),
+            Times.Once);
         MockIdentityProvisioningService.Verify(
             s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken),
             Times.Once);
@@ -94,6 +101,9 @@ public partial class UserTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
             UserService.CreateAsync(requestDto, cancellationToken));
 
+        MockIdentityProvisioningService.Verify(
+            s => s.ValidateRolesExistAsync(It.IsAny<IEnumerable<string>>()),
+            Times.Never());
         MockIdentityProvisioningService.Verify(
             s => s.CreateIdentityUserAsync(requestDto.Email, requestDto.Email, requestDto.TemporaryPassword, cancellationToken),
             Times.Once);

@@ -1,0 +1,64 @@
+<header>
+  <div class="app-header__bar">
+    <div class="app-header__left">
+      <button
+        type="button"
+        class="app-header__menu-toggle"
+        aria-label="Toggle navigation"
+        (click)="onToggleMenu()"
+      >
+        <span class="sr-only">Toggle navigation</span>
+        <span class="flex flex-col gap-1">
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+          <span class="block h-0.5 w-5 bg-[var(--fg)]"></span>
+        </span>
+      </button>
+    </div>
+
+    <div class="app-header__actions">
+      <div class="app-header__menu">
+        <button
+          type="button"
+          class="app-header__menu-button"
+          aria-haspopup="menu"
+          aria-label="User menu"
+        >
+          <span class="app-header__avatar">
+            {{ displayInitial() }}
+          </span>
+          <span class="app-header__menu-label">
+            {{ displayName() }}
+          </span>
+        </button>
+
+        <div
+          class="app-header__menu-panel"
+          role="menu"
+        >
+
+        <button
+        class="app-header__menu-item"
+        type="button"
+        (click)="logout()"
+        role="menuitem"
+      >
+        Logout
+      </button>
+
+          <button
+            class="app-header__menu-item"
+            type="button"
+            (click)="toggleTheme()"
+            role="menuitem"
+          >
+            <span>{{ currentTheme() === 'theme-dark' ? 'Dark' : 'Light' }} theme</span>
+          </button>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+

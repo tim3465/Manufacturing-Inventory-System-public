@@ -14,6 +14,12 @@ public partial class UserService
     /// <returns>The created user information including both Identity and Domain UserIds.</returns>
     public async Task<CreateUserResponseDto> CreateAsync(CreateUserRequestDto dto, CancellationToken ct = default)
     {
+        // Step 0: Validate requested roles exist BEFORE creating the Identity user to avoid orphaned records.
+        if (dto.Roles.Any())
+        {
+            await _identityProvisioningService.ValidateRolesExistAsync(dto.Roles);
+        }
+
         // Step 1: Create Identity user (UserName = Email, password)
         // Identity UserName must equal Email (same value)
         var identityUserId = await _identityProvisioningService.CreateIdentityUserAsync(

@@ -9,10 +9,40 @@ namespace CncApp.Infrastructure.Services;
 public class IdentityProvisioningService : IIdentityProvisioningService
 {
     private readonly UserManager<IdentityUser<int>> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-    public IdentityProvisioningService(UserManager<IdentityUser<int>> userManager)
+    public IdentityProvisioningService(
+        UserManager<IdentityUser<int>> userManager,
+        RoleManager<IdentityRole<int>> roleManager)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
+    /// <inheritdoc />
+    public async Task ValidateRolesExistAsync(IEnumerable<string> roles)
+    {
+        var roleList = (roles ?? Enumerable.Empty<string>())
+            .Where(r => !string.IsNullOrWhiteSpace(r))
+            .Select(r => r.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (!roleList.Any()) return;
+
+        var missing = new List<string>();
+        foreach (var role in roleList)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                missing.Add(role);
+            }
+        }
+
+        if (missing.Any())
+        {
+            throw new InvalidOperationException($"Role(s) do not exist: {string.Join(", ", missing)}");
+        }
     }
 
     /// <inheritdoc />
@@ -70,6 +100,19 @@ public class IdentityProvisioningService : IIdentityProvisioningService
                 throw new InvalidOperationException($"Failed to assign roles: {errors}");
             }
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<List<string>> GetRolesAsync(int identityUserId, CancellationToken ct = default)
+    {
+        var identityUser = await _userManager.FindByIdAsync(identityUserId.ToString());
+        if (identityUser == null)
+        {
+            throw new InvalidOperationException($"Identity user with ID {identityUserId} not found.");
+        }
+
+        var roles = await _userManager.GetRolesAsync(identityUser);
+        return roles.ToList();
     }
 }
 

@@ -1,0 +1,19 @@
+<section class="space-y-6">
+  <header class="space-y-1">
+    <p class="text-sm text-slate-500">Admin</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Settings</h1>
+  </header>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] divide-y divide-[var(--border)]">
+    @for (setting of settings; track setting.label) {
+    <div class="px-4 py-3 flex items-center justify-between text-sm">
+      <div>
+        <p class="font-semibold text-[var(--fg)]">{{ setting.label }}</p>
+        <p class="text-slate-500">Configured</p>
+      </div>
+      <span class="text-slate-500">{{ setting.value }}</span>
+    </div>
+    }
+  </div>
+</section>
+

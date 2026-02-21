@@ -6,6 +6,14 @@ namespace CncApp.Application.Interfaces;
 public interface IIdentityProvisioningService
 {
     /// <summary>
+    /// Validates that all provided roles exist in the Identity role store.
+    /// This is intended to be called before user creation to prevent partial provisioning.
+    /// </summary>
+    /// <param name="roles">Roles to validate.</param>
+    /// <exception cref="InvalidOperationException">Thrown when one or more roles do not exist.</exception>
+    Task ValidateRolesExistAsync(IEnumerable<string> roles);
+
+    /// <summary>
     /// Creates a new Identity user with the specified email, username, and password.
     /// Note: Identity UserName will be set to Email (UserName = Email).
     /// </summary>
@@ -25,5 +33,14 @@ public interface IIdentityProvisioningService
     /// <param name="ct">Cancellation token.</param>
     /// <exception cref="InvalidOperationException">Thrown when role assignment fails.</exception>
     Task AssignRolesAsync(int identityUserId, IEnumerable<string> roles, CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets Identity roles assigned to an Identity user.
+    /// </summary>
+    /// <param name="identityUserId">The Identity UserId.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of role names assigned to the user.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the Identity user is not found.</exception>
+    Task<List<string>> GetRolesAsync(int identityUserId, CancellationToken ct = default);
 }
 

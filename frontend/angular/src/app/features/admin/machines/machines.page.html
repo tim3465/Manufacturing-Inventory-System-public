@@ -1,0 +1,26 @@
+<section class="space-y-6">
+  <header class="space-y-1">
+    <p class="text-sm text-slate-500">Admin</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Machines</h1>
+  </header>
+
+  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+    <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+      Fleet status
+    </div>
+    <ul class="divide-y divide-[var(--border)]">
+      @for (machine of machines; track machine.name) {
+      <li class="px-4 py-3 flex items-center justify-between text-sm">
+        <div>
+          <p class="font-semibold text-[var(--fg)]">{{ machine.name }}</p>
+          <p class="text-slate-500">Utilization: {{ machine.utilization }}</p>
+        </div>
+        <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
+          {{ machine.status }}
+        </span>
+      </li>
+      }
+    </ul>
+  </div>
+</section>
+

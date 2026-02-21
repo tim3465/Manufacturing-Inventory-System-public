@@ -1,0 +1,18 @@
+{
+  "UserSeeding": {
+    "Enabled": true,
+    "OverwriteRoles": true,
+    "OverwritePassword": true,
+    "Users": [
+      {
+        "Email": "admin@example.com",
+        "FirstName": "Admin",
+        "LastName": "User",
+        "Password": "Change_Me",
+        "Roles": [ "Admin" ]
+      }
+    ]
+  }
+}
+
+

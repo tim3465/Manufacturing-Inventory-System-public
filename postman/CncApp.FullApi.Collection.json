@@ -820,6 +820,16 @@
           "response": []
         },
         {
+          "name": "GET User Roles by Id (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" } ],
+            "url": { "raw": "{{baseUrl}}/api/users/{{userId}}/roles", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{userId}}", "roles"] }
+          },
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });" ] } } ],
+          "response": []
+        },
+        {
           "name": "GET List Active Users (Authenticated)",
           "request": {
             "method": "GET",

@@ -1,0 +1,115 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div
+    class="relative z-10 w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+  >
+    <div
+      class="relative w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+    >
+      <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+        <div>
+          <div class="text-lg font-semibold text-[var(--fg)]">Add user</div>
+        </div>
+        <button
+          type="button"
+          class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">First name</div>
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="firstName"
+              autocomplete="given-name"
+            />
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Last name</div>
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="lastName"
+              autocomplete="family-name"
+            />
+          </label>
+        </div>
+
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Email</div>
+          <input
+            type="email"
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="email"
+            autocomplete="email"
+          />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <div class="mt-1 text-xs text-red-500">Enter a valid email</div>
+          }
+        </label>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Temporary password</div>
+            <input
+              type="password"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="temporaryPassword"
+              autocomplete="new-password"
+            />
+            @if (
+              form.controls.temporaryPassword.touched && form.controls.temporaryPassword.invalid
+            ) {
+              <div class="mt-1 text-xs text-red-500">Password is required</div>
+            }
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Role</div>
+            <select
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="role"
+            >
+              @for (r of roleOptions(); track r) {
+                <option [value]="r">{{ roleLabels[r] }}</option>
+              }
+            </select>
+            @if (form.controls.role.touched && form.controls.role.invalid) {
+              <div class="mt-1 text-xs text-red-500">Role is required</div>
+            }
+          </label>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+            (click)="onCancel()"
+            [disabled]="submitting()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="submitting()"
+          >
+            Create user
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

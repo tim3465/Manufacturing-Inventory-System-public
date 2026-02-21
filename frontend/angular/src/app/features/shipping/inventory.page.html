@@ -1,0 +1,28 @@
+<section class="space-y-6">
+  <header class="space-y-1">
+    <p class="text-sm text-slate-500">Shipping / Receiving</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Inventory</h1>
+  </header>
+
+  <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+        <tr>
+          <th class="px-4 py-3 font-medium">SKU</th>
+          <th class="px-4 py-3 font-medium">Description</th>
+          <th class="px-4 py-3 font-medium text-right">Qty</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--border)]">
+        @for (item of items; track item.sku) {
+        <tr>
+          <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ item.sku }}</td>
+          <td class="px-4 py-3 text-slate-500">{{ item.description }}</td>
+          <td class="px-4 py-3 text-right text-[var(--fg)]">{{ item.qty }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
