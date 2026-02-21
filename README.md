@@ -1,181 +1,197 @@
-# CNC Shop Inventory Management – Backend Architecture Project
+# CNC Shop Inventory Management System
 
-## Overview
-
-The primary focus of this project is the design and implementation of a **SOLID, scalable backend architecture**. Rather than starting with complex business rules, the project prioritizes **clean separation of concerns**, strong testing boundaries, and a structure that can evolve safely as domain complexity increases.
-
-> SOLID principles in this project are applied primarily to **structure, boundaries, and dependencies**, even while business rules are intentionally minimal in early phases.
-
-The backend is organized into five clearly defined layers:
-
-* **Domain** – Core business rules and invariants
-* **Application** – Use cases and orchestration logic
-* **Infrastructure** – Database access, persistence, and external concerns
-* **API** – HTTP endpoints and request/response handling
-* **Testing** – Domain and application tests that validate behavior and guard against regression
-
-The goal is to isolate functionality to its appropriate layer, resulting in code that is easier to reason about, easier to test, and more resilient to change over time.
+Full-stack CNC shop inventory system built with ASP.NET Core (.NET 8) and Angular 21, designed with clean architecture, strict layer boundaries, and production-style patterns.
 
 ---
 
-## Problem Domain
+## Tech Stack
 
-The theoretical problem this project models is a **simple shop inventory management system**.
+### Backend
+- .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core (SQL Server)
+- ASP.NET Identity
+- JWT Authentication (role claims)
+- AutoMapper
+- xUnit + Moq (unit testing)
+- Swagger / OpenAPI
 
-At a high level, the system represents the lifecycle of raw material within a machine shop:
-
-* Raw bar stock enters the system through shipping and receiving
-* Inventory is tracked by stock lots
-* Inventory is consumed by jobs
-* Consumed material results in finished parts (products)
-
-While the domain itself is intentionally straightforward, it provides a realistic foundation for exploring inventory flow, traceability, and backend design patterns commonly found in manufacturing systems.
-
----
-
-## Current State of the Project
-
-The project is currently operating under **Phase 1: End-to-End Functional Foundations**.
-
-Phase 1 focuses on establishing consistent architectural patterns across all implemented slices of functionality.
-
-At this stage, the focus has been on:
-
-* Establishing the backend architecture and project structure
-* Implementing full end-to-end flows (Database → Domain → Application → API)
-* Writing tests alongside each slice of functionality
-* Defining consistent patterns for controllers, services, repositories, and tests
-
-Business logic at this point is intentionally **rudimentary**. Each API endpoint primarily interacts with its corresponding table or aggregate, without deeper cross-entity coordination.
-
-This approach was chosen deliberately to allow the infrastructure, testing strategy, and architectural patterns to solidify before introducing more complex domain behavior.
-
-> Each “slice” of functionality corresponds to a single aggregate and its supporting API, application, infrastructure, and test components.
+### Frontend
+- Angular 21 (standalone components)
+- Angular Signals
+- Reactive Forms
+- Tailwind CSS (custom styling, no component library)
+- Vitest (unit testing)
+- HTTP Interceptors (JWT attachment + 401 handling)
+- Custom API client with caching layer (TTL + invalidation)
+- Dark mode via ThemeService
 
 ---
 
-## Next Phase: Targeted Business Logic
+## Key Features
 
-The next phase of the project will focus on **introducing richer, backend-controlled business logic**.
-
-For example:
-
-* The `StockLot` and `StockLotAdjustment` tables are conceptually linked
-* Creating a new stock lot should also create a corresponding stock lot adjustment that records how much inventory was added
-
-Rather than handling this logic at the API layer, future iterations will move these responsibilities into the **application and domain layers**, ensuring consistency, traceability, and enforceable invariants.
-
-This phase will involve revisiting and refining existing logic to better reflect real-world workflows and domain rules.
-
----
-
-## Design Philosophy
-
-This project is intentionally built in stages. Early emphasis is placed on:
-
-* Architectural clarity over feature completeness
-* Testability over convenience
-* Explicit boundaries between layers
-
-By first establishing a strong foundation, later changes—such as adding cross-entity rules, transactional workflows, or more advanced inventory behavior—can be introduced with confidence and minimal risk.
+- Role-based authentication and authorization (JWT with role claims)
+- Dual-user system (Identity user + Domain user)
+- Soft delete pattern across all entities
+- Full audit trail (Created/Updated/Inactivated with user tracking)
+- Global exception handler returning RFC 7807 ProblemDetails
+- Development-only database seeding (roles + admin user)
+- API request caching layer (frontend)
+- 60+ application-layer unit tests
+- Strict Domain / Application / Infrastructure / API separation
 
 ---
 
-## Backend Project Structure
+## Roles & Access Control
 
-Below is a quick tour of each backend project and its responsibilities. This section is intended to help orient readers to where different concerns live and how the layers interact.
+Supported roles:
 
----
+- Machinist
+- Shipping & Receiving
+- Supervisor
+- Administrator
+- User (baseline authenticated access)
 
-### CncApp.Api
-
-**ASP.NET Core Web API host**. This project is responsible for application startup and HTTP concerns only.
-
-Responsibilities:
-
-* Wires up controllers and routing
-* Configures Swagger/OpenAPI
-* Configures JWT authentication and ASP.NET Identity
-* Registers global exception handling and problem details
-* Pulls in the Application and Infrastructure layers
-* Seeds default roles and a development admin user *in development only*
-
-Key setup occurs in `Program.cs`:
-
-* Controller and middleware registration
-* Authentication and JWT configuration
-* Development-only seeding logic
-
-This layer intentionally contains **no business logic**.
+Pages are restricted by role both:
+- Backend (JWT role enforcement)
+- Frontend (route guards + conditional navigation)
 
 ---
 
-### CncApp.Application
+## Architecture Overview
 
-**Application/service layer** that orchestrates use cases on top of the domain.
+The backend follows a layered Clean Architecture structure:
 
-Responsibilities:
+```
+backend/CncApp/
+├── CncApp.Api/               # Controllers, JWT config, Swagger
+├── CncApp.Application/       # Services (Commands/Queries), DTOs, AutoMapper
+├── CncApp.Infrastructure/    # EF Core, Repositories, Identity integration
+├── CncApp.Domain/            # Entities, guards, domain exceptions
+├── CncApp.Domain.Tests/      # Domain unit tests (xUnit)
+└── CncApp.Application.Tests/ # Service tests (xUnit + Moq)
+```
 
-* Registers per-aggregate services (Machines, Jobs, Materials, Orders, Parts, Shifts, StockLots, StockLotAdjustments, Users)
-* Coordinates workflows using repositories
-* Applies per-aggregate business rules today, with cross-entity orchestration planned for future phases
-* Hosts AutoMapper profiles for DTO ↔ domain mapping
+The frontend is organized by feature:
 
-Services are registered centrally via `DependencyInjection.cs`, keeping orchestration logic out of controllers and repositories.
-
----
-
-### CncApp.Infrastructure
-
-**Data access and cross-cutting support layer**.
-
-Responsibilities:
-
-* Configures EF Core `AppDbContext` against SQL Server
-* Implements repositories per aggregate
-* Provides current-user resolution via HTTP context
-* Syncs ASP.NET Identity users with domain users via an identity provisioning service
-
-This layer contains all persistence concerns and external integrations, allowing higher layers to remain persistence-agnostic.
+```
+frontend/angular/
+├── core/        # auth, api client, interceptors, theme
+├── features/    # dashboard, machinist, shipping, supervisor, admin
+├── shared/      # DTOs, reusable components
+```
 
 ---
 
-### CncApp.Domain
+## Design Highlights
 
-**Core domain layer** containing the business model.
+### Dual User Model
+Authentication uses `IdentityUser<int>`, while business logic uses a separate `Domain.User` entity linked by `IdentityUserId`. This keeps authentication concerns separate from business concerns.
 
-Responsibilities:
+### Soft Delete + Audit Trail
+All entities inherit from `AuditableEntityBase` and include:
+- CreatedDateTime / CreatedByUserId
+- UpdatedDateTime / UpdatedByUserId
+- InactivatedDateTime / InactivatedByUserId
 
-* Domain entities (Machines, Jobs, Materials, Orders, Parts, Shifts, StockLots, StockLotAdjustments, Users)
-* Shared base entity types and abstractions
-* Domain enums and value concepts
+Audit fields are automatically populated in `SaveChangesAsync`.
 
-At present, domain entities primarily enforce **invariants, validity, and lifecycle rules**, rather than complex cross-aggregate workflows.
+### Global Exception Handling
+Unhandled exceptions are mapped to structured RFC 7807 `ProblemDetails` responses with trace IDs for debugging.
 
-The domain targets .NET 8 and enables nullable reference types and implicit usings. It is designed to be framework-light and focused on business meaning rather than infrastructure concerns.
-
----
-
-### Testing Projects
-
-* **CncApp.Domain.Tests** – Unit tests that validate domain behavior and invariants
-* **CncApp.Application.Tests** – Unit tests that validate application/service logic per aggregate
-
-Tests are structured to ensure:
-
-* Domain tests validate invariants and prevent invalid states without touching persistence
-* Application tests validate orchestration and workflows without re-testing domain rules
-
-This testing boundary ensures high confidence while keeping tests fast, focused, and maintainable.
+### Service-per-Aggregate Pattern
+The Application layer uses a service-per-aggregate structure, with partial classes organized into `Commands/` and `Queries/` folders.  
+This is not CQRS with MediatR — it maintains a straightforward orchestration model without mediator abstraction.
 
 ---
 
-### Solution Structure
+## Testing
 
-The `CncApp.sln` solution ties all projects together. Additional folders such as `docs/` and `postman/` provide supporting documentation and API testing artifacts outside the compiled code.
+- xUnit for backend tests
+- Moq for mocking dependencies
+- 60+ application-layer test files
+- Domain tests validate invariants without touching persistence
+- Application tests validate orchestration without re-testing domain rules
+- Vitest for frontend unit tests
+
+The Domain layer has zero external NuGet dependencies.
 
 ---
 
-## Summary
+## Getting Started
 
-This backend is structured around clear architectural boundaries, with each project owning a specific responsibility. The separation between API, Application, Infrastructure, and Domain layers is intentional and designed to support long-term maintainability, testability, and future expansion as business logic becomes more sophisticated.
+### Prerequisites
+
+- .NET 8 SDK
+- Node.js (v18+ recommended)
+- SQL Server or SQL Server LocalDB
+- Angular CLI
+
+---
+
+### Run Backend
+
+```
+cd backend/CncApp
+dotnet restore
+dotnet ef database update
+dotnet run --project CncApp.Api
+```
+
+Backend runs on:
+```
+https://localhost:7136
+```
+
+Swagger UI:
+```
+https://localhost:7136/swagger
+```
+
+---
+
+### Run Frontend
+
+```
+cd frontend/angular
+npm install
+ng serve
+```
+
+Frontend runs on:
+```
+http://localhost:4200
+```
+
+The Angular proxy configuration forwards API requests to the backend.
+
+---
+
+## Development Seeding
+
+Controlled via `appsettings.Development.json` flags:
+
+- Role seeding
+- Admin user seeding
+
+This ensures clean local database resets without affecting production environments.
+
+---
+
+## API Testing
+
+A Postman collection is available in the `/postman` directory for manual API testing.
+
+---
+
+## Documentation
+
+Additional technical documentation is available in the `/docs` directory, including architecture notes and testing philosophy.
+
+---
+
+## Status
+
+Active development.  
+Architecture foundation complete.  
+Incrementally expanding business workflows and UI integration.
