@@ -88,14 +88,17 @@ We use two buckets:
 
 ---
 
-## Current Locked Decision
+## Current Implementation
 
-We will create **one** workflow controller for Shipping & Receiving:
+One workflow controller exists for Shipping & Receiving:
 
-- Folder: `CncApp.Api/Controllers/Workflow/`
-- Controller name: `ShippingReceivingController`
+- File: `CncApp.Api/Controllers/Workflow/ShippingReceivingController.cs`
+- Route: `api/ShippingReceiving`
+- Endpoint: `POST /api/ShippingReceiving/receive`
+- Authorization: `Admin` role required
 
 This controller represents a business workflow, not a role.
+The controller is thin — it delegates entirely to `ShippingReceivingService`.
 
 ---
 
@@ -119,9 +122,9 @@ Ensure the ShippingReceiving workflow executes atomically.
 Creating:
 
 - Material (if needed)
-- StockLot
-- StockLotAdjustment
-- Updating `StockLot.AmountOfBars`
+- StockLot (with `AmountOfBars = 0`)
+- StockLotAdjustment (with `DeltaBars` = received quantity, `Reason = Received`)
+- Updating `StockLot.AmountOfBars` from the adjustment's `DeltaBars`
 
 must succeed or fail as a single unit.
 
@@ -132,28 +135,86 @@ must succeed or fail as a single unit.
 All multi-entity workflows inside `ShippingReceivingService`
 must be wrapped in an explicit database transaction.
 
-All participating services must share the same scoped `DbContext` instance.
+All participating services share the same scoped `DbContext` instance
+(guaranteed by ASP.NET Core scoped DI).
 
-### Pattern
+---
+
+## ITransactionManager
+
+Because the Application layer does not reference `Microsoft.EntityFrameworkCore`,
+the workflow service cannot access `AppDbContext.Database` directly.
+
+Transaction control is exposed through a thin interface:
+
+- Interface: `CncApp.Application/Interfaces/ITransactionManager.cs`
+- Implementation: `CncApp.Infrastructure/Services/TransactionManager.cs`
+- Registration: `AddScoped<ITransactionManager, TransactionManager>()` in `Infrastructure/DependencyInjection.cs`
+
+The interface exposes three methods:
 
 ```csharp
-await using var tx = await _context.Database.BeginTransactionAsync(ct);
+public interface ITransactionManager
+{
+    Task BeginTransactionAsync(CancellationToken ct = default);
+    Task CommitTransactionAsync(CancellationToken ct = default);
+    Task RollbackTransactionAsync(CancellationToken ct = default);
+}
+```
+
+The implementation wraps `AppDbContext.Database.BeginTransactionAsync()` internally.
+This follows the same interface-in-Application / implementation-in-Infrastructure
+convention used by repositories and `ICurrentUserService`.
+
+---
+
+## Implemented Transaction Pattern
+
+```csharp
+await _transactionManager.BeginTransactionAsync(ct);
 
 try
 {
-    await _materialService.CreateAsync(..., ct);
-    await _stockLotService.CreateAsync(..., ct);
-    await _stockLotAdjustmentService.CreateAsync(..., ct);
+    // Step 1: Resolve or create Material
+    materialId = dto.MaterialId ?? await _materialService.CreateAsync(..., ct);
 
-    await tx.CommitAsync(ct);
+    // Step 2: Create StockLot with AmountOfBars = 0
+    stockLotId = await _stockLotService.CreateAsync(..., ct);
+
+    // Step 3: Create StockLotAdjustment with DeltaBars and Reason = Received
+    adjustmentId = await _stockLotAdjustmentService.CreateAsync(..., ct);
+
+    // Step 4: Apply DeltaBars to StockLot.AmountOfBars
+    var stockLot = await _stockLotRepository.GetByIdAsync(stockLotId, ct);
+    stockLot.AmountOfBars += dto.AmountOfBars;
+    await _stockLotRepository.SaveChangesAsync(ct);
+
+    await _transactionManager.CommitTransactionAsync(ct);
 }
 catch
 {
-    await tx.RollbackAsync(ct);
+    await _transactionManager.RollbackTransactionAsync(ct);
     throw;
 }
-
 ```
+
+### Why existing service methods work inside the transaction
+
+Each single-entity `CreateAsync` method calls `SaveChangesAsync` internally.
+Inside an open EF Core transaction, `SaveChangesAsync` sends SQL to the database
+but does **not** commit. Only `CommitTransactionAsync` finalizes the transaction.
+If any step throws, `RollbackTransactionAsync` undoes all SQL sent within the transaction.
+
+### Why StockLot is created with AmountOfBars = 0
+
+The inventory integrity rule requires that `AmountOfBars` only changes
+as a result of a `StockLotAdjustment`. The workflow enforces this by:
+
+1. Creating the StockLot with `AmountOfBars = 0`.
+2. Creating a `StockLotAdjustment` with `DeltaBars` = the received quantity.
+3. Applying the adjustment's `DeltaBars` to the StockLot.
+
+All within the same transaction.
 
 ---
 
@@ -190,7 +251,7 @@ These services operate on one aggregate only.
 
 ## Workflow Services
 
-Multi-entity business workflows must live under:
+Multi-entity business workflows live under:
 
 CncApp.Application/Services/Workflows/
 
@@ -198,9 +259,7 @@ Each workflow gets its own folder.
 
 ---
 
-## ShippingReceiving (Minimum Viable Structure)
-
-For the current implementation, we will create only what is needed:
+## ShippingReceiving (Implemented Structure)
 
 CncApp.Application/
   Services/
@@ -209,6 +268,24 @@ CncApp.Application/
         Commands/
           ShippingReceivingService.ReceiveShipment.cs
         ShippingReceivingService.cs
+
+---
+
+## ShippingReceivingService Dependencies
+
+The partial root (`ShippingReceivingService.cs`) injects:
+
+| Dependency | Purpose |
+|---|---|
+| `MaterialService` | Create material (if new) |
+| `StockLotService` | Create stock lot |
+| `StockLotAdjustmentService` | Create adjustment |
+| `IStockLotRepository` | Fetch and update `StockLot.AmountOfBars` after adjustment |
+| `ITransactionManager` | Begin / commit / rollback the database transaction |
+
+`IStockLotRepository` is injected directly because updating `AmountOfBars`
+is not exposed by `StockLotService` (its `UpdateAsync` is metadata-only).
+This is the correct boundary — the workflow service owns the inventory-update rule.
 
 ---
 
@@ -231,6 +308,37 @@ This keeps the architecture:
 
 ---
 
+# DTOs
+
+## ReceiveShipmentRequestDto
+
+Location: `CncApp.Application/Dtos/ShippingReceiving/ReceiveShipmentRequestDto.cs`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| MaterialId | `int?` | No | If provided, uses existing material. If null, creates new. |
+| HeatNumber | `string?` | Conditional | Required when `MaterialId` is null. Max 100. |
+| MaterialName | `string?` | Conditional | Required when `MaterialId` is null. Max 100. |
+| LotNumber | `string` | Yes | Max 100. |
+| AmountOfBars | `int` | Yes | Minimum 1. Becomes `DeltaBars` on the adjustment. |
+| Diameter | `decimal` | Yes | |
+| BarLength | `decimal` | Yes | |
+| Condition | `StockLotConditionEnum` | Yes | |
+| CheckedInDateTime | `DateTime` | Yes | |
+| Notes | `string?` | No | Passed to the adjustment. Max 2000. |
+
+## ReceiveShipmentResponseDto
+
+Location: `CncApp.Application/Dtos/ShippingReceiving/ReceiveShipmentResponseDto.cs`
+
+| Field | Type | Notes |
+|---|---|---|
+| MaterialId | `int` | Existing or newly created |
+| StockLotId | `int` | Newly created |
+| StockLotAdjustmentId | `int` | Newly created |
+
+---
+
 # Partial Class & Test Symmetry Rule
 
 ## Goal
@@ -246,9 +354,9 @@ This pattern must also apply to workflow services.
 
 ## Workflow Service Structure (Partial Pattern)
 
-Each workflow service must follow the same structure as single-entity services.
+Each workflow service follows the same structure as single-entity services.
 
-Example:
+Implemented:
 
 CncApp.Application/
   Services/
@@ -273,9 +381,9 @@ Rules:
 
 ## Application Test Structure (Mirror Rule)
 
-The Application test project must mirror the Application service structure.
+The Application test project mirrors the Application service structure.
 
-Example:
+Implemented:
 
 CncApp.Application.Tests/
   Services/
@@ -288,12 +396,34 @@ CncApp.Application.Tests/
 Rules:
 
 - Test root file (`ShippingReceivingTests.cs`) contains:
-  - Shared setup
-  - Shared test helpers
+  - Shared mocks (repositories, mapper, transaction manager)
+  - Real service instances (MaterialService, StockLotService, StockLotAdjustmentService) created with mocked dependencies
+  - `ShippingReceivingService` instance wired with the above
 - Each workflow command gets its own test file.
-- Folder structure must match Application structure for clarity.
+- Folder structure matches Application structure for clarity.
 - Tests verify workflow behavior (atomicity, invariants, orchestration),
   not database internals.
+
+---
+
+## Test Coverage (ReceiveShipment)
+
+| Test | What it verifies |
+|---|---|
+| `ReceiveShipmentAsync_WithNewMaterial_CreatesAllEntitiesAndCommits` | Full happy path with new material; all IDs returned; transaction committed; AmountOfBars updated |
+| `ReceiveShipmentAsync_WithExistingMaterial_SkipsMaterialCreation` | Existing MaterialId is passed through; material repository Add is never called |
+| `ReceiveShipmentAsync_WhenStockLotCreationFails_RollsBackTransaction` | Exception triggers rollback; commit is never called |
+| `ReceiveShipmentAsync_StockLotCreatedWithZeroBars_BeforeAdjustment` | StockLot DTO has `AmountOfBars = 0` (not the incoming quantity) |
+| `ReceiveShipmentAsync_AdjustmentUsesReceivedReason` | Adjustment DTO has `Reason = Received`, correct `DeltaBars`, and `Notes` passed through |
+
+---
+
+## DI Registration Summary
+
+| Registration | Location |
+|---|---|
+| `AddScoped<ShippingReceivingService>()` | `CncApp.Application/DependencyInjection.cs` |
+| `AddScoped<ITransactionManager, TransactionManager>()` | `CncApp.Infrastructure/DependencyInjection.cs` |
 
 ---
 
