@@ -27,7 +27,7 @@ public class ShippingReceivingController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The IDs of all created entities.</returns>
     [HttpPost("receive")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Shipping")]
     [ProducesResponseType(typeof(ReceiveShipmentResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ReceiveShipmentResponseDto>> ReceiveShipmentAsync(
