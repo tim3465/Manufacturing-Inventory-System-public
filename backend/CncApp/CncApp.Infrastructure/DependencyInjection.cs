@@ -31,6 +31,9 @@ public static class DependencyInjection
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
 
+        // Register Transaction Manager
+        services.AddScoped<ITransactionManager, TransactionManager>();
+
         // Register Current User Service
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
