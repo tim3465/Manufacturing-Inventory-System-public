@@ -44,7 +44,7 @@ public partial class ShippingReceivingService
                     CheckedInDateTime = dto.CheckedInDateTime
                 }, ct);
 
-            var adjustmentId = await _stockLotAdjustmentService.CreateAsync(
+            var adjustmentId = await _stockLotAdjustmentService.CreateWithinTransactionAsync(
                 new CreateStockLotAdjustmentRequestDto
                 {
                     StockLotId = stockLotId,
@@ -52,10 +52,6 @@ public partial class ShippingReceivingService
                     Reason = StockLotAdjustmentReasonEnum.Received,
                     Notes = dto.Notes
                 }, ct);
-
-            var stockLot = await _stockLotRepository.GetByIdAsync(stockLotId, ct);
-            stockLot!.AmountOfBars += dto.AmountOfBars;
-            await _stockLotRepository.SaveChangesAsync(ct);
 
             await _transactionManager.CommitTransactionAsync(ct);
 

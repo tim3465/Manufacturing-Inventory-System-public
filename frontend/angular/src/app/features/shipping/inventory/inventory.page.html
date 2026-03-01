@@ -35,6 +35,7 @@
             <th class="px-4 py-3 font-medium text-right">Bar length</th>
             <th class="px-4 py-3 font-medium">Condition</th>
             <th class="px-4 py-3 font-medium">Checked in</th>
+            <th class="px-4 py-3 font-medium"></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
@@ -46,6 +47,15 @@
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.barLength }}</td>
               <td class="px-4 py-3 text-slate-500">{{ conditionLabel(lot.condition) }}</td>
               <td class="px-4 py-3 text-slate-500">{{ lot.checkedInDateTime | date:'MM/dd/yyyy h:mm a' }}</td>
+              <td class="px-4 py-3">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
+                  (click)="openAdjustBars(lot)"
+                >
+                  Adjust
+                </button>
+              </td>
             </tr>
           }
         </tbody>
@@ -57,6 +67,15 @@
     <app-receive-shipment-modal
       (closed)="closeReceiveShipment()"
       (created)="loadInventory()"
+    />
+  }
+
+  @if (isAdjustBarsOpen() && selectedLotForAdjustment()) {
+    <app-adjust-bars-modal
+      [stockLotId]="selectedLotForAdjustment()!.id"
+      [lotNumber]="selectedLotForAdjustment()!.lotNumber"
+      (closed)="closeAdjustBars()"
+      (adjusted)="loadInventory()"
     />
   }
 </section>

@@ -29,13 +29,15 @@ public partial class ShippingReceivingTests
         var materialService = new MaterialService(MockMaterialRepository.Object, MockMapper.Object);
         var stockLotService = new StockLotService(MockStockLotRepository.Object, MockMapper.Object);
         var stockLotAdjustmentService = new StockLotAdjustmentService(
-            MockStockLotAdjustmentRepository.Object, MockMapper.Object);
+            MockStockLotAdjustmentRepository.Object,
+            MockStockLotRepository.Object,
+            MockTransactionManager.Object,
+            MockMapper.Object);
 
         Service = new ShippingReceivingService(
             materialService,
             stockLotService,
             stockLotAdjustmentService,
-            MockStockLotRepository.Object,
             MockTransactionManager.Object);
     }
 }

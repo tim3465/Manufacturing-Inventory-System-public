@@ -5,11 +5,12 @@ import { StockLotDto } from '../../../core/dtos/stock-lots/stock-lot.dto';
 import { STOCK_LOT_CONDITION_LABELS, StockLotCondition } from '../../../core/dtos/shipping-receiving';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { ReceiveShipmentModalComponent } from './receive-shipment-modal/receive-shipment-modal.component';
+import { AdjustBarsModalComponent } from './adjust-bars-modal/adjust-bars-modal.component';
 
 @Component({
   selector: 'app-inventory-page',
   standalone: true,
-  imports: [CommonModule, ReceiveShipmentModalComponent],
+  imports: [CommonModule, ReceiveShipmentModalComponent, AdjustBarsModalComponent],
   templateUrl: './inventory.page.html',
   styleUrl: './inventory.page.css'
 })
@@ -20,7 +21,10 @@ export class InventoryPageComponent implements OnInit {
   protected readonly loading = signal<boolean>(true);
   protected readonly error = signal<string | null>(null);
   protected readonly stockLots = signal<StockLotDto[]>([]);
+
   protected readonly isReceiveShipmentOpen = signal<boolean>(false);
+  protected readonly isAdjustBarsOpen = signal<boolean>(false);
+  protected readonly selectedLotForAdjustment = signal<StockLotDto | null>(null);
 
   protected readonly conditionLabels = STOCK_LOT_CONDITION_LABELS;
 
@@ -34,6 +38,16 @@ export class InventoryPageComponent implements OnInit {
 
   protected closeReceiveShipment(): void {
     this.isReceiveShipmentOpen.set(false);
+  }
+
+  protected openAdjustBars(lot: StockLotDto): void {
+    this.selectedLotForAdjustment.set(lot);
+    this.isAdjustBarsOpen.set(true);
+  }
+
+  protected closeAdjustBars(): void {
+    this.isAdjustBarsOpen.set(false);
+    this.selectedLotForAdjustment.set(null);
   }
 
   protected loadInventory(): void {
