@@ -26,9 +26,9 @@
     } @else if (stockLots().length === 0) {
       <div class="px-4 py-3 text-sm text-slate-500">No stock lots found.</div>
     } @else {
-      <table class="min-w-full text-sm">
-        <thead class="text-left text-slate-500 border-b border-[var(--border)]">
-          <tr>
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+        <tr>
             <th class="px-4 py-3 font-medium">Lot number</th>
             <th class="px-4 py-3 font-medium text-right">Bars</th>
             <th class="px-4 py-3 font-medium text-right">Diameter</th>
@@ -36,11 +36,11 @@
             <th class="px-4 py-3 font-medium">Condition</th>
             <th class="px-4 py-3 font-medium">Checked in</th>
             <th class="px-4 py-3 font-medium"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--border)]">
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--border)]">
           @for (lot of stockLots(); track lot.id) {
-            <tr>
+        <tr>
               <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ lot.lotNumber }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.amountOfBars }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.diameter }}</td>
@@ -56,10 +56,10 @@
                   Adjust
                 </button>
               </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+        </tr>
+        }
+      </tbody>
+    </table>
     }
   </div>
 
