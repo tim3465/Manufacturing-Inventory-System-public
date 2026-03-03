@@ -81,7 +81,7 @@ public class StockLotAdjustmentsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created stock lot adjustment ID with Location header.</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Shipping")]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreateAsync(

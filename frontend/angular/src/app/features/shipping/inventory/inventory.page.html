@@ -1,0 +1,81 @@
+<section class="space-y-6">
+  <header class="flex items-start justify-between gap-4">
+    <div class="space-y-1">
+      <p class="text-sm text-slate-500">Shipping / Receiving</p>
+      <h1 class="text-2xl font-semibold text-[var(--fg)]">Inventory</h1>
+    </div>
+
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm"
+      (click)="openReceiveShipment()"
+    >
+      Receive shipment
+    </button>
+  </header>
+
+  <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+    <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+      Active stock lots
+    </div>
+
+    @if (loading()) {
+      <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+    } @else if (error()) {
+      <div class="px-4 py-3 text-sm text-red-500">{{ error() }}</div>
+    } @else if (stockLots().length === 0) {
+      <div class="px-4 py-3 text-sm text-slate-500">No stock lots found.</div>
+    } @else {
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+        <tr>
+            <th class="px-4 py-3 font-medium">Lot number</th>
+            <th class="px-4 py-3 font-medium text-right">Bars</th>
+            <th class="px-4 py-3 font-medium text-right">Diameter</th>
+            <th class="px-4 py-3 font-medium text-right">Bar length</th>
+            <th class="px-4 py-3 font-medium">Condition</th>
+            <th class="px-4 py-3 font-medium">Checked in</th>
+            <th class="px-4 py-3 font-medium"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--border)]">
+          @for (lot of stockLots(); track lot.id) {
+        <tr>
+              <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ lot.lotNumber }}</td>
+              <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.amountOfBars }}</td>
+              <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.diameter }}</td>
+              <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.barLength }}</td>
+              <td class="px-4 py-3 text-slate-500">{{ conditionLabel(lot.condition) }}</td>
+              <td class="px-4 py-3 text-slate-500">{{ lot.checkedInDateTime | date:'MM/dd/yyyy h:mm a' }}</td>
+              <td class="px-4 py-3">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
+                  (click)="openAdjustBars(lot)"
+                >
+                  Adjust
+                </button>
+              </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    }
+  </div>
+
+  @if (isReceiveShipmentOpen()) {
+    <app-receive-shipment-modal
+      (closed)="closeReceiveShipment()"
+      (created)="loadInventory()"
+    />
+  }
+
+  @if (isAdjustBarsOpen() && selectedLotForAdjustment()) {
+    <app-adjust-bars-modal
+      [stockLotId]="selectedLotForAdjustment()!.id"
+      [lotNumber]="selectedLotForAdjustment()!.lotNumber"
+      (closed)="closeAdjustBars()"
+      (adjusted)="loadInventory()"
+    />
+  }
+</section>

@@ -1,0 +1,116 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div
+    class="relative z-10 w-full max-w-md rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+  >
+    <div
+      class="relative w-full max-w-md rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+    >
+      <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+        <div>
+          <div class="text-lg font-semibold text-[var(--fg)]">Adjust Bars</div>
+          <div class="text-sm text-slate-500 mt-0.5">Lot: {{ lotNumber }}</div>
+        </div>
+        <button
+          type="button"
+          class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Add / Remove toggle -->
+        <div>
+          <div class="text-sm font-medium text-[var(--fg)] mb-2">Operation</div>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg border text-sm transition"
+              [ngClass]="direction() === 'add' ? 'bg-green-600 text-white border-green-600' : 'border-[var(--border)] hover:bg-[var(--surface)]'"
+              (click)="setDirection('add')"
+            >
+              + Add bars
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 rounded-lg border text-sm transition"
+              [ngClass]="direction() === 'remove' ? 'bg-red-600 text-white border-red-600' : 'border-[var(--border)] hover:bg-[var(--surface)]'"
+              (click)="setDirection('remove')"
+            >
+              − Remove bars
+            </button>
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Quantity</div>
+          <input
+            type="number"
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="quantity"
+            min="1"
+          />
+          @if (form.controls.quantity.touched && form.controls.quantity.invalid) {
+            <div class="mt-1 text-xs text-red-500">Enter a quantity of at least 1</div>
+          }
+        </label>
+
+        <!-- Reason -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Reason</div>
+          <select
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="reason"
+          >
+            <option value="0" disabled>Select reason</option>
+            @for (r of reasonOptions; track r) {
+              <option [value]="r">{{ reasonLabels[r] }}</option>
+            }
+          </select>
+          @if (form.controls.reason.touched && form.controls.reason.invalid) {
+            <div class="mt-1 text-xs text-red-500">Reason is required</div>
+          }
+        </label>
+
+        <!-- Notes -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Notes</div>
+          <textarea
+            rows="3"
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm resize-y"
+            formControlName="notes"
+            maxlength="2000"
+          ></textarea>
+        </label>
+
+        <!-- Actions -->
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+            (click)="onCancel()"
+            [disabled]="submitting()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="submitting()"
+          >
+            Save adjustment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
