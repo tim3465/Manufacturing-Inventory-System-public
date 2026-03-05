@@ -235,3 +235,7 @@ MockTransactionManager.Verify(t => t.CommitTransactionAsync(...), Times.Never);
 5. Workflow tests use real sub-services, not mocked ones, so the orchestration is actually exercised.
 6. Every workflow test verifies `BeginTransactionAsync`, `CommitTransactionAsync`, and `RollbackTransactionAsync` by name with explicit `Times` counts.
 7. `Times.Never` is required wherever a mock should not be called given the scenario — do not omit it.
+8. Application tests target the public surface area of services/workflows (public methods) and verify observable outcomes + key interactions.
+   - Do NOT write tests solely for internal/private helper methods.
+   - Internal logic is covered indirectly through tests of the public method(s) that use it.
+   - Exception: if an internal method contains complex, reusable logic, extract it into a testable component (pure function / domain method / dedicated service) and test that component directly.
