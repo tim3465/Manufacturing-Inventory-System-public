@@ -99,7 +99,7 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The updated material if found, otherwise 404.</returns>
     [HttpPatch("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Shipping")]
     [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MaterialDto>> UpdateAsync(

@@ -39,6 +39,12 @@ Manufacturing-Inventory-System/
 |-------|--------------|
 | `backend-implement` | Recon → Plan → Implement a backend feature or change |
 
+## Available Skills
+
+| Slash Command | What It Does |
+|---------------|--------------|
+| `/git-commit` | Summarize changes, propose commit message, confirm, then commit locally |
+
 ---
 
 ## Tech Stack
