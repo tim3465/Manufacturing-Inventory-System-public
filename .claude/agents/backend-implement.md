@@ -17,6 +17,16 @@ Implement a backend change using a lean, staged approach that minimizes drift:
 
 # Authority
 
+## Architecture Rules
+
+Before starting reconnaissance, read:
+
+- docs/Rules/backend/map.md   — layer structure, namespaces, file conventions
+- docs/Rules/backend/rules.md — controller, entity, AutoMapper, DTO, test rules
+- docs/Rules/backend/test-rules.md — test scope and conventions
+
+---
+
 ## Scope
 
 The agent operates within the backend architecture and must follow these structural conventions.

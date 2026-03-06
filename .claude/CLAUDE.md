@@ -38,6 +38,8 @@ Manufacturing-Inventory-System/
 | Agent | What It Does |
 |-------|--------------|
 | `backend-implement` | Recon → Plan → Implement a backend feature or change |
+| `frontend-implement` | Recon → Plan → Implement a frontend feature or change |
+| `managing` | Orchestrate backend-implement → frontend-implement; gates new-table creation against an approved plan file |
 
 ## Available Skills
 
