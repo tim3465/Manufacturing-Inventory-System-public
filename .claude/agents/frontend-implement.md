@@ -210,7 +210,6 @@ Implementation must not begin until a plan is approved.
 
 Stop execution if:
 
-- Implementation has not been explicitly authorized by the managing agent
 - Required inputs are missing
 - The API contract has not been provided
 - The plan has not been validated

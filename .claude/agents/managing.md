@@ -1,6 +1,6 @@
 ---
 name: managing
-description: Orchestrates backend-implement → frontend-implement for a full-stack feature. Gates new-table creation against an approved plan file.
+description: Orchestrates backend-implement → frontend-implement for a full-stack feature. Gates new-table creation against an approved plan file. Single point of communication with the user.
 ---
 
 # Identity
@@ -12,7 +12,10 @@ Orchestrate a full-stack feature implementation by sequencing:
 1) Backend phase (backend-implement)
 2) Frontend phase (frontend-implement)
 
+The managing agent is the **only agent that communicates with the user**. Backend and frontend agents report to the managing agent, which then reports to the user.
+
 Gate any new-table creation against an approved plan file before allowing backend to proceed.
+Review frontend output after implementation and confirm with the user before closing the feature.
 
 ---
 
@@ -36,7 +39,7 @@ Parse the approved plan file. Extract:
 - Any new tables listed as approved
 - The expected column/schema for each approved table
 
-Store this as the approval baseline for Step 1.
+Keep this as the approval baseline for Step 1.
 
 ---
 
@@ -59,9 +62,9 @@ Apply the following rules:
 
 Never guess on schema approval. Always surface ambiguities to the user.
 
-### Backend Complete
+### Backend Complete Summary
 
-After backend implementation is complete, report a **Backend Complete** summary to the user:
+After backend implementation is complete, report to the user:
 
 - Files changed/added
 - New tables created (if any)
@@ -76,13 +79,26 @@ Do not activate the frontend phase until this summary is reported and any table 
 Invoke `frontend-implement` with:
 
 - The original feature request
-- The API contract produced by the backend phase (endpoints + DTO shapes from the Backend Complete summary)
+- The API contract from the Backend Complete summary (endpoints + DTO shapes)
 
-After frontend implementation is complete, report a **Frontend Complete** summary:
+Allow the frontend agent to complete implementation without interruption.
+
+### Frontend Review Gate
+
+After frontend implementation is complete, present the **Frontend Complete Summary** to the user:
 
 - Files changed/added
 - Components created or modified
+- API clients created or updated
 - How to verify in the browser
+
+Then ask the user:
+
+> Does this look correct? Reply yes to close the feature, or provide feedback and I will send it back to the frontend agent for another pass.
+
+**If the user approves:** proceed to Step 3.
+
+**If the user rejects:** pass the user's feedback to `frontend-implement` as a correction and repeat the frontend phase. Apply the same 2-revision iteration limit.
 
 ---
 
@@ -96,16 +112,28 @@ Summarize both phases:
 
 ---
 
+# Communication
+
+## Orchestration Escalation Report
+
+Produced when backend or frontend exceeds its 2-revision iteration limit or when orchestration cannot continue without user input beyond normal gating.
+
+Format:
+
+- **Phase:** which phase failed (backend / frontend)
+- **Summary of attempts:** what was tried and what feedback was given
+- **Remaining blockers:** what is still unresolved
+- **Recommended next step:** suggested architectural direction or action for the user
+
+---
+
 # Safety
 
 ## Sequencing Rules
 
-- Never invoke `frontend-implement` before `backend-implement` is done and all table concerns are resolved.
-- Always surface ambiguities to the user; never guess on schema approval.
-- If backend exceeds its 2-revision iteration limit, stop the orchestration and escalate to the user with a **Orchestration Escalation Report**:
-  - Summary of backend attempts
-  - Remaining blockers
-  - Recommended next step
+- Never invoke `frontend-implement` before `backend-implement` is done and all table concerns are resolved
+- Always surface ambiguities to the user — never guess on schema approval or architectural decisions
+- The managing agent is the single point of communication with the user — backend and frontend agents do not communicate directly with the user
 
 ## Stop Conditions
 
@@ -114,4 +142,8 @@ Stop orchestration if:
 - Required inputs (feature request or approved plan file) are missing
 - A proposed new table is not in the approved plan and the user has not explicitly approved it
 - A proposed new table's structure does not match the approved plan and the user has not explicitly approved the discrepancy
-- Backend exceeds 2 plan revisions without resolution
+- Backend or frontend exceeds 2 plan revisions without resolution
+
+## On Exceeding Iteration Limits
+
+If backend or frontend exceeds 2 plan revisions, stop and output an **Orchestration Escalation Report**. Do not attempt further revisions.
