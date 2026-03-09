@@ -14,7 +14,7 @@ User runs `/close-ticket` with no arguments.
 
 ```
 REPO        = tim3465/Manufacturing-Inventory-System
-BASE_BRANCH = master
+BASE_BRANCH = claude-agent-workflows-20260303
 ```
 
 > **To target a different base branch:** change `BASE_BRANCH` to the branch name you want the PR to merge into (e.g. `ai-orchestration-setup`). All references to the base branch in this skill use `BASE_BRANCH` — this is the only line you need to edit.
