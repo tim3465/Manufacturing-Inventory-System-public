@@ -12,12 +12,13 @@ User runs `/close-ticket` with no arguments.
 
 ## Configuration
 
-```
-REPO        = tim3465/Manufacturing-Inventory-System
-BASE_BRANCH = claude-agent-workflows-20260303
-```
+Read these values before executing any step. Substitute them into every command that references them.
 
-> **To target a different base branch:** change `BASE_BRANCH` to the branch name you want the PR to merge into (e.g. `ai-orchestration-setup`). All references to the base branch in this skill use `BASE_BRANCH` — this is the only line you need to edit.
+- `REPO` = `tim3465/Manufacturing-Inventory-System`
+- `BASE_BRANCH` = `claude-agent-workflows-20260303`
+
+Every place you see `{BASE_BRANCH}` in this skill, replace it with the value above before running the command.
+---
 
 ---
 
@@ -214,49 +215,12 @@ Print:
 
 ---
 
-### Step 7 — Confirm before deleting the worktree
+### Step 7 — Close terminal and delete the worktree
 
-Print a summary of everything completed so far, then ask:
+The worktree cannot be deleted while this terminal is running inside it. 
 
+Print:
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Ready to delete local worktree
-
-  Branch    : {BRANCH_NAME}
-  PR        : {pr_url}
-  Issue     : #{ISSUE_NUMBER}
-  Folder    : {WORKTREE_PATH}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Everything has been pushed and the PR is open.
-Delete the local worktree folder now? (yes / no)
-```
-
-If the user says no:
-> Skipped. Your worktree folder is still at: {WORKTREE_PATH}
-Then stop.
-
----
-
-### Step 8 — Delete the worktree
-
-From the `main` repo (not from inside the worktree folder), run:
-
-```bash
-git -C "C:\dev\projects\Manufacturing-Inventory-System\main" worktree remove "{WORKTREE_PATH}" --force
-```
-
-If this fails, stop and show the raw error:
-
-> Worktree removal failed. The folder may still exist at: {WORKTREE_PATH}
-> You can remove it manually with:
-> git worktree remove "{WORKTREE_PATH}" --force
-
-If it succeeds, print:
-
-```
-✓ Worktree deleted: {WORKTREE_PATH}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Ticket #{ISSUE_NUMBER} is closed out.
 
@@ -264,11 +228,15 @@ If it succeeds, print:
   ✓ Branch pushed to origin
   ✓ PR open and linked to issue
   ✓ Commit summary posted to issue
-  ✓ Worktree deleted
 
-  Next step: review and merge the PR on GitHub.
+  Last step — close this terminal, then run:
+
+  git -C "C:\dev\projects\Manufacturing-Inventory-System\main" worktree remove "{WORKTREE_PATH}" --force
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+Then stop. Do not attempt to delete the folder.
 
 ---
 
