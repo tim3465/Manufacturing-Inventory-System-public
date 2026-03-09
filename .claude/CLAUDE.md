@@ -46,6 +46,7 @@ Manufacturing-Inventory-System/
 | Slash Command | What It Does |
 |---------------|--------------|
 | `/git-commit` | Summarize changes, propose commit message, confirm, then commit locally |
+| `/new-worktree` | Creates a Git worktree for a GitHub issue |
 
 ---
 
