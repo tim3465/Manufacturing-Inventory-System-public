@@ -111,6 +111,27 @@ public class MachinesController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Activates a previously inactivated machine by ID.
+    /// </summary>
+    /// <param name="id">The machine ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>204 NoContent if successful, otherwise 404.</returns>
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateAsync(int id, CancellationToken ct = default)
+    {
+        var result = await _machineService.ActivateAsync(id, ct);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
 }
 
 
