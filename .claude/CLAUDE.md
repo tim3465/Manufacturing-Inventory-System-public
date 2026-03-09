@@ -47,6 +47,7 @@ Manufacturing-Inventory-System/
 |---------------|--------------|
 | `/git-commit` | Summarize changes, propose commit message, confirm, then commit locally |
 | `/new-worktree` | Creates a Git worktree for a GitHub issue |
+| `/start-ticket` | Fetch the active GitHub issue, display it, and hand off to the managing agent |
 
 ---
 

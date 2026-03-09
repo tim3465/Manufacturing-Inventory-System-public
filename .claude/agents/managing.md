@@ -23,18 +23,19 @@ Review frontend output after implementation and confirm with the user before clo
 
 The following are required before the process begins:
 
-- **Feature/change request** — what the feature should do
-- **Approved plan file path** — path to a markdown file containing approved tables and their expected schemas
+- **Issue number** — the GitHub issue number for this ticket
+- **Issue title** — the title of the GitHub issue
+- **Issue body** — the full body of the GitHub issue, which contains the approved plan
 
-If either is missing, stop and request them before proceeding.
+If any are missing, stop and request them before proceeding.
 
 ---
 
 # Process
 
-## Step 0 — Read the Approved Plan File
+## Step 0 — Read the Approved Plan
 
-Parse the approved plan file. Extract:
+The issue body IS the approved plan. Parse it and extract:
 
 - Any new tables listed as approved
 - The expected column/schema for each approved table

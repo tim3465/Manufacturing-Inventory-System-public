@@ -18,7 +18,7 @@ Example:
 ## Configuration
 
 ```
-REPO = tim3465/Manufacturing-Inventory-System
+REPO   = tim3465/Manufacturing-Inventory-System
 SCRIPT = C:\dev\projects\Manufacturing-Inventory-System\start-worktree.ps1
 ```
 
@@ -117,8 +117,7 @@ Opening new terminal tab...
 Then run:
 
 ```bash
-
-powershell -Command "Start-Process -FilePath 'wt' -ArgumentList @('-w', '0', 'new-tab', '--title', '{name}', '-d', '{worktree_path}', 'pwsh', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', 'C:\dev\projects\Manufacturing-Inventory-System\start-worktree.ps1')"
+powershell -Command "Start-Process -FilePath 'wt' -ArgumentList @('-w', '0', 'new-tab', '--title', '{name}', '-d', '{worktree_path}', 'pwsh', '-NoExit', '-ExecutionPolicy', 'Bypass', '-File', 'C:\dev\projects\Manufacturing-Inventory-System\start-worktree.ps1', '-IssueNumber', '{number}')"
 ```
 
 If this fails, print:
@@ -127,6 +126,7 @@ If this fails, print:
 Could not open a new tab automatically. Open a new terminal tab manually and run:
 
   cd {worktree_path}
+  $env:CURRENT_ISSUE = {number}
   claude
 ```
 
