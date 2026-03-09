@@ -136,6 +136,12 @@ Format:
 - Always surface ambiguities to the user — never guess on schema approval or architectural decisions
 - The managing agent is the single point of communication with the user — backend and frontend agents do not communicate directly with the user
 
+## Environment Rules
+
+- Before running `npm install`, check if `node_modules` exists in the frontend folder
+- If `node_modules` exists, skip `npm install` entirely — the worktree shares dependencies with main
+- Only run `npm install` if `node_modules` is missing or a `package.json` change is part of this ticket
+
 ## Stop Conditions
 
 Stop orchestration if:
