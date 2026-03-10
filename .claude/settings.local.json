@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(node_modules/.bin/ng build:*)",
-      "Bash(gh issue:*)"
+      "Bash(gh issue:*)",
+      "Bash(git worktree:*)"
     ]
   }
 }
