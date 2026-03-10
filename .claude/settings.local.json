@@ -11,7 +11,10 @@
       "Bash(/c/dev/projects/Manufacturing-Inventory-System/main/frontend/angular/node_modules/.bin/ng build:*)",
       "Bash(npm install:*)",
       "Bash(npx ng:*)",
-      "Bash(git worktree:*)"
+      "Bash(git worktree:*)",
+      "Bash(gh:*)",
+      "Bash(gh pr:*)",
+      "Bash(git push:*)"
     ]
   }
 }
