@@ -16,7 +16,7 @@ public partial class JobTests
         {
             OrderId = 1,
             MachineId = 2,
-            StockLotId = 3,
+            StockLotId = null,
             PartAmountPlanned = 10,
             BarAmountPlanned = 5,
             BarCycleTime = TimeSpan.FromMinutes(1),

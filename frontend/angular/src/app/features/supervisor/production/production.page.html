@@ -4,6 +4,22 @@
       <p class="text-sm text-slate-500">Supervisor</p>
       <h1 class="text-2xl font-semibold text-[var(--fg)]">Production</h1>
     </div>
+    <div class="flex gap-2 items-center">
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+        (click)="openAddPart()"
+      >
+        + Add New Part
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
+        (click)="goToNewOrder()"
+      >
+        + Add New Order
+      </button>
+    </div>
   </header>
 
   <!-- Tab Bar -->
@@ -26,16 +42,6 @@
   <!-- ORDERS TAB -->
   @if (selectedTab() === 'orders') {
     <div class="space-y-4">
-      <div class="flex justify-end">
-        <button
-          type="button"
-          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
-          (click)="goToNewOrder()"
-        >
-          + Add New Order
-        </button>
-      </div>
-
       <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
         <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
           Active Orders
@@ -189,16 +195,6 @@
   <!-- PARTS TAB -->
   @if (selectedTab() === 'parts') {
     <div class="space-y-4">
-      <div class="flex justify-end">
-        <button
-          type="button"
-          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
-          (click)="openAddPart()"
-        >
-          + Add New Part
-        </button>
-      </div>
-
       <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
         <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
           Active Parts

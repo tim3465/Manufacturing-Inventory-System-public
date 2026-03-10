@@ -4,8 +4,7 @@ namespace CncApp.Application.Dtos.OrderPlanning;
 
 public class CreateJobInOrderRequestDto
 {
-    [Required(ErrorMessage = "StockLotId is required.")]
-    public int StockLotId { get; set; }
+    public int? StockLotId { get; set; }
 
     [Required(ErrorMessage = "MachineId is required.")]
     public int MachineId { get; set; }
