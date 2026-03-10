@@ -12,6 +12,13 @@
       "Bash(npm install:*)",
       "Bash(npx ng:*)",
       "Bash(git worktree:*)",
+      "Bash(\"C:/dev/projects/Manufacturing-Inventory-System/main/frontend/angular/node_modules/.bin/ng\" build:*)",
+      "Bash(node:*)",
+      "Bash(NODE_PATH=\"C:/dev/projects/Manufacturing-Inventory-System/main/frontend/angular/node_modules\" node:*)",
+      "Bash(cmd:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(git worktree:*)",
       "Bash(gh:*)",
       "Bash(gh pr:*)",
       "Bash(git push:*)"

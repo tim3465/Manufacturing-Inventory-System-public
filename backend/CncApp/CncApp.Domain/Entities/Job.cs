@@ -17,7 +17,7 @@ public class Job : AuditableEntityBase
     /// <exception cref="DomainException">Thrown when invariants are violated.</exception>
     public Job(
         int orderId,
-        int stockLotId,
+        int? stockLotId,
         int machineId,
         int partAmountPlanned,
         int barAmountPlanned,
@@ -54,14 +54,14 @@ public class Job : AuditableEntityBase
         }
     }
 
-    private int _stockLotId;
+    private int? _stockLotId;
 
-    public int StockLotId
+    public int? StockLotId
     {
         get => _stockLotId;
         set
         {
-            if (value <= 0)
+            if (value.HasValue && value.Value <= 0)
             {
                 throw new DomainException("StockLotId must be greater than zero.");
             }
@@ -184,7 +184,7 @@ public class Job : AuditableEntityBase
 
     public Order Order { get; set; } = null!;
 
-    public StockLot StockLot { get; set; } = null!;
+    public StockLot? StockLot { get; set; }
 
     public Machine Machine { get; set; } = null!;
 

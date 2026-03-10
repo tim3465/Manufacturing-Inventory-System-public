@@ -16,12 +16,12 @@ import { StockLotDto } from '../../../core/dtos/stock-lots/stock-lot.dto';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 
 interface RawJobValue {
-  stockLotId: string | number;
+  stockLotId: string | number | null;
   machineId: string | number;
   partAmountPlanned: string | number;
   barAmountPlanned: string | number;
   barCycleTime: string;
-  barsInJob: string | number;
+  barLoaderTime: string;
   estimatedPartsPerBar: string | number | null;
   dueDate: string;
 }
@@ -55,7 +55,15 @@ export class NewOrderPageComponent implements OnInit {
   protected readonly phase1Confirmed = signal(false);
   protected readonly showNewPartFields = signal(false);
 
-  // Phase 1 form
+  // Resolved part (set on confirm so Phase 2 can use part data)
+  protected readonly resolvedPart = signal<PartDto | null>(null);
+
+  // Derived: resolved partId (from existing or newly created)
+  protected resolvedPartId = signal<number>(0);
+
+  protected readonly isNewPartMode = computed(() => this.showNewPartFields());
+
+  // Phase 1 form — includes numberOfJobs as last field
   protected readonly phase1Form = this.fb.nonNullable.group({
     customerId: [0, [Validators.required, Validators.min(1)]],
     partMode: ['existing' as 'existing' | 'new'],
@@ -65,12 +73,20 @@ export class NewOrderPageComponent implements OnInit {
     newPartCycleTime: ['00:00:30'],
     newPartCheckPerPart: [1],
     partAmountRequested: [1, [Validators.required, Validators.min(1)]],
-    partsPerBar: [1, [Validators.required, Validators.min(1)]]
+    partsPerBar: [1, [Validators.required, Validators.min(1)]],
+    numberOfJobs: [1, [Validators.required, Validators.min(1)]]
+  });
+
+  // Computed: estimated bars needed from Phase 1 inputs
+  protected readonly estimatedBarsNeeded = computed(() => {
+    const req = Number(this.phase1Form.controls.partAmountRequested.value) || 0;
+    const ppb = Number(this.phase1Form.controls.partsPerBar.value) || 1;
+    return Math.ceil(req / ppb);
   });
 
   // Phase 2 job form array
   protected readonly jobsForm = this.fb.nonNullable.group({
-    jobs: this.fb.array([this.createJobGroup()])
+    jobs: this.fb.array([] as FormGroup[])
   });
 
   get jobsArray(): FormArray {
@@ -84,11 +100,6 @@ export class NewOrderPageComponent implements OnInit {
   getControl(group: AbstractControl, name: string) {
     return (group as FormGroup).get(name);
   }
-
-  // Derived: resolved partId (from existing or newly created)
-  protected resolvedPartId = signal<number>(0);
-
-  protected readonly isNewPartMode = computed(() => this.showNewPartFields());
 
   ngOnInit(): void {
     this.customersApi.listActive().subscribe({
@@ -138,12 +149,12 @@ export class NewOrderPageComponent implements OnInit {
   }
 
   protected onConfirmPhase1(): void {
-    // Validate only the relevant phase1 controls
     const controls = this.phase1Form.controls;
     const relevant: AbstractControl[] = [
       controls.customerId,
       controls.partAmountRequested,
-      controls.partsPerBar
+      controls.partsPerBar,
+      controls.numberOfJobs
     ];
 
     if (this.isNewPartMode()) {
@@ -157,10 +168,13 @@ export class NewOrderPageComponent implements OnInit {
     if (anyInvalid) return;
 
     if (!this.isNewPartMode()) {
-      this.resolvedPartId.set(Number(controls.partId.value));
+      const partId = Number(controls.partId.value);
+      this.resolvedPartId.set(partId);
+      const partDto = this.parts().find((p) => p.id === partId) ?? null;
+      this.resolvedPart.set(partDto);
       this.phase1Confirmed.set(true);
+      this.autoGenerateJobs();
     } else {
-      // Create the part first, then confirm
       const dto: CreatePartRequestDto = {
         partName: controls.newPartName.value.trim(),
         partNumber: controls.newPartNumber.value.trim(),
@@ -171,9 +185,18 @@ export class NewOrderPageComponent implements OnInit {
       this.partsApi.create(dto).subscribe({
         next: (created) => {
           this.resolvedPartId.set(created.id);
-          // Refresh parts list and set partId
+          // Build a minimal PartDto from the create form so barCycleTime can be computed
+          const partDto: PartDto = {
+            id: created.id,
+            partName: dto.partName,
+            partNumber: dto.partNumber,
+            approxPartCycleTime: dto.approxPartCycleTime,
+            checkPerPart: dto.checkPerPart
+          };
+          this.resolvedPart.set(partDto);
           this.partsApi.listActive().subscribe({ next: (data) => this.parts.set(data) });
           this.phase1Confirmed.set(true);
+          this.autoGenerateJobs();
           this.toast.success(`Part "${dto.partName}" created`);
         },
         error: (err: unknown) => {
@@ -190,12 +213,11 @@ export class NewOrderPageComponent implements OnInit {
       );
       if (!confirmed) return;
 
-      // Clear jobs back to one empty group
       while (this.jobsArray.length > 0) {
         this.jobsArray.removeAt(0);
       }
-      this.jobsArray.push(this.createJobGroup());
     }
+    this.resolvedPart.set(null);
     this.phase1Confirmed.set(false);
   }
 
@@ -207,6 +229,18 @@ export class NewOrderPageComponent implements OnInit {
     if (this.jobsArray.length > 1) {
       this.jobsArray.removeAt(index);
     }
+  }
+
+  protected recalculateBarCycleTime(index: number): void {
+    const group = this.getJobGroup(index);
+    const eppb = Number(group.get('estimatedPartsPerBar')?.value) || 0;
+    const loader = String(group.get('barLoaderTime')?.value || '00:00:00');
+    const result = this.calcBarCycleTime(
+      this.resolvedPart()?.approxPartCycleTime ?? null,
+      eppb,
+      loader
+    );
+    group.patchValue({ barCycleTime: result }, { emitEvent: false });
   }
 
   protected onSubmit(): void {
@@ -221,17 +255,18 @@ export class NewOrderPageComponent implements OnInit {
     const raw = this.jobsForm.getRawValue();
 
     const jobs: CreateJobInOrderRequestDto[] = (raw.jobs as unknown as RawJobValue[]).map((j) => ({
-      stockLotId: Number(j.stockLotId),
+      stockLotId: j.stockLotId !== null && j.stockLotId !== '' ? Number(j.stockLotId) : null,
       machineId: Number(j.machineId),
       partAmountPlanned: Number(j.partAmountPlanned),
       barAmountPlanned: Number(j.barAmountPlanned),
       barCycleTime: String(j.barCycleTime).trim(),
-      barsInJob: Number(j.barsInJob),
+      barsInJob: Number(j.barAmountPlanned),  // proxy — BarsInJob still required by backend
       estimatedPartsPerBar:
         j.estimatedPartsPerBar !== null && j.estimatedPartsPerBar !== ''
           ? Number(j.estimatedPartsPerBar)
           : null,
       dueDate: String(j.dueDate)
+      // barLoaderTime intentionally excluded — form-only field
     }));
 
     const dto: CreateOrderWithJobsRequestDto = {
@@ -265,6 +300,7 @@ export class NewOrderPageComponent implements OnInit {
     this.phase1Confirmed.set(false);
     this.showNewPartFields.set(false);
     this.resolvedPartId.set(0);
+    this.resolvedPart.set(null);
 
     this.phase1Form.reset({
       customerId: 0,
@@ -275,24 +311,75 @@ export class NewOrderPageComponent implements OnInit {
       newPartCycleTime: '00:00:30',
       newPartCheckPerPart: 1,
       partAmountRequested: 1,
-      partsPerBar: 1
+      partsPerBar: 1,
+      numberOfJobs: 1
     });
 
     while (this.jobsArray.length > 0) {
       this.jobsArray.removeAt(0);
     }
-    this.jobsArray.push(this.createJobGroup());
   }
 
-  private createJobGroup(): FormGroup {
+  // Auto-generate job rows when Phase 1 is confirmed
+  private autoGenerateJobs(): void {
+    while (this.jobsArray.length > 0) {
+      this.jobsArray.removeAt(0);
+    }
+
+    const p1 = this.phase1Form.getRawValue();
+    const numJobs = Number(p1.numberOfJobs) || 1;
+    const partsReq = Number(p1.partAmountRequested) || 0;
+    const ppb = Number(p1.partsPerBar) || 1;
+    const estBars = Math.ceil(partsReq / ppb);
+    const partAmountPlanned = Math.ceil(partsReq / numJobs);
+    const barAmountPlanned = Math.ceil(estBars / numJobs);
+    const barCycleTime = this.calcBarCycleTime(
+      this.resolvedPart()?.approxPartCycleTime ?? null,
+      ppb,
+      '00:00:00'
+    );
+
+    for (let i = 0; i < numJobs; i++) {
+      this.jobsArray.push(
+        this.createJobGroup(partAmountPlanned, barAmountPlanned, ppb, barCycleTime)
+      );
+    }
+  }
+
+  private calcBarCycleTime(
+    approxCycleTime: string | null,
+    estimatedPartsPerBar: number,
+    barLoaderTime: string
+  ): string {
+    const parseHms = (hms: string): number => {
+      const [h, m, s] = hms.split(':').map(Number);
+      return (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
+    };
+    const formatHms = (totalSeconds: number): string => {
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = Math.floor(totalSeconds % 60);
+      return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+    };
+    const cycleSecs = approxCycleTime ? parseHms(approxCycleTime) : 0;
+    const loaderSecs = parseHms(barLoaderTime);
+    return formatHms(cycleSecs * estimatedPartsPerBar + loaderSecs);
+  }
+
+  private createJobGroup(
+    partAmountPlanned = 0,
+    barAmountPlanned = 0,
+    estimatedPartsPerBar: number | null = null,
+    barCycleTime = '00:00:00'
+  ): FormGroup {
     return this.fb.nonNullable.group({
-      stockLotId: ['', [Validators.required, Validators.min(1)]],
+      stockLotId: [null as number | null],
       machineId: ['', [Validators.required, Validators.min(1)]],
-      partAmountPlanned: ['', [Validators.required, Validators.min(0)]],
-      barAmountPlanned: ['', [Validators.required, Validators.min(0)]],
-      barCycleTime: ['', [Validators.required, Validators.pattern(/^\d{2}:\d{2}:\d{2}$/)]],
-      barsInJob: ['', [Validators.required, Validators.min(0)]],
-      estimatedPartsPerBar: [''],
+      partAmountPlanned: [partAmountPlanned, [Validators.required, Validators.min(0)]],
+      barAmountPlanned: [barAmountPlanned, [Validators.required, Validators.min(0)]],
+      barCycleTime: [barCycleTime, [Validators.required, Validators.pattern(/^\d{2}:\d{2}:\d{2}$/)]],
+      barLoaderTime: ['00:00:00', [Validators.pattern(/^\d{2}:\d{2}:\d{2}$/)]],
+      estimatedPartsPerBar: [estimatedPartsPerBar],
       dueDate: ['', [Validators.required]]
     });
   }

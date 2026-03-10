@@ -57,6 +57,24 @@ public class JobTests
     }
 
     [Fact]
+    public void Constructor_WhenStockLotIdIsNull_CreatesJob()
+    {
+        var job = new Job(
+            orderId: ValidOrderId,
+            stockLotId: null,
+            machineId: ValidMachineId,
+            partAmountPlanned: ValidPartAmountPlanned,
+            barAmountPlanned: ValidBarAmountPlanned,
+            barCycleTime: ValidBarCycleTime,
+            barsInJob: ValidBarsInJob,
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1));
+
+        Assert.NotNull(job);
+        Assert.Null(job.StockLotId);
+    }
+
+    [Fact]
     public void Constructor_WhenMachineIdIsZero_ThrowsDomainException()
     {
         var ex = Assert.Throws<DomainException>(() => new Job(
@@ -204,6 +222,14 @@ public class JobTests
         var job = CreateValidJob();
         var ex = Assert.Throws<DomainException>(() => job.StockLotId = 0);
         Assert.Contains("StockLotId", ex.Message);
+    }
+
+    [Fact]
+    public void StockLotIdSetter_WhenSetToNull_AllowsNull()
+    {
+        var job = CreateValidJob();
+        job.StockLotId = null;
+        Assert.Null(job.StockLotId);
     }
 
     [Fact]

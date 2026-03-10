@@ -1,5 +1,5 @@
 export interface CreateJobInOrderRequestDto {
-  stockLotId: number;
+  stockLotId: number | null;
   machineId: number;
   partAmountPlanned: number;
   barAmountPlanned: number;

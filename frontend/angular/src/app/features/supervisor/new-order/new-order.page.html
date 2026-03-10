@@ -26,28 +26,30 @@
     </div>
   } @else {
 
-    <!-- PHASE 1: Order Details -->
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-base font-semibold text-[var(--fg)]">
-          Phase 1 — Order Details
-          @if (phase1Confirmed()) {
-            <span class="ml-2 text-xs text-green-600 font-normal">Confirmed</span>
-          }
-        </h2>
-        @if (phase1Confirmed()) {
-          <button
-            type="button"
-            class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
-            (click)="onEditPhase1()"
-          >
-            Edit
-          </button>
-        }
-      </div>
+    <!-- Single card wrapping both phases -->
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
 
-      <form [formGroup]="phase1Form" class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- PHASE 1: Order Details -->
+      <div class="p-5 space-y-4" [class.opacity-60]="phase1Confirmed()">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-semibold text-[var(--fg)]">
+            Phase 1 — Order Details
+            @if (phase1Confirmed()) {
+              <span class="ml-2 text-xs text-green-600 font-normal">Confirmed</span>
+            }
+          </h2>
+          @if (phase1Confirmed()) {
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs opacity-100"
+              (click)="onEditPhase1()"
+            >
+              Edit
+            </button>
+          }
+        </div>
+
+        <form [formGroup]="phase1Form" class="space-y-4">
           <!-- Customer -->
           <label class="block">
             <div class="text-sm font-medium text-[var(--fg)]">Customer</div>
@@ -65,6 +67,114 @@
               <div class="mt-1 text-xs text-red-500">Customer is required</div>
             }
           </label>
+
+          <!-- Part Selection -->
+          @if (!phase1Confirmed()) {
+            <div class="space-y-3">
+              <div class="text-sm font-medium text-[var(--fg)]">Part</div>
+              <div class="flex gap-3">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border text-sm transition"
+                  [class.bg-green-600]="!isNewPartMode()"
+                  [class.text-white]="!isNewPartMode()"
+                  [class.border-green-600]="!isNewPartMode()"
+                  [class.border-[var(--border)]]="isNewPartMode()"
+                  [class.text-[var(--fg)]]="isNewPartMode()"
+                  (click)="togglePartMode('existing')"
+                >
+                  Select Existing Part
+                </button>
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border text-sm transition"
+                  [class.bg-green-600]="isNewPartMode()"
+                  [class.text-white]="isNewPartMode()"
+                  [class.border-green-600]="isNewPartMode()"
+                  [class.border-[var(--border)]]="!isNewPartMode()"
+                  [class.text-[var(--fg)]]="!isNewPartMode()"
+                  (click)="togglePartMode('new')"
+                >
+                  Create New Part
+                </button>
+              </div>
+
+              @if (!isNewPartMode()) {
+                <label class="block">
+                  <select
+                    class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                    formControlName="partId"
+                  >
+                    <option [value]="0" disabled>Select a part</option>
+                    @for (part of parts(); track part.id) {
+                      <option [value]="part.id">{{ part.partName }} ({{ part.partNumber }})</option>
+                    }
+                  </select>
+                  @if (phase1Form.controls.partId.touched && phase1Form.controls.partId.invalid) {
+                    <div class="mt-1 text-xs text-red-500">Part is required</div>
+                  }
+                </label>
+              } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)]">
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Part Name</div>
+                    <input
+                      type="text"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="newPartName"
+                      autocomplete="off"
+                    />
+                    @if (phase1Form.controls.newPartName.touched && phase1Form.controls.newPartName.invalid) {
+                      <div class="mt-1 text-xs text-red-500">Required (max 100 characters)</div>
+                    }
+                  </label>
+
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Part Number</div>
+                    <input
+                      type="text"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="newPartNumber"
+                      autocomplete="off"
+                    />
+                    @if (phase1Form.controls.newPartNumber.touched && phase1Form.controls.newPartNumber.invalid) {
+                      <div class="mt-1 text-xs text-red-500">Required (max 50 characters)</div>
+                    }
+                  </label>
+
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Approx Cycle Time (HH:MM:SS)</div>
+                    <input
+                      type="text"
+                      placeholder="00:00:30"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="newPartCycleTime"
+                      autocomplete="off"
+                    />
+                    @if (phase1Form.controls.newPartCycleTime.touched && phase1Form.controls.newPartCycleTime.invalid) {
+                      <div class="mt-1 text-xs text-red-500">Required, format HH:MM:SS</div>
+                    }
+                  </label>
+
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Check Per Part</div>
+                    <input
+                      type="number"
+                      min="0"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="newPartCheckPerPart"
+                    />
+                  </label>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Show confirmed part info readonly -->
+            <div class="text-sm text-slate-500">
+              <span class="font-medium text-[var(--fg)]">Part: </span>
+              {{ resolvedPart()?.partName }} ({{ resolvedPart()?.partNumber }})
+            </div>
+          }
 
           <!-- Parts Requested -->
           <label class="block">
@@ -95,133 +205,47 @@
               <div class="mt-1 text-xs text-red-500">Parts per bar must be at least 1</div>
             }
           </label>
-        </div>
 
-        <!-- Part Selection -->
-        @if (!phase1Confirmed()) {
-          <div class="space-y-3">
-            <div class="text-sm font-medium text-[var(--fg)]">Part</div>
-            <div class="flex gap-3">
+          <!-- Number of Jobs -->
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Number of Jobs</div>
+            <input
+              type="number"
+              min="1"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm disabled:opacity-60"
+              formControlName="numberOfJobs"
+              [attr.disabled]="phase1Confirmed() ? true : null"
+            />
+            @if (phase1Form.controls.numberOfJobs.touched && phase1Form.controls.numberOfJobs.invalid) {
+              <div class="mt-1 text-xs text-red-500">Number of jobs must be at least 1</div>
+            }
+          </label>
+
+          <!-- Estimated Bars Needed (read-only computed) -->
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-[var(--fg)]">Estimated Bars Needed:</span>
+            <span class="text-sm text-slate-500">{{ estimatedBarsNeeded() }}</span>
+          </div>
+
+          @if (!phase1Confirmed()) {
+            <div class="flex justify-end">
               <button
                 type="button"
-                class="px-3 py-1.5 rounded-lg border text-sm transition"
-                [class.bg-green-600]="!isNewPartMode()"
-                [class.text-white]="!isNewPartMode()"
-                [class.border-green-600]="!isNewPartMode()"
-                [class.border-[var(--border)]]="isNewPartMode()"
-                [class.text-[var(--fg)]]="isNewPartMode()"
-                (click)="togglePartMode('existing')"
+                class="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
+                (click)="onConfirmPhase1()"
               >
-                Select Existing Part
-              </button>
-              <button
-                type="button"
-                class="px-3 py-1.5 rounded-lg border text-sm transition"
-                [class.bg-green-600]="isNewPartMode()"
-                [class.text-white]="isNewPartMode()"
-                [class.border-green-600]="isNewPartMode()"
-                [class.border-[var(--border)]]="!isNewPartMode()"
-                [class.text-[var(--fg)]]="!isNewPartMode()"
-                (click)="togglePartMode('new')"
-              >
-                Create New Part
+                Confirm Order Details
               </button>
             </div>
+          }
+        </form>
+      </div>
 
-            @if (!isNewPartMode()) {
-              <label class="block">
-                <select
-                  class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                  formControlName="partId"
-                >
-                  <option [value]="0" disabled>Select a part</option>
-                  @for (part of parts(); track part.id) {
-                    <option [value]="part.id">{{ part.partName }} ({{ part.partNumber }})</option>
-                  }
-                </select>
-                @if (phase1Form.controls.partId.touched && phase1Form.controls.partId.invalid) {
-                  <div class="mt-1 text-xs text-red-500">Part is required</div>
-                }
-              </label>
-            } @else {
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-lg border border-[var(--border)] bg-[var(--bg)]">
-                <label class="block">
-                  <div class="text-xs font-medium text-[var(--fg)]">Part Name</div>
-                  <input
-                    type="text"
-                    class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                    formControlName="newPartName"
-                    autocomplete="off"
-                  />
-                  @if (phase1Form.controls.newPartName.touched && phase1Form.controls.newPartName.invalid) {
-                    <div class="mt-1 text-xs text-red-500">Required (max 100 characters)</div>
-                  }
-                </label>
+      <!-- PHASE 2: Job Breakdown (only after Phase 1 confirmed) -->
+      @if (phase1Confirmed()) {
+        <hr class="border-[var(--border)]" />
 
-                <label class="block">
-                  <div class="text-xs font-medium text-[var(--fg)]">Part Number</div>
-                  <input
-                    type="text"
-                    class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                    formControlName="newPartNumber"
-                    autocomplete="off"
-                  />
-                  @if (phase1Form.controls.newPartNumber.touched && phase1Form.controls.newPartNumber.invalid) {
-                    <div class="mt-1 text-xs text-red-500">Required (max 50 characters)</div>
-                  }
-                </label>
-
-                <label class="block">
-                  <div class="text-xs font-medium text-[var(--fg)]">Approx Cycle Time (HH:MM:SS)</div>
-                  <input
-                    type="text"
-                    placeholder="00:00:30"
-                    class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                    formControlName="newPartCycleTime"
-                    autocomplete="off"
-                  />
-                  @if (phase1Form.controls.newPartCycleTime.touched && phase1Form.controls.newPartCycleTime.invalid) {
-                    <div class="mt-1 text-xs text-red-500">Required, format HH:MM:SS</div>
-                  }
-                </label>
-
-                <label class="block">
-                  <div class="text-xs font-medium text-[var(--fg)]">Check Per Part</div>
-                  <input
-                    type="number"
-                    min="0"
-                    class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                    formControlName="newPartCheckPerPart"
-                  />
-                </label>
-              </div>
-            }
-          </div>
-        } @else {
-          <!-- Show confirmed part info readonly -->
-          <div class="text-sm text-[var(--fg)]">
-            <span class="font-medium">Part ID: </span>{{ resolvedPartId() }}
-          </div>
-        }
-
-        @if (!phase1Confirmed()) {
-          <div class="flex justify-end">
-            <button
-              type="button"
-              class="px-5 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
-              (click)="onConfirmPhase1()"
-            >
-              Confirm Order Details
-            </button>
-          </div>
-        }
-      </form>
-    </div>
-
-    <!-- PHASE 2: Job Breakdown (only after Phase 1 confirmed) -->
-    @if (phase1Confirmed()) {
-      <form [formGroup]="jobsForm" (ngSubmit)="onSubmit()" class="space-y-4">
-        <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 space-y-4">
+        <form [formGroup]="jobsForm" (ngSubmit)="onSubmit()" class="p-5 space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-base font-semibold text-[var(--fg)]">Phase 2 — Job Breakdown</h2>
             <button
@@ -253,21 +277,18 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <!-- Stock Lot -->
+                  <!-- Stock Lot (optional) -->
                   <label class="block">
-                    <div class="text-xs font-medium text-[var(--fg)]">Stock Lot</div>
+                    <div class="text-xs font-medium text-[var(--fg)]">Stock Lot <span class="text-slate-400">(optional)</span></div>
                     <select
                       class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
                       formControlName="stockLotId"
                     >
-                      <option value="" disabled>Select a stock lot</option>
+                      <option [value]="null">None</option>
                       @for (lot of stockLots(); track lot.id) {
                         <option [value]="lot.id">#{{ lot.id }} — {{ lot.amountOfBars }} bars</option>
                       }
                     </select>
-                    @if (getControl(job, 'stockLotId')?.touched && getControl(job, 'stockLotId')?.invalid) {
-                      <div class="mt-1 text-xs text-red-500">Required</div>
-                    }
                   </label>
 
                   <!-- Machine -->
@@ -328,7 +349,35 @@
                     }
                   </label>
 
-                  <!-- Bar Cycle Time -->
+                  <!-- Estimated Parts Per Bar (triggers recalc) -->
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Estimated Parts Per Bar <span class="text-slate-400">(optional)</span></div>
+                    <input
+                      type="number"
+                      min="0"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="estimatedPartsPerBar"
+                      (change)="recalculateBarCycleTime($index)"
+                    />
+                  </label>
+
+                  <!-- Bar Loader Time (triggers recalc) -->
+                  <label class="block">
+                    <div class="text-xs font-medium text-[var(--fg)]">Bar Loader Time (HH:MM:SS)</div>
+                    <input
+                      type="text"
+                      placeholder="00:00:00"
+                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                      formControlName="barLoaderTime"
+                      autocomplete="off"
+                      (change)="recalculateBarCycleTime($index)"
+                    />
+                    @if (getControl(job, 'barLoaderTime')?.touched && getControl(job, 'barLoaderTime')?.invalid) {
+                      <div class="mt-1 text-xs text-red-500">Format HH:MM:SS</div>
+                    }
+                  </label>
+
+                  <!-- Bar Cycle Time (overridable) -->
                   <label class="block">
                     <div class="text-xs font-medium text-[var(--fg)]">Bar Cycle Time (HH:MM:SS)</div>
                     <input
@@ -342,47 +391,22 @@
                       <div class="mt-1 text-xs text-red-500">Required, format HH:MM:SS</div>
                     }
                   </label>
-
-                  <!-- Bars In Job -->
-                  <label class="block">
-                    <div class="text-xs font-medium text-[var(--fg)]">Bars In Job</div>
-                    <input
-                      type="number"
-                      min="0"
-                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                      formControlName="barsInJob"
-                    />
-                    @if (getControl(job, 'barsInJob')?.touched && getControl(job, 'barsInJob')?.invalid) {
-                      <div class="mt-1 text-xs text-red-500">Required, min 0</div>
-                    }
-                  </label>
-
-                  <!-- Estimated Parts Per Bar (optional) -->
-                  <label class="block">
-                    <div class="text-xs font-medium text-[var(--fg)]">Estimated Parts Per Bar <span class="text-slate-400">(optional)</span></div>
-                    <input
-                      type="number"
-                      min="0"
-                      class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                      formControlName="estimatedPartsPerBar"
-                    />
-                  </label>
                 </div>
               </div>
             }
           </div>
-        </div>
 
-        <div class="flex justify-end">
-          <button
-            type="submit"
-            class="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            [disabled]="submitting()"
-          >
-            {{ submitting() ? 'Creating...' : 'Create Order' }}
-          </button>
-        </div>
-      </form>
-    }
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="submitting()"
+            >
+              {{ submitting() ? 'Creating...' : 'Create Order' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
   }
 </section>
