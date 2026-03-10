@@ -12,6 +12,8 @@ public class PartTests
 {
     private static readonly TimeSpan ValidApproxPartCycleTime = TimeSpan.FromMinutes(5);
     private const int ValidCheckPerPart = 10;
+    private const string ValidPartName = "Test Part";
+    private const string ValidPartNumber = "TP-001";
 
     #region Constructor Tests
 
@@ -23,7 +25,7 @@ public class PartTests
         var checkPerPart = ValidCheckPerPart;
 
         // Act & Assert
-        var exception = Assert.Throws<DomainException>(() => new Part(approxPartCycleTime, checkPerPart));
+        var exception = Assert.Throws<DomainException>(() => new Part("Test Part", "TP-001", approxPartCycleTime, checkPerPart));
         Assert.Contains("ApproxPartCycleTime must be non-negative", exception.Message);
     }
 
@@ -35,7 +37,7 @@ public class PartTests
         var checkPerPart = -1;
 
         // Act & Assert
-        var exception = Assert.Throws<DomainException>(() => new Part(approxPartCycleTime, checkPerPart));
+        var exception = Assert.Throws<DomainException>(() => new Part("Test Part", "TP-001", approxPartCycleTime, checkPerPart));
         Assert.Contains("CheckPerPart must be non-negative", exception.Message);
     }
 
@@ -47,7 +49,7 @@ public class PartTests
         var checkPerPart = ValidCheckPerPart;
 
         // Act
-        var part = new Part(approxPartCycleTime, checkPerPart);
+        var part = new Part("Test Part", "TP-001", approxPartCycleTime, checkPerPart);
 
         // Assert
         Assert.NotNull(part);
@@ -66,7 +68,7 @@ public class PartTests
         var checkPerPart = ValidCheckPerPart;
 
         // Act
-        var part = new Part(approxPartCycleTime, checkPerPart);
+        var part = new Part("Test Part", "TP-001", approxPartCycleTime, checkPerPart);
 
         // Assert
         Assert.NotNull(part);
@@ -81,7 +83,7 @@ public class PartTests
         var checkPerPart = 0;
 
         // Act
-        var part = new Part(approxPartCycleTime, checkPerPart);
+        var part = new Part("Test Part", "TP-001", approxPartCycleTime, checkPerPart);
 
         // Assert
         Assert.NotNull(part);
@@ -96,7 +98,7 @@ public class PartTests
     public void ApproxPartCycleTimeSetter_WhenValueIsNegative_ThrowsDomainException()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
 
         // Act & Assert
         var exception = Assert.Throws<DomainException>(() => part.ApproxPartCycleTime = TimeSpan.FromMinutes(-1));
@@ -107,7 +109,7 @@ public class PartTests
     public void ApproxPartCycleTimeSetter_WhenValueIsValid_UpdatesProperty()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         var newCycleTime = TimeSpan.FromMinutes(10);
 
         // Act
@@ -121,7 +123,7 @@ public class PartTests
     public void ApproxPartCycleTimeSetter_WhenValueIsZero_UpdatesProperty()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
 
         // Act
         part.ApproxPartCycleTime = TimeSpan.Zero;
@@ -134,7 +136,7 @@ public class PartTests
     public void CheckPerPartSetter_WhenValueIsNegative_ThrowsDomainException()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
 
         // Act & Assert
         var exception = Assert.Throws<DomainException>(() => part.CheckPerPart = -1);
@@ -145,7 +147,7 @@ public class PartTests
     public void CheckPerPartSetter_WhenValueIsValid_UpdatesProperty()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         var newCheckPerPart = 20;
 
         // Act
@@ -159,7 +161,7 @@ public class PartTests
     public void CheckPerPartSetter_WhenValueIsZero_UpdatesProperty()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
 
         // Act
         part.CheckPerPart = 0;
@@ -170,13 +172,99 @@ public class PartTests
 
     #endregion
 
+    #region PartName and PartNumber Tests
+
+    [Fact]
+    public void Constructor_WhenPartNameIsNull_ThrowsDomainException()
+    {
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part(null!, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartName", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WhenPartNameIsWhiteSpace_ThrowsDomainException()
+    {
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part("   ", ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartName", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WhenPartNameExceedsMaxLength_ThrowsDomainException()
+    {
+        var longName = new string('A', 101);
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part(longName, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartName", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WhenPartNumberIsNull_ThrowsDomainException()
+    {
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part(ValidPartName, null!, ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartNumber", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WhenPartNumberIsWhiteSpace_ThrowsDomainException()
+    {
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part(ValidPartName, "   ", ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartNumber", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_WhenPartNumberExceedsMaxLength_ThrowsDomainException()
+    {
+        var longNumber = new string('X', 51);
+        var exception = Assert.Throws<DomainException>(() =>
+            new Part(ValidPartName, longNumber, ValidApproxPartCycleTime, ValidCheckPerPart));
+        Assert.Contains("PartNumber", exception.Message);
+    }
+
+    [Fact]
+    public void PartNameSetter_WhenValueIsNull_ThrowsDomainException()
+    {
+        var part = new Part(ValidPartName, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart);
+        var exception = Assert.Throws<DomainException>(() => part.PartName = null!);
+        Assert.Contains("PartName", exception.Message);
+    }
+
+    [Fact]
+    public void PartNameSetter_WhenValueIsValid_UpdatesProperty()
+    {
+        var part = new Part(ValidPartName, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart);
+        part.PartName = "Updated Part";
+        Assert.Equal("Updated Part", part.PartName);
+    }
+
+    [Fact]
+    public void PartNumberSetter_WhenValueIsNull_ThrowsDomainException()
+    {
+        var part = new Part(ValidPartName, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart);
+        var exception = Assert.Throws<DomainException>(() => part.PartNumber = null!);
+        Assert.Contains("PartNumber", exception.Message);
+    }
+
+    [Fact]
+    public void PartNumberSetter_WhenValueIsValid_UpdatesProperty()
+    {
+        var part = new Part(ValidPartName, ValidPartNumber, ValidApproxPartCycleTime, ValidCheckPerPart);
+        part.PartNumber = "TP-999";
+        Assert.Equal("TP-999", part.PartNumber);
+    }
+
+    #endregion
+
     #region Inactivate Method Tests
 
     [Fact]
     public void Inactivate_WhenPartIsActive_SetsInactivatedDateTime()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         Assert.Null(part.InactivatedDateTime);
 
         // Act
@@ -192,7 +280,7 @@ public class PartTests
     public void Inactivate_WhenPartIsActive_SetsInactivatedByUserId()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         var userId = 42;
 
         // Act
@@ -207,7 +295,7 @@ public class PartTests
     public void Inactivate_WhenPartIsActive_WithNullUserId_SetsInactivatedDateTime()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
 
         // Act
         part.Inactivate(null);
@@ -221,7 +309,7 @@ public class PartTests
     public void Inactivate_WhenPartIsAlreadyInactivated_ThrowsDomainException()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         part.Inactivate();
 
         // Act & Assert
@@ -234,7 +322,7 @@ public class PartTests
     public void Inactivate_WhenPartIsAlreadyInactivated_WithUserId_ThrowsDomainException()
     {
         // Arrange
-        var part = new Part(ValidApproxPartCycleTime, ValidCheckPerPart);
+        var part = new Part("Test Part", "TP-001", ValidApproxPartCycleTime, ValidCheckPerPart);
         part.Inactivate(1);
         var originalInactivatedDateTime = part.InactivatedDateTime;
         var originalInactivatedByUserId = part.InactivatedByUserId;

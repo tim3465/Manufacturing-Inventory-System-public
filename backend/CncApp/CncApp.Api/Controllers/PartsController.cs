@@ -79,7 +79,7 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created part DTO with Location header.</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     [ProducesResponseType(typeof(PartDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PartDto>> CreateAsync(

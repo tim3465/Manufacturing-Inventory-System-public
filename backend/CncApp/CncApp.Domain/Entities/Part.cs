@@ -4,24 +4,59 @@ namespace CncApp.Domain.Entities;
 
 public class Part : AuditableEntityBase
 {
+    private const int MaxPartNameLength = 100;
+    private const int MaxPartNumberLength = 50;
+
     // Private constructor for EF Core
     // Sets backing fields directly to avoid validation during materialization
     private Part()
     {
+        _partName = string.Empty;
+        _partNumber = string.Empty;
         Orders = new List<Order>();
     }
 
     /// <summary>
     /// Creates a new Part instance with validated invariants.
     /// </summary>
+    /// <param name="partName">The part name (required, max 100 characters).</param>
+    /// <param name="partNumber">The part number (required, max 50 characters).</param>
     /// <param name="approxPartCycleTime">The approximate part cycle time (required, must be non-negative).</param>
     /// <param name="checkPerPart">The check per part count (required, must be non-negative).</param>
     /// <exception cref="DomainException">Thrown when invariants are violated.</exception>
-    public Part(TimeSpan approxPartCycleTime, int checkPerPart)
+    public Part(string partName, string partNumber, TimeSpan approxPartCycleTime, int checkPerPart)
     {
+        PartName = partName;
+        PartNumber = partNumber;
         ApproxPartCycleTime = approxPartCycleTime;
         CheckPerPart = checkPerPart;
         Orders = new List<Order>();
+    }
+
+    private string _partName = string.Empty;
+
+    public string PartName
+    {
+        get => _partName;
+        set
+        {
+            Guard.AgainstNullOrWhiteSpace(value, nameof(PartName));
+            Guard.AgainstMaxLength(value, MaxPartNameLength, nameof(PartName));
+            _partName = value;
+        }
+    }
+
+    private string _partNumber = string.Empty;
+
+    public string PartNumber
+    {
+        get => _partNumber;
+        set
+        {
+            Guard.AgainstNullOrWhiteSpace(value, nameof(PartNumber));
+            Guard.AgainstMaxLength(value, MaxPartNumberLength, nameof(PartNumber));
+            _partNumber = value;
+        }
     }
 
     private TimeSpan _approxPartCycleTime;

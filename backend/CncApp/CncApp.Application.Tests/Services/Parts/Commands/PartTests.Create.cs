@@ -14,12 +14,14 @@ public partial class PartTests
         // Arrange
         var dto = new CreatePartRequestDto
         {
+            PartName = "Test Part",
+            PartNumber = "TP-001",
             ApproxPartCycleTime = TimeSpan.FromMinutes(5),
             CheckPerPart = 10
         };
         var cancellationToken = CancellationToken.None;
 
-        var part = new Part(dto.ApproxPartCycleTime, dto.CheckPerPart)
+        var part = new Part(dto.PartName, dto.PartNumber, dto.ApproxPartCycleTime, dto.CheckPerPart)
         {
             Id = 1
         };

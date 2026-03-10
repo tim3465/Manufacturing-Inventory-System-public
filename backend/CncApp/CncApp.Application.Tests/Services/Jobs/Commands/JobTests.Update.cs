@@ -32,7 +32,8 @@ public partial class JobTests
             barAmountPlanned: 5,
             barCycleTime: TimeSpan.FromMinutes(1),
             barsInJob: 1,
-            estimatedPartsPerBar: null)
+            estimatedPartsPerBar: null,
+            dueDate: new DateOnly(2026, 6, 1))
         {
             Id = jobId
         };

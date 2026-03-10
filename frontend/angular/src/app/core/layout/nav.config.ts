@@ -41,8 +41,8 @@ export const ROLE_NAV_GROUPS: RoleNavGroup[] = [
     title: Roles.Supervisor,
     roles: [Roles.Supervisor],
     items: [
-      { label: 'Orders', path: '/supervisor/orders' },
-      { label: 'Job Planning', path: '/supervisor/job-planning' }
+      { label: 'Production', path: '/supervisor/production' },
+      { label: 'Customers', path: '/supervisor/customers' }
     ]
   },
   {

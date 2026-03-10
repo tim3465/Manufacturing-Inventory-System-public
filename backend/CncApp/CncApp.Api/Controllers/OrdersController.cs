@@ -3,6 +3,7 @@ using CncApp.Application.Services.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace CncApp.Api.Controllers;
 
 /// <summary>
@@ -114,6 +115,18 @@ public class OrdersController : ControllerBase
         }
 
         return Ok(order);
+    }
+
+    /// <summary>
+    /// Gets all active orders with production detail (customer, part, computed completion).
+    /// </summary>
+    [HttpGet("production")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<OrderProductionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<OrderProductionDto>>> ListProductionAsync(CancellationToken ct = default)
+    {
+        var orders = await _orderService.ListProductionAsync(ct);
+        return Ok(orders);
     }
 
     /// <summary>

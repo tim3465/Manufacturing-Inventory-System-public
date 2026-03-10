@@ -23,7 +23,8 @@ public class Job : AuditableEntityBase
         int barAmountPlanned,
         TimeSpan barCycleTime,
         int barsInJob,
-        int? estimatedPartsPerBar)
+        int? estimatedPartsPerBar,
+        DateOnly dueDate)
     {
         OrderId = orderId;
         StockLotId = stockLotId;
@@ -33,6 +34,7 @@ public class Job : AuditableEntityBase
         BarCycleTime = barCycleTime;
         BarsInJob = barsInJob;
         EstimatedPartsPerBar = estimatedPartsPerBar;
+        DueDate = dueDate;
         Shifts = new List<Shift>();
     }
 
@@ -161,6 +163,22 @@ public class Job : AuditableEntityBase
             }
 
             _estimatedPartsPerBar = value;
+        }
+    }
+
+    private DateOnly _dueDate;
+
+    public DateOnly DueDate
+    {
+        get => _dueDate;
+        set
+        {
+            if (value == default)
+            {
+                throw new DomainException("DueDate must not be the default value.");
+            }
+
+            _dueDate = value;
         }
     }
 

@@ -3,6 +3,7 @@ using CncApp.Application.Services.Jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace CncApp.Api.Controllers;
 
 [ApiController]
@@ -98,6 +99,15 @@ public class JobsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("production")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<JobProductionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobProductionDto>>> ListProductionAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListProductionAsync(ct);
+        return Ok(jobs);
     }
 }
 

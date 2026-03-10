@@ -9,8 +9,9 @@ import { LogShiftPageComponent } from './features/machinist/log-shift.page';
 import { MyJobsPageComponent } from './features/machinist/my-jobs.page';
 import { InventoryPageComponent } from './features/shipping/inventory/inventory.page';
 import { ReceiveMaterialPageComponent } from './features/shipping/receive-material/receive-material.page';
-import { JobPlanningPageComponent } from './features/supervisor/job-planning.page';
-import { OrdersPageComponent } from './features/supervisor/orders.page';
+import { ProductionPageComponent } from './features/supervisor/production/production.page';
+import { CustomersPageComponent } from './features/supervisor/customers/customers.page';
+import { NewOrderPageComponent } from './features/supervisor/new-order/new-order.page';
 import { MachinesPageComponent } from './features/admin/machines/machines.page';
 import { UsersPageComponent } from './features/admin/users/users.page';
 import { SettingsPageComponent } from './features/admin/settings/settings.page';
@@ -54,8 +55,9 @@ export const routes: Routes = [
         canMatch: [roleGuard],
         data: { roles: [Roles.Supervisor, Roles.Admin] },
         children: [
-          { path: 'orders', component: OrdersPageComponent },
-          { path: 'job-planning', component: JobPlanningPageComponent }
+          { path: 'production', component: ProductionPageComponent },
+          { path: 'customers', component: CustomersPageComponent },
+          { path: 'new-order', component: NewOrderPageComponent }
         ]
       },
       {

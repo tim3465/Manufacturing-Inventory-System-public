@@ -22,6 +22,57 @@ namespace CncApp.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CncApp.Domain.Entities.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("InactivatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("InactivatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedDateTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
             modelBuilder.Entity("CncApp.Domain.Entities.Job", b =>
                 {
                     b.Property<int>("Id")
@@ -36,11 +87,22 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<TimeSpan>("BarCycleTime")
                         .HasColumnType("time");
 
+                    b.Property<int>("BarsInJob")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<int?>("CreatedByUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("CreatedDateTime")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("EstimatedPartsPerBar")
+                        .HasColumnType("int");
 
                     b.Property<int?>("InactivatedByUserId")
                         .HasColumnType("int");
@@ -74,7 +136,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("StockLotId");
 
-                    b.ToTable("Jobs", (string)null);
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Machine", b =>
@@ -115,7 +177,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Machines", (string)null);
+                    b.ToTable("Machines");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Material", b =>
@@ -156,7 +218,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Materials", (string)null);
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Order", b =>
@@ -199,9 +261,11 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.HasIndex("PartId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Part", b =>
@@ -230,6 +294,16 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("InactivatedDateTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("PartName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PartNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int?>("UpdatedByUserId")
                         .HasColumnType("int");
 
@@ -238,7 +312,10 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Parts", (string)null);
+                    b.HasIndex("PartNumber")
+                        .IsUnique();
+
+                    b.ToTable("Parts");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Shift", b =>
@@ -248,6 +325,11 @@ namespace CncApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BarsConsumed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<int?>("CreatedByUserId")
                         .HasColumnType("int");
@@ -273,6 +355,9 @@ namespace CncApp.Infrastructure.Migrations
                     b.Property<int>("PartsMade")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PartsPerBar")
+                        .HasColumnType("int");
+
                     b.Property<int>("Scrap")
                         .HasColumnType("int");
 
@@ -294,7 +379,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("OperatorId");
 
-                    b.ToTable("Shifts", (string)null);
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLot", b =>
@@ -352,7 +437,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("MaterialId");
 
-                    b.ToTable("StockLots", (string)null);
+                    b.ToTable("StockLots");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.StockLotAdjustment", b =>
@@ -401,7 +486,7 @@ namespace CncApp.Infrastructure.Migrations
 
                     b.HasIndex("StockLotId");
 
-                    b.ToTable("StockLotAdjustments", (string)null);
+                    b.ToTable("StockLotAdjustments");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.User", b =>
@@ -684,11 +769,19 @@ namespace CncApp.Infrastructure.Migrations
 
             modelBuilder.Entity("CncApp.Domain.Entities.Order", b =>
                 {
+                    b.HasOne("CncApp.Domain.Entities.Customer", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("CncApp.Domain.Entities.Part", "Part")
                         .WithMany("Orders")
                         .HasForeignKey("PartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Part");
                 });
@@ -783,6 +876,11 @@ namespace CncApp.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CncApp.Domain.Entities.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("CncApp.Domain.Entities.Job", b =>

@@ -27,5 +27,8 @@ public class CreateJobRequestDto
     public int BarsInJob { get; set; }
 
     public int? EstimatedPartsPerBar { get; set; }
+
+    [Required(ErrorMessage = "DueDate is required.")]
+    public DateOnly DueDate { get; set; }
 }
 
