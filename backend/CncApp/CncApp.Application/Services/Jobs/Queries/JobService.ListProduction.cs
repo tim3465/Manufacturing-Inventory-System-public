@@ -9,14 +9,27 @@ public partial class JobService
     {
         var jobs = await _jobRepository.ListActiveWithShiftsAsync(ct);
 
-        return jobs.Select(j => new JobProductionDto
+        return jobs.Select(j =>
         {
-            Id = j.Id,
-            OrderId = j.OrderId,
-            DueDate = j.DueDate,
-            MachineId = j.MachineId,
-            PartAmountPlanned = j.PartAmountPlanned,
-            Shifts = _mapper.Map<List<ShiftDto>>(j.Shifts)
+            var partsCompleted = j.Shifts.Sum(s => s.PartsMade);
+            var percentComplete = j.PartAmountPlanned > 0
+                ? Math.Round((decimal)partsCompleted / j.PartAmountPlanned * 100, 1)
+                : 0m;
+
+            return new JobProductionDto
+            {
+                Id = j.Id,
+                OrderId = j.OrderId,
+                DueDate = j.DueDate,
+                MachineId = j.MachineId,
+                MachineName = j.Machine?.SerialNumber ?? string.Empty,
+                PartAmountPlanned = j.PartAmountPlanned,
+                PartName = j.Order?.Part?.PartName ?? string.Empty,
+                PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
+                PartsCompleted = partsCompleted,
+                PercentComplete = percentComplete,
+                Shifts = _mapper.Map<List<ShiftDto>>(j.Shifts)
+            };
         }).ToList();
     }
 }

@@ -12,7 +12,17 @@ public class JobProductionDto
 
     public int MachineId { get; set; }
 
+    public string MachineName { get; set; } = string.Empty;
+
     public int PartAmountPlanned { get; set; }
+
+    public string PartName { get; set; } = string.Empty;
+
+    public string PartNumber { get; set; } = string.Empty;
+
+    public int PartsCompleted { get; set; }
+
+    public decimal PercentComplete { get; set; }
 
     public List<ShiftDto> Shifts { get; set; } = new();
 }

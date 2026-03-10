@@ -4,68 +4,288 @@
       <p class="text-sm text-slate-500">Supervisor</p>
       <h1 class="text-2xl font-semibold text-[var(--fg)]">Production</h1>
     </div>
-
-    <button
-      type="button"
-      class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
-      (click)="loadOrders()"
-    >
-      Refresh
-    </button>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-    <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
-      Active Orders
-    </div>
-
-    @if (loading()) {
-      <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
-    } @else if (error()) {
-      <div class="px-4 py-3 text-sm text-red-500">{{ error() }}</div>
-    } @else if (orders().length === 0) {
-      <div class="px-4 py-3 text-sm text-slate-500">No active orders.</div>
-    } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-[var(--border)] text-slate-500">
-              <th class="px-4 py-2 text-left font-medium">Order</th>
-              <th class="px-4 py-2 text-left font-medium">Customer</th>
-              <th class="px-4 py-2 text-left font-medium">Part</th>
-              <th class="px-4 py-2 text-left font-medium">Part #</th>
-              <th class="px-4 py-2 text-right font-medium">Requested</th>
-              <th class="px-4 py-2 text-right font-medium">Completed</th>
-              <th class="px-4 py-2 text-left font-medium w-40">Progress</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[var(--border)]">
-            @for (order of orders(); track order.id) {
-              <tr class="hover:bg-[var(--surface-hover,var(--surface))]">
-                <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ order.id }}</td>
-                <td class="px-4 py-3 text-[var(--fg)]">{{ order.customerName }}</td>
-                <td class="px-4 py-3 text-[var(--fg)]">{{ order.partName }}</td>
-                <td class="px-4 py-3 text-slate-500">{{ order.partNumber }}</td>
-                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ order.partAmountRequested }}</td>
-                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ order.partAmountCompleted }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2">
-                    <div class="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden">
-                      <div
-                        class="h-full rounded-full bg-green-500 transition-all"
-                        [style.width.%]="clampPercent(order.percentComplete)"
-                      ></div>
-                    </div>
-                    <span class="text-xs text-slate-500 w-10 text-right">
-                      {{ order.percentComplete | number:'1.0-0' }}%
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+  <!-- Tab Bar -->
+  <div class="flex gap-1 border-b border-[var(--border)]">
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium border-b-2 transition -mb-px"
+        [class.border-green-600]="selectedTab() === tab.id"
+        [class.text-green-600]="selectedTab() === tab.id"
+        [class.border-transparent]="selectedTab() !== tab.id"
+        [class.text-slate-500]="selectedTab() !== tab.id"
+        (click)="selectTab(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
     }
   </div>
+
+  <!-- ORDERS TAB -->
+  @if (selectedTab() === 'orders') {
+    <div class="space-y-4">
+      <div class="flex justify-end">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
+          (click)="goToNewOrder()"
+        >
+          + Add New Order
+        </button>
+      </div>
+
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+        <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+          Active Orders
+        </div>
+
+        @if (loadingOrders()) {
+          <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+        } @else if (orders().length === 0) {
+          <div class="px-4 py-3 text-sm text-slate-500">No active orders.</div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border)] text-slate-500">
+                  <th class="px-4 py-2 text-left font-medium">Order</th>
+                  <th class="px-4 py-2 text-left font-medium">Customer</th>
+                  <th class="px-4 py-2 text-left font-medium">Part</th>
+                  <th class="px-4 py-2 text-left font-medium">Part #</th>
+                  <th class="px-4 py-2 text-right font-medium">Requested</th>
+                  <th class="px-4 py-2 text-right font-medium">Completed</th>
+                  <th class="px-4 py-2 text-center font-medium w-24">Progress</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--border)]">
+                @for (order of orders(); track order.id) {
+                  <tr class="hover:bg-[var(--surface-hover,var(--surface))]">
+                    <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ order.id }}</td>
+                    <td class="px-4 py-3 text-[var(--fg)]">{{ order.customerName }}</td>
+                    <td class="px-4 py-3 text-[var(--fg)]">{{ order.partName }}</td>
+                    <td class="px-4 py-3 text-slate-500">{{ order.partNumber }}</td>
+                    <td class="px-4 py-3 text-right text-[var(--fg)]">{{ order.partAmountRequested }}</td>
+                    <td class="px-4 py-3 text-right text-[var(--fg)]">{{ order.partAmountCompleted }}</td>
+                    <td class="px-4 py-3 flex items-center justify-center">
+                      <!-- SVG Pie Chart -->
+                      <svg width="40" height="40" viewBox="0 0 40 40" class="-rotate-90">
+                        <circle
+                          cx="20" cy="20" r="15.9155"
+                          fill="none"
+                          stroke="var(--border)"
+                          stroke-width="4"
+                        />
+                        <circle
+                          cx="20" cy="20" r="15.9155"
+                          fill="none"
+                          stroke="#16a34a"
+                          stroke-width="4"
+                          stroke-linecap="round"
+                          [attr.stroke-dasharray]="getPieStrokeDasharray(order.percentComplete)"
+                          stroke-dashoffset="0"
+                        />
+                      </svg>
+                      <span class="ml-2 text-xs text-slate-500 w-9 text-right">
+                        {{ order.percentComplete | number:'1.0-0' }}%
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- JOBS TAB -->
+  @if (selectedTab() === 'jobs') {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+        Active Jobs — sorted by Due Date
+      </div>
+
+      @if (loadingJobs()) {
+        <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+      } @else if (jobRows().length === 0) {
+        <div class="px-4 py-3 text-sm text-slate-500">No active jobs.</div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-[var(--border)] text-slate-500">
+                <th class="px-4 py-2 text-left font-medium w-6"></th>
+                <th class="px-4 py-2 text-left font-medium">Due Date</th>
+                <th class="px-4 py-2 text-left font-medium">Order #</th>
+                <th class="px-4 py-2 text-left font-medium">Part Name</th>
+                <th class="px-4 py-2 text-left font-medium">Part #</th>
+                <th class="px-4 py-2 text-left font-medium">Machine</th>
+                <th class="px-4 py-2 text-right font-medium">Planned</th>
+                <th class="px-4 py-2 text-right font-medium">Completed</th>
+                <th class="px-4 py-2 text-right font-medium">% Done</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (job of jobRows(); track job.id) {
+                <tr
+                  class="border-b border-[var(--border)] hover:bg-[var(--surface-hover,var(--surface))] cursor-pointer"
+                  (click)="toggleJobExpanded(job.id)"
+                >
+                  <td class="px-4 py-3 text-slate-400 text-xs">
+                    {{ isJobExpanded(job.id) ? '&#9660;' : '&#9654;' }}
+                  </td>
+                  <td class="px-4 py-3 text-[var(--fg)]">{{ job.dueDate }}</td>
+                  <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ job.orderId }}</td>
+                  <td class="px-4 py-3 text-[var(--fg)]">{{ job.partName }}</td>
+                  <td class="px-4 py-3 text-slate-500">{{ job.partNumber }}</td>
+                  <td class="px-4 py-3 text-[var(--fg)]">{{ job.machineName }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>
+                </tr>
+
+                @if (isJobExpanded(job.id)) {
+                  @if (job.shifts.length === 0) {
+                    <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
+                      <td colspan="9" class="px-8 py-2 text-xs text-slate-400">No shifts recorded for this job.</td>
+                    </tr>
+                  } @else {
+                    <!-- Shift sub-header -->
+                    <tr class="bg-slate-50 dark:bg-slate-800 border-b border-[var(--border)]">
+                      <td></td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500" colspan="2">Operator</td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500">Start</td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500">Stop</td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Parts Made</td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Scrap</td>
+                      <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Bars</td>
+                      <td></td>
+                    </tr>
+                    @for (shift of job.shifts; track shift.id) {
+                      <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
+                        <td></td>
+                        <td class="px-4 py-2 text-xs text-[var(--fg)]" colspan="2">{{ shift.operatorName }}</td>
+                        <td class="px-4 py-2 text-xs text-slate-500">{{ formatStartTime(shift.startTime) }}</td>
+                        <td class="px-4 py-2 text-xs text-slate-500">{{ formatStopTime(shift.stopTime) }}</td>
+                        <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
+                        <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.scrap }}</td>
+                        <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+                        <td></td>
+                      </tr>
+                    }
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- PARTS TAB -->
+  @if (selectedTab() === 'parts') {
+    <div class="space-y-4">
+      <div class="flex justify-end">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm"
+          (click)="openAddPart()"
+        >
+          + Add New Part
+        </button>
+      </div>
+
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+        <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+          Active Parts
+        </div>
+
+        @if (loadingParts()) {
+          <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+        } @else if (parts().length === 0) {
+          <div class="px-4 py-3 text-sm text-slate-500">No active parts.</div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[var(--border)] text-slate-500">
+                  <th class="px-4 py-2 text-left font-medium">Part Name</th>
+                  <th class="px-4 py-2 text-left font-medium">Part Number</th>
+                  <th class="px-4 py-2 text-left font-medium">Cycle Time</th>
+                  <th class="px-4 py-2 text-right font-medium">Check / Part</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--border)]">
+                @for (part of parts(); track part.id) {
+                  <tr class="hover:bg-[var(--surface-hover,var(--surface))]">
+                    <td class="px-4 py-3 text-[var(--fg)]">{{ part.partName }}</td>
+                    <td class="px-4 py-3 text-slate-500">{{ part.partNumber }}</td>
+                    <td class="px-4 py-3 text-[var(--fg)]">{{ formatCycleTime(part.approxPartCycleTime) }}</td>
+                    <td class="px-4 py-3 text-right text-[var(--fg)]">{{ part.checkPerPart }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- SHIFTS TAB -->
+  @if (selectedTab() === 'shifts') {
+    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
+        Shifts — sorted by Start Time (newest first)
+      </div>
+
+      @if (loadingShifts()) {
+        <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+      } @else if (shifts().length === 0) {
+        <div class="px-4 py-3 text-sm text-slate-500">No shifts recorded.</div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-[var(--border)] text-slate-500">
+                <th class="px-4 py-2 text-left font-medium">Operator</th>
+                <th class="px-4 py-2 text-left font-medium">Job #</th>
+                <th class="px-4 py-2 text-left font-medium">Part</th>
+                <th class="px-4 py-2 text-left font-medium">Start Time</th>
+                <th class="px-4 py-2 text-left font-medium">Stop Time</th>
+                <th class="px-4 py-2 text-right font-medium">Parts Made</th>
+                <th class="px-4 py-2 text-right font-medium">Scrap</th>
+                <th class="px-4 py-2 text-right font-medium">Bars</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--border)]">
+              @for (shift of shifts(); track shift.id) {
+                <tr class="hover:bg-[var(--surface-hover,var(--surface))]">
+                  <td class="px-4 py-3 text-[var(--fg)]">{{ shift.operatorName }}</td>
+                  <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ shift.jobId }}</td>
+                  <td class="px-4 py-3 text-[var(--fg)]">{{ shift.partName }}</td>
+                  <td class="px-4 py-3 text-slate-500">{{ formatStartTime(shift.startTime) }}</td>
+                  <td class="px-4 py-3 text-slate-500">{{ formatStopTime(shift.stopTime) }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.scrap }}</td>
+                  <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
 </section>
+
+@if (isAddPartOpen()) {
+  <app-add-part-modal
+    (closed)="isAddPartOpen.set(false)"
+    (created)="onPartCreated()"
+  />
+}

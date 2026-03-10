@@ -11,7 +11,11 @@ public partial class JobRepository : IJobRepository
     {
         return await _context.Jobs
             .Where(j => !j.InactivatedDateTime.HasValue)
+            .Include(j => j.Machine)
+            .Include(j => j.Order)
+                .ThenInclude(o => o.Part)
             .Include(j => j.Shifts)
+                .ThenInclude(s => s.Operator)
             .ToListAsync(ct);
     }
 }
