@@ -9,7 +9,8 @@
       "Bash(dotnet ef:*)",
       "Bash(dotnet test:*)",
       "Bash(/c/dev/projects/Manufacturing-Inventory-System/main/frontend/angular/node_modules/.bin/ng build:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx ng:*)"
     ]
   }
 }
