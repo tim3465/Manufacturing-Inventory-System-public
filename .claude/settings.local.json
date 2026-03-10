@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node_modules/.bin/ng build:*)"
+      "Bash(node_modules/.bin/ng build:*)",
+      "Bash(gh issue:*)"
     ]
   }
 }

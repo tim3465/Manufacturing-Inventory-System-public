@@ -114,6 +114,24 @@ When a query filters by a foreign key, name the route and parameter explicitly a
 
 ---
 
+## Multi-Table Write Rule
+
+If a single user action creates or modifies records in more than one aggregate, it must be implemented as a **Workflow service** — not as sequential calls to individual entity services from the frontend.
+
+- The frontend makes **one API call** to a workflow controller endpoint
+- The workflow service owns the transaction boundary via `ITransactionManager`
+- Single-entity services never manage transactions
+- Workflow services live in `Application/Services/Workflows/{WorkflowName}/`
+- Workflow controllers live in `Api/Controllers/Workflow/{WorkflowName}Controller.cs`
+
+**Golden reference:** `ShippingReceiving` slice — see `ShippingReceivingService` and `ShippingReceivingController`.
+
+**Examples of when this applies:**
+- Creating an Order + one or more Jobs in a single user action
+- Any write that spans more than one aggregate in one transaction
+
+---
+
 ## Test Rules
 
 ### Test Boundary
