@@ -12,6 +12,17 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
         builder.HasKey(p => p.Id);
 
         // Properties
+        builder.Property(p => p.PartName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(p => p.PartNumber)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.HasIndex(p => p.PartNumber)
+            .IsUnique();
+
         builder.Property(p => p.ApproxPartCycleTime)
             .IsRequired();
 

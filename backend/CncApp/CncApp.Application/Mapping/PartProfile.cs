@@ -16,7 +16,8 @@ public class PartProfile : Profile
 
         CreateMap<UpdatePartRequestDto, Part>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.Orders, opt => opt.Ignore());
+            .ForMember(dest => dest.Orders, opt => opt.Ignore())
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }
 

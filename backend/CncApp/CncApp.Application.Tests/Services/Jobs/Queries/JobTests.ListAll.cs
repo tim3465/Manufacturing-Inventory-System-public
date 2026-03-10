@@ -15,8 +15,8 @@ public partial class JobTests
 
         var jobs = new List<Job>
         {
-            new Job(1, 1, 1, 10, 5, TimeSpan.FromMinutes(1), 2, 5) { Id = 1 },
-            new Job(2, 2, 2, 20, 10, TimeSpan.FromMinutes(2), 3, 6) { Id = 2 }
+            new Job(1, 1, 1, 10, 5, TimeSpan.FromMinutes(1), 2, 5, new DateOnly(2026, 6, 1)) { Id = 1 },
+            new Job(2, 2, 2, 20, 10, TimeSpan.FromMinutes(2), 3, 6, new DateOnly(2026, 7, 1)) { Id = 2 }
         };
 
         var expectedDtos = new List<JobDto>

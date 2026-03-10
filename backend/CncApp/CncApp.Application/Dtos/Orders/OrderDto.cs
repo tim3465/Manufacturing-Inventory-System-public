@@ -17,5 +17,7 @@ public class OrderDto
     public int PartAmountRequested { get; set; }
 
     public int PartsPerBar { get; set; }
+
+    public string CustomerName { get; set; } = string.Empty;
 }
 

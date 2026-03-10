@@ -23,7 +23,8 @@ public class JobProfile : Profile
             .ForMember(dest => dest.Order, opt => opt.Ignore())
             .ForMember(dest => dest.StockLot, opt => opt.Ignore())
             .ForMember(dest => dest.Machine, opt => opt.Ignore())
-            .ForMember(dest => dest.Shifts, opt => opt.Ignore());
+            .ForMember(dest => dest.Shifts, opt => opt.Ignore())
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }
 

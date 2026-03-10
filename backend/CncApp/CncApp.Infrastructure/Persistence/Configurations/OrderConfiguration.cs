@@ -23,14 +23,20 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(o => o.PartsPerBar);
 
-        // Relationship
+        // Relationships
         builder.HasOne(o => o.Part)
             .WithMany(p => p.Orders)
             .HasForeignKey(o => o.PartId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Index on Foreign Key
+        builder.HasOne(o => o.Customer)
+            .WithMany(c => c.Orders)
+            .HasForeignKey(o => o.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Indexes on Foreign Keys
         builder.HasIndex(o => o.PartId);
+        builder.HasIndex(o => o.CustomerId);
 
         // Navigation Properties
         builder.HasMany(o => o.Jobs)
