@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(node_modules/.bin/ng build:*)",
-      "Bash(gh issue:*)"
+      "Bash(gh issue:*)",
+      "Bash(echo:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(dotnet test:*)",
+      "Bash(/c/dev/projects/Manufacturing-Inventory-System/main/frontend/angular/node_modules/.bin/ng build:*)",
+      "Bash(npm install:*)",
+      "Bash(npx ng:*)"
     ]
   }
 }

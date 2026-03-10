@@ -21,7 +21,8 @@ public partial class JobTests
             BarAmountPlanned = 5,
             BarCycleTime = TimeSpan.FromMinutes(1),
             BarsInJob = 2,
-            EstimatedPartsPerBar = 5
+            EstimatedPartsPerBar = 5,
+            DueDate = new DateOnly(2026, 6, 1)
         };
         var cancellationToken = CancellationToken.None;
 
@@ -33,7 +34,8 @@ public partial class JobTests
             barAmountPlanned: dto.BarAmountPlanned,
             barCycleTime: dto.BarCycleTime,
             barsInJob: dto.BarsInJob,
-            estimatedPartsPerBar: dto.EstimatedPartsPerBar)
+            estimatedPartsPerBar: dto.EstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1))
         {
             Id = 1
         };

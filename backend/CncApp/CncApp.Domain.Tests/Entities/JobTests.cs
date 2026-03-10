@@ -33,7 +33,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("OrderId", ex.Message);
     }
@@ -49,7 +50,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("StockLotId", ex.Message);
     }
@@ -65,7 +67,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("MachineId", ex.Message);
     }
@@ -81,7 +84,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("PartAmountPlanned", ex.Message);
     }
@@ -97,7 +101,8 @@ public class JobTests
             barAmountPlanned: -1,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("BarAmountPlanned", ex.Message);
     }
@@ -113,7 +118,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: TimeSpan.FromSeconds(-1),
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("BarCycleTime", ex.Message);
     }
@@ -129,7 +135,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: -1,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar));
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("BarsInJob", ex.Message);
     }
@@ -145,7 +152,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: -1));
+            estimatedPartsPerBar: -1,
+            dueDate: new DateOnly(2026, 6, 1)));
 
         Assert.Contains("EstimatedPartsPerBar", ex.Message);
     }
@@ -161,7 +169,8 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar);
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1));
 
         Assert.NotNull(job);
         Assert.Equal(ValidOrderId, job.OrderId);
@@ -255,6 +264,44 @@ public class JobTests
 
     #endregion
 
+    #region DueDate Tests
+
+    [Fact]
+    public void Constructor_WhenDueDateIsDefault_ThrowsDomainException()
+    {
+        var ex = Assert.Throws<DomainException>(() => new Job(
+            orderId: ValidOrderId,
+            stockLotId: ValidStockLotId,
+            machineId: ValidMachineId,
+            partAmountPlanned: ValidPartAmountPlanned,
+            barAmountPlanned: ValidBarAmountPlanned,
+            barCycleTime: ValidBarCycleTime,
+            barsInJob: ValidBarsInJob,
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: default));
+
+        Assert.Contains("DueDate", ex.Message);
+    }
+
+    [Fact]
+    public void DueDateSetter_WhenValueIsDefault_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+        var ex = Assert.Throws<DomainException>(() => job.DueDate = default);
+        Assert.Contains("DueDate", ex.Message);
+    }
+
+    [Fact]
+    public void DueDateSetter_WhenValueIsValid_UpdatesProperty()
+    {
+        var job = CreateValidJob();
+        var newDate = new DateOnly(2027, 1, 15);
+        job.DueDate = newDate;
+        Assert.Equal(newDate, job.DueDate);
+    }
+
+    #endregion
+
     #region Method Tests
 
     [Fact]
@@ -303,6 +350,7 @@ public class JobTests
             barAmountPlanned: ValidBarAmountPlanned,
             barCycleTime: ValidBarCycleTime,
             barsInJob: ValidBarsInJob,
-            estimatedPartsPerBar: ValidEstimatedPartsPerBar);
+            estimatedPartsPerBar: ValidEstimatedPartsPerBar,
+            dueDate: new DateOnly(2026, 6, 1));
 }
 

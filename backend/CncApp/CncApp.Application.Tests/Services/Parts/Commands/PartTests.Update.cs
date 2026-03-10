@@ -20,7 +20,7 @@ public partial class PartTests
         };
         var cancellationToken = CancellationToken.None;
 
-        var part = new Part(TimeSpan.FromMinutes(5), 10)
+        var part = new Part("Test Part", "TP-001", TimeSpan.FromMinutes(5), 10)
         {
             Id = partId
         };
@@ -100,7 +100,7 @@ public partial class PartTests
         };
         var cancellationToken = CancellationToken.None;
 
-        var part = new Part(TimeSpan.FromMinutes(5), 10)
+        var part = new Part("Test Part", "TP-001", TimeSpan.FromMinutes(5), 10)
         {
             Id = partId
         };

@@ -45,6 +45,15 @@ public class ShiftsController : ControllerBase
         return Ok(shift);
     }
 
+    [HttpGet("production")]
+    [Authorize(Roles = "Admin,Supervisor")]
+    [ProducesResponseType(typeof(List<ShiftDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<ShiftDto>>> ListProductionAsync(CancellationToken ct = default)
+    {
+        var shifts = await _shiftService.ListProductionAsync(ct);
+        return Ok(shifts);
+    }
+
     [HttpGet("all")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(List<ShiftDto>), StatusCodes.Status200OK)]
