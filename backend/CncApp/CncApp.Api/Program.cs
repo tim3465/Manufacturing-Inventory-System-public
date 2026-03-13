@@ -48,8 +48,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.MapInboundClaims = false;   // prevents "sub" → NameIdentifier remapping so FindFirst("sub") works
     options.TokenValidationParameters = new TokenValidationParameters
     {
+        RoleClaimType = "role",
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
