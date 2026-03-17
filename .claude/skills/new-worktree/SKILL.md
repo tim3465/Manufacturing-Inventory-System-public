@@ -1,4 +1,7 @@
-# Skill: new-worktree
+---
+name: new-worktree
+description: Create a Git worktree for a GitHub issue with a clean branch name and open a new terminal tab with Claude Code.
+---
 
 Create a Git worktree for a GitHub issue. Fetches the issue title, builds a clean folder/branch name, sets up the worktree as a sibling of `main`, and opens a new terminal tab with Claude Code ready to go.
 

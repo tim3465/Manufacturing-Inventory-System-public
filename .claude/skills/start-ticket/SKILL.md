@@ -1,4 +1,7 @@
-# Skill: start-ticket
+---
+name: start-ticket
+description: Fetch the active GitHub issue, display it, and hand off to the managing agent.
+---
 
 Fetch the active GitHub issue from the environment, display it to the user, and hand it off to the managing agent on confirmation.
 
