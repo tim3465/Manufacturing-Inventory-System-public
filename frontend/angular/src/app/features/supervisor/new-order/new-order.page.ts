@@ -260,7 +260,6 @@ export class NewOrderPageComponent implements OnInit {
       partAmountPlanned: Number(j.partAmountPlanned),
       barAmountPlanned: Number(j.barAmountPlanned),
       barCycleTime: String(j.barCycleTime).trim(),
-      barsInJob: Number(j.barAmountPlanned),  // proxy — BarsInJob still required by backend
       estimatedPartsPerBar:
         j.estimatedPartsPerBar !== null && j.estimatedPartsPerBar !== ''
           ? Number(j.estimatedPartsPerBar)

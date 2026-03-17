@@ -21,7 +21,6 @@ public partial class JobTests
             partAmountPlanned: 10,
             barAmountPlanned: 5,
             barCycleTime: TimeSpan.FromMinutes(1),
-            barsInJob: 2,
             estimatedPartsPerBar: 5,
             dueDate: new DateOnly(2026, 6, 1))
         {
