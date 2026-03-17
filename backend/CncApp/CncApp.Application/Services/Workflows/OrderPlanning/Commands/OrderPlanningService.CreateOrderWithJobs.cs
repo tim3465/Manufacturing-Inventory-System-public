@@ -36,7 +36,6 @@ public partial class OrderPlanningService
                         PartAmountPlanned = jobDto.PartAmountPlanned,
                         BarAmountPlanned = jobDto.BarAmountPlanned,
                         BarCycleTime = jobDto.BarCycleTime,
-                        BarsInJob = jobDto.BarsInJob,
                         EstimatedPartsPerBar = jobDto.EstimatedPartsPerBar,
                         DueDate = jobDto.DueDate
                     }, ct);

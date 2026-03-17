@@ -4,7 +4,6 @@ export interface CreateJobInOrderRequestDto {
   partAmountPlanned: number;
   barAmountPlanned: number;
   barCycleTime: string;
-  barsInJob: number;
   estimatedPartsPerBar: number | null;
   dueDate: string;
 }
