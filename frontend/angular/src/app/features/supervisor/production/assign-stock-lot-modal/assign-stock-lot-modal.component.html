@@ -1,0 +1,59 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div class="relative z-10 w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl">
+    <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+      <div class="text-lg font-semibold text-[var(--fg)]">Assign Stock Lot</div>
+      <button
+        type="button"
+        class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+        (click)="onCancel()"
+        [disabled]="submitting()"
+        aria-label="Close"
+      >
+        &#x2715;
+      </button>
+    </div>
+
+    <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="text-sm text-slate-500">
+        Job #{{ job.orderId }} &mdash; {{ job.partName }} ({{ job.partNumber }})
+      </div>
+
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Stock Lot</div>
+        <select
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="stockLotId"
+        >
+          <option [ngValue]="null">— No lot assigned —</option>
+          @for (lot of stockLots(); track lot.id) {
+            <option [ngValue]="lot.id">
+              {{ lot.lotNumber }} &mdash; {{ lot.amountOfBars }} bars, {{ lot.diameter }}"
+            </option>
+          }
+        </select>
+      </label>
+
+      <div class="pt-2 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="submitting()"
+        >
+          {{ submitting() ? 'Saving...' : 'Confirm' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

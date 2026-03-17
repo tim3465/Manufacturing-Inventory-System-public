@@ -11,6 +11,7 @@ import { PartDto } from '../../../core/dtos/parts/part.dto';
 import { ShiftDto } from '../../../core/dtos/shifts/shift.dto';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { AddPartModalComponent } from './add-part-modal/add-part-modal.component';
+import { AssignStockLotModalComponent } from './assign-stock-lot-modal/assign-stock-lot-modal.component';
 
 type Tab = 'orders' | 'jobs' | 'parts' | 'shifts';
 
@@ -19,7 +20,7 @@ interface TabDef {
   label: string;
 }
 
-interface JobRow {
+export interface JobProductionRow {
   id: number;
   orderId: number;
   dueDate: string;
@@ -31,12 +32,14 @@ interface JobRow {
   percentComplete: number;
   expanded: boolean;
   shifts: ShiftDto[];
+  stockLotId: number | null;
+  lotNumber: string | null;
 }
 
 @Component({
   selector: 'app-production-page',
   standalone: true,
-  imports: [CommonModule, AddPartModalComponent],
+  imports: [CommonModule, AddPartModalComponent, AssignStockLotModalComponent],
   templateUrl: './production.page.html',
   styleUrl: './production.page.css'
 })
@@ -68,8 +71,9 @@ export class ProductionPageComponent implements OnInit {
   protected readonly shifts = signal<ShiftDto[]>([]);
 
   protected readonly isAddPartOpen = signal(false);
+  protected readonly selectedJobForLot = signal<JobProductionRow | null>(null);
 
-  protected readonly jobRows = computed<JobRow[]>(() =>
+  protected readonly jobRows = computed<JobProductionRow[]>(() =>
     this.jobs()
       .slice()
       .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
@@ -84,7 +88,9 @@ export class ProductionPageComponent implements OnInit {
         partsCompleted: j.partsCompleted,
         percentComplete: j.percentComplete,
         expanded: false,
-        shifts: j.shifts
+        shifts: j.shifts,
+        stockLotId: j.stockLotId,
+        lotNumber: j.lotNumber
       }))
   );
 
@@ -200,6 +206,15 @@ export class ProductionPageComponent implements OnInit {
   protected onPartCreated(): void {
     this.parts.set([]);
     this.loadParts();
+  }
+
+  protected openAssignLotModal(job: JobProductionRow): void {
+    this.selectedJobForLot.set(job);
+  }
+
+  protected onLotAssigned(): void {
+    this.selectedJobForLot.set(null);
+    this.loadJobs();
   }
 
   protected formatStopTime(stopTime: string | null): string {

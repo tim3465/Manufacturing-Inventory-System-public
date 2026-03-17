@@ -12,4 +12,6 @@ export interface JobProductionDto {
   partsCompleted: number;
   percentComplete: number;
   shifts: ShiftDto[];
+  stockLotId: number | null;
+  lotNumber: string | null;
 }
