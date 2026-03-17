@@ -22,7 +22,8 @@
       "Bash(gh:*)",
       "Bash(gh pr:*)",
       "Bash(git push:*)",
-      "Bash(./node_modules/.bin/ng build:*)"
+      "Bash(./node_modules/.bin/ng build:*)",
+      "Bash(xargs cat:*)"
     ]
   }
 }
