@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { MachineDto, CreateMachineRequestDto } from '../dtos/machines/machine.dto';
+import { MachineWithJobsDto } from '../dtos/machines/machine-with-jobs.dto';
 import { ApiClient } from './api-client.service';
 
 const _PATH = '/machines';
@@ -9,6 +10,11 @@ const _PATH = '/machines';
 @Injectable({ providedIn: 'root' })
 export class MachinesApi {
   constructor(private readonly api: ApiClient) {}
+
+  /** GET /api/machines/with-jobs - active machines with their active jobs */
+  listWithJobs(): Observable<MachineWithJobsDto[]> {
+    return this.api.getCached<MachineWithJobsDto[]>(`${_PATH}/with-jobs`);
+  }
 
   /** GET /api/machines/all - all machines including inactive (Admin-only) */
   listAll(): Observable<MachineDto[]> {

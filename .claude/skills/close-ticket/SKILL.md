@@ -1,4 +1,7 @@
-# Skill: close-ticket
+---
+name: close-ticket
+description: Clean up a finished ticket: commit, push, open PR linked to issue, post summary comment, then provide worktree removal command.
+---
 
 Clean up a finished ticket: ensure everything is committed, push the branch, open a PR linked to the issue, post a commit summary comment on the issue, then safely delete the worktree from the local machine.
 

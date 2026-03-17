@@ -39,6 +39,20 @@ public class MachinesController : ControllerBase
     }
 
     /// <summary>
+    /// Gets all active machines with their active jobs.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of active machines with their active jobs.</returns>
+    [HttpGet("with-jobs")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<MachineWithJobsDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MachineWithJobsDto>>> ListWithJobsAsync(CancellationToken ct = default)
+    {
+        var machines = await _machineService.ListActiveWithJobsAsync(ct);
+        return Ok(machines);
+    }
+
+    /// <summary>
     /// Gets a machine by ID.
     /// </summary>
     /// <param name="id">The machine ID.</param>
