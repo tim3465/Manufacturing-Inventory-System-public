@@ -24,5 +24,9 @@ public class JobProductionDto
 
     public decimal PercentComplete { get; set; }
 
+    public int? StockLotId { get; set; }
+
+    public string? LotNumber { get; set; }
+
     public List<ShiftDto> Shifts { get; set; } = new();
 }

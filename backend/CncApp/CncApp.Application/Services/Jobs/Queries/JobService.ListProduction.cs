@@ -28,6 +28,8 @@ public partial class JobService
                 PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
                 PartsCompleted = partsCompleted,
                 PercentComplete = percentComplete,
+                StockLotId = j.StockLotId,
+                LotNumber = j.StockLot?.LotNumber,
                 Shifts = _mapper.Map<List<ShiftDto>>(j.Shifts)
             };
         }).ToList();
