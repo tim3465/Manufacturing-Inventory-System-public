@@ -30,4 +30,9 @@ export class JobsApi {
       })
     );
   }
+  /** PATCH /api/jobs/{id}/assign-stocklot - assign or clear a stock lot on a job (Supervisor/Admin) */
+  assignStockLot(id: number, body: { stockLotId: number | null }): Observable<void> {
+    return this.api.patch<void>(`${_PATH}/${id}/assign-stocklot`, body);
+
+  }
 }

@@ -20,7 +20,6 @@ public partial class JobTests
             PartAmountPlanned = 10,
             BarAmountPlanned = 5,
             BarCycleTime = TimeSpan.FromMinutes(1),
-            BarsInJob = 2,
             EstimatedPartsPerBar = 5,
             DueDate = new DateOnly(2026, 6, 1)
         };
@@ -33,7 +32,6 @@ public partial class JobTests
             partAmountPlanned: dto.PartAmountPlanned,
             barAmountPlanned: dto.BarAmountPlanned,
             barCycleTime: dto.BarCycleTime,
-            barsInJob: dto.BarsInJob,
             estimatedPartsPerBar: dto.EstimatedPartsPerBar,
             dueDate: new DateOnly(2026, 6, 1))
         {

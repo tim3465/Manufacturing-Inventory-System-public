@@ -14,6 +14,7 @@ public partial class JobRepository : IJobRepository
             .Include(j => j.Machine)
             .Include(j => j.Order)
                 .ThenInclude(o => o.Part)
+            .Include(j => j.StockLot)
             .Include(j => j.Shifts)
                 .ThenInclude(s => s.Operator)
             .ToListAsync(ct);

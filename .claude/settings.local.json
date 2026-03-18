@@ -23,7 +23,9 @@
       "Bash(gh pr:*)",
       "Bash(git push:*)",
       "Bash(xargs cat:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(./node_modules/.bin/ng build:*)",
+      "Bash(xargs cat:*)"
     ]
   }
 }

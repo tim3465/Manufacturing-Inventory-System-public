@@ -18,9 +18,6 @@ public class CreateJobInOrderRequestDto
     [Required(ErrorMessage = "BarCycleTime is required.")]
     public TimeSpan BarCycleTime { get; set; }
 
-    [Required(ErrorMessage = "BarsInJob is required.")]
-    public int BarsInJob { get; set; }
-
     public int? EstimatedPartsPerBar { get; set; }
 
     [Required(ErrorMessage = "DueDate is required.")]

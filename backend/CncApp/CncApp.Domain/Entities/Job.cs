@@ -22,7 +22,6 @@ public class Job : AuditableEntityBase
         int partAmountPlanned,
         int barAmountPlanned,
         TimeSpan barCycleTime,
-        int barsInJob,
         int? estimatedPartsPerBar,
         DateOnly dueDate)
     {
@@ -32,7 +31,6 @@ public class Job : AuditableEntityBase
         PartAmountPlanned = partAmountPlanned;
         BarAmountPlanned = barAmountPlanned;
         BarCycleTime = barCycleTime;
-        BarsInJob = barsInJob;
         EstimatedPartsPerBar = estimatedPartsPerBar;
         DueDate = dueDate;
         Shifts = new List<Shift>();

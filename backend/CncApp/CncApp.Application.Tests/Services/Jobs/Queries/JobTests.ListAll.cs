@@ -15,14 +15,14 @@ public partial class JobTests
 
         var jobs = new List<Job>
         {
-            new Job(1, 1, 1, 10, 5, TimeSpan.FromMinutes(1), 2, 5, new DateOnly(2026, 6, 1)) { Id = 1 },
-            new Job(2, 2, 2, 20, 10, TimeSpan.FromMinutes(2), 3, 6, new DateOnly(2026, 7, 1)) { Id = 2 }
+            new Job(1, 1, 1, 10, 5, TimeSpan.FromMinutes(1), 5, new DateOnly(2026, 6, 1)) { Id = 1 },
+            new Job(2, 2, 2, 20, 10, TimeSpan.FromMinutes(2), 6, new DateOnly(2026, 7, 1)) { Id = 2 }
         };
 
         var expectedDtos = new List<JobDto>
         {
-            new JobDto { Id = 1, OrderId = 1, StockLotId = 1, MachineId = 1, PartAmountPlanned = 10, BarAmountPlanned = 5, BarCycleTime = TimeSpan.FromMinutes(1), BarsInJob = 2, EstimatedPartsPerBar = 5 },
-            new JobDto { Id = 2, OrderId = 2, StockLotId = 2, MachineId = 2, PartAmountPlanned = 20, BarAmountPlanned = 10, BarCycleTime = TimeSpan.FromMinutes(2), BarsInJob = 3, EstimatedPartsPerBar = 6 }
+            new JobDto { Id = 1, OrderId = 1, StockLotId = 1, MachineId = 1, PartAmountPlanned = 10, BarAmountPlanned = 5, BarCycleTime = TimeSpan.FromMinutes(1), BarsInJob = 0, EstimatedPartsPerBar = 5 },
+            new JobDto { Id = 2, OrderId = 2, StockLotId = 2, MachineId = 2, PartAmountPlanned = 20, BarAmountPlanned = 10, BarCycleTime = TimeSpan.FromMinutes(2), BarsInJob = 0, EstimatedPartsPerBar = 6 }
         };
 
         MockRepository

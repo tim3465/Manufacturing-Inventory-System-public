@@ -126,5 +126,15 @@ public class JobsController : ControllerBase
         var result = await _startJobService.StartJobAsync(id, dto, ct);
         return StatusCode(StatusCodes.Status201Created, result);
     }
+    [HttpPatch("{id:int}/assign-stocklot")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AssignStockLotAsync(int id, [FromBody] AssignStockLotRequestDto dto, CancellationToken ct = default)
+    {
+        var success = await _jobService.AssignStockLotAsync(id, dto, ct);
+        return success ? NoContent() : NotFound();
+
+    }
 }
 
