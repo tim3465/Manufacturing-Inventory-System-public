@@ -331,6 +331,48 @@ public class JobTests
     #region Method Tests
 
     [Fact]
+    public void Start_WhenValidBarsToAdd_SetsStartedDateTimeAndIncrementsBarsInJob()
+    {
+        var job = CreateValidJob();
+        var initialBarsInJob = job.BarsInJob;
+
+        job.Start(3);
+
+        Assert.NotNull(job.StartedDateTime);
+        Assert.True(job.StartedDateTime.Value <= DateTimeOffset.UtcNow);
+        Assert.True(job.StartedDateTime.Value >= DateTimeOffset.UtcNow.AddSeconds(-1));
+        Assert.Equal(initialBarsInJob + 3, job.BarsInJob);
+    }
+
+    [Fact]
+    public void Start_WhenAlreadyStarted_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+        job.Start(1);
+
+        var ex = Assert.Throws<DomainException>(() => job.Start(1));
+        Assert.Contains("already been started", ex.Message);
+    }
+
+    [Fact]
+    public void Start_WhenBarsToAddIsZero_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+
+        var ex = Assert.Throws<DomainException>(() => job.Start(0));
+        Assert.Contains("BarsToAdd", ex.Message);
+    }
+
+    [Fact]
+    public void Start_WhenBarsToAddIsNegative_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+
+        var ex = Assert.Throws<DomainException>(() => job.Start(-5));
+        Assert.Contains("BarsToAdd", ex.Message);
+    }
+
+    [Fact]
     public void Inactivate_WhenJobIsActive_SetsInactivatedDateTime()
     {
         var job = CreateValidJob();

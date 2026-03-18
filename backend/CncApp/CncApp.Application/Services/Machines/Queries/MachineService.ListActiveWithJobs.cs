@@ -14,13 +14,15 @@ public partial class MachineService
             SerialNumber = m.SerialNumber,
             ModelNumber = m.ModelNumber,
             Jobs = m.Jobs
+                .Where(j => j.EndedDateTime == null)
                 .OrderBy(j => j.DueDate)
                 .Select(j => new MachineJobSummaryDto
                 {
                     Id = j.Id,
                     PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
                     DueDate = j.DueDate,
-                    LotNumber = j.StockLot?.LotNumber
+                    LotNumber = j.StockLot?.LotNumber,
+                    StartedDateTime = j.StartedDateTime
                 })
                 .ToList()
         }).ToList();

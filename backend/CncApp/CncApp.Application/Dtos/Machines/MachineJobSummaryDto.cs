@@ -6,4 +6,5 @@ public class MachineJobSummaryDto
     public string PartNumber { get; set; } = string.Empty;
     public DateOnly DueDate { get; set; }
     public string? LotNumber { get; set; }
+    public DateTimeOffset? StartedDateTime { get; set; }
 }

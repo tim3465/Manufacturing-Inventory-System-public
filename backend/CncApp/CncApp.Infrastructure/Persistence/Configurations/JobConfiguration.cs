@@ -38,6 +38,10 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.DueDate)
             .IsRequired();
 
+        builder.Property(j => j.StartedDateTime);
+
+        builder.Property(j => j.EndedDateTime);
+
         // Relationships
         builder.HasOne(j => j.Order)
             .WithMany(o => o.Jobs)

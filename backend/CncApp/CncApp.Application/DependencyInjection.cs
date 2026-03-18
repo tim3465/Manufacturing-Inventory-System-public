@@ -10,6 +10,7 @@ using CncApp.Application.Services.StockLots;
 using CncApp.Application.Services.Users;
 using CncApp.Application.Services.Workflows.OrderPlanning;
 using CncApp.Application.Services.Workflows.ShippingReceiving;
+using CncApp.Application.Services.Workflows.StartJob;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CncApp.Application;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         // Register Workflow Services
         services.AddScoped<ShippingReceivingService>();
         services.AddScoped<OrderPlanningService>();
+        services.AddScoped<StartJobService>();
 
         // Register AutoMapper
         services.AddAutoMapper(typeof(DependencyInjection).Assembly);

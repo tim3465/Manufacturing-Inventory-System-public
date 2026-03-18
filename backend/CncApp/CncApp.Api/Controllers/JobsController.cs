@@ -1,5 +1,6 @@
 using CncApp.Application.Dtos.Jobs;
 using CncApp.Application.Services.Jobs;
+using CncApp.Application.Services.Workflows.StartJob;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,12 @@ namespace CncApp.Api.Controllers;
 public class JobsController : ControllerBase
 {
     private readonly JobService _jobService;
+    private readonly StartJobService _startJobService;
 
-    public JobsController(JobService jobService)
+    public JobsController(JobService jobService, StartJobService startJobService)
     {
         _jobService = jobService;
+        _startJobService = startJobService;
     }
 
     // Conventions:
@@ -108,6 +111,20 @@ public class JobsController : ControllerBase
     {
         var jobs = await _jobService.ListProductionAsync(ct);
         return Ok(jobs);
+    }
+
+    [HttpPost("{id:int}/start")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(StartJobResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<StartJobResponseDto>> StartJobAsync(
+        int id,
+        [FromBody] StartJobRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var result = await _startJobService.StartJobAsync(id, dto, ct);
+        return StatusCode(StatusCodes.Status201Created, result);
     }
 }
 

@@ -31,5 +31,9 @@ public class JobDto
 
     [Required(ErrorMessage = "DueDate is required.")]
     public DateOnly DueDate { get; set; }
+
+    public DateTimeOffset? StartedDateTime { get; set; }
+
+    public DateTimeOffset? EndedDateTime { get; set; }
 }
 
