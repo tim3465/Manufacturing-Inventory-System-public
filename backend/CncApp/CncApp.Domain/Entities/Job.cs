@@ -180,6 +180,22 @@ public class Job : AuditableEntityBase
         }
     }
 
+    private DateTimeOffset? _startedDateTime;
+
+    public DateTimeOffset? StartedDateTime
+    {
+        get => _startedDateTime;
+        private set => _startedDateTime = value;
+    }
+
+    private DateTimeOffset? _endedDateTime;
+
+    public DateTimeOffset? EndedDateTime
+    {
+        get => _endedDateTime;
+        private set => _endedDateTime = value;
+    }
+
     public Order Order { get; set; } = null!;
 
     public StockLot? StockLot { get; set; }
@@ -187,6 +203,27 @@ public class Job : AuditableEntityBase
     public Machine Machine { get; set; } = null!;
 
     public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
+
+    /// <summary>
+    /// Starts the job by recording the start time and adding bars to the job.
+    /// </summary>
+    /// <param name="barsToAdd">The number of bars being pulled from inventory into this job.</param>
+    /// <exception cref="DomainException">Thrown when the job is already started or barsToAdd is not positive.</exception>
+    public void Start(int barsToAdd)
+    {
+        if (StartedDateTime.HasValue)
+        {
+            throw new DomainException("Job has already been started.");
+        }
+
+        if (barsToAdd <= 0)
+        {
+            throw new DomainException("BarsToAdd must be greater than zero.");
+        }
+
+        StartedDateTime = DateTimeOffset.UtcNow;
+        BarsInJob += barsToAdd;
+    }
 
     /// <summary>
     /// Inactivates the job (soft-delete).

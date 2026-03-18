@@ -3,12 +3,14 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MachinesApi } from '../../core/api/machines.api';
 import { MachineWithJobsDto } from '../../core/dtos/machines/machine-with-jobs.dto';
 import { ToastService } from '../../core/ui/toast/toast.service';
+import { StartJobModalComponent } from './start-job-modal/start-job-modal.component';
 
 interface JobRow {
   id: number;
   partNumber: string;
   dueDate: string;
   lotNumber: string | null;
+  isActive: boolean;
 }
 
 interface MachineCard {
@@ -21,7 +23,7 @@ interface MachineCard {
 @Component({
   selector: 'app-machinist-machines-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, StartJobModalComponent],
   templateUrl: './machines.page.html',
   styleUrl: './machines.page.css'
 })
@@ -31,6 +33,8 @@ export class MachinistMachinesPageComponent implements OnInit {
 
   protected readonly loading = signal<boolean>(true);
   protected readonly machines = signal<MachineWithJobsDto[]>([]);
+  protected readonly selectedJobId = signal<number | null>(null);
+  protected readonly showStartModal = signal<boolean>(false);
 
   protected readonly machineCards = computed<MachineCard[]>(() =>
     this.machines().map(m => ({
@@ -41,7 +45,8 @@ export class MachinistMachinesPageComponent implements OnInit {
         id: j.id,
         partNumber: j.partNumber,
         dueDate: j.dueDate,
-        lotNumber: j.lotNumber
+        lotNumber: j.lotNumber,
+        isActive: j.startedDateTime != null
       }))
     }))
   );
@@ -62,5 +67,16 @@ export class MachinistMachinesPageComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  protected onJobRowClick(job: JobRow): void {
+    if (job.isActive) return;
+    this.selectedJobId.set(job.id);
+    this.showStartModal.set(true);
+  }
+
+  protected onJobStarted(): void {
+    this.showStartModal.set(false);
+    this.loadMachines();
   }
 }

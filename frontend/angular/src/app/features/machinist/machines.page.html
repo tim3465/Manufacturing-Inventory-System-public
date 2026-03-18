@@ -27,7 +27,12 @@
                 <span>Lot #</span>
               </div>
               @for (job of card.jobs; track job.id) {
-                <div class="grid grid-cols-3 gap-2 text-sm text-[var(--fg)]">
+                <div
+                  class="grid grid-cols-3 gap-2 text-sm cursor-pointer rounded px-1 -mx-1 transition"
+                  [style.background-color]="job.isActive ? 'var(--primary)' : ''"
+                  [style.color]="job.isActive ? 'var(--primary-fg)' : 'var(--fg)'"
+                  (click)="onJobRowClick(job)"
+                >
                   <span>{{ job.partNumber }}</span>
                   <span>{{ job.dueDate }}</span>
                   <span>{{ job.lotNumber ?? '—' }}</span>
@@ -38,5 +43,13 @@
         </div>
       }
     </div>
+  }
+
+  @if (showStartModal()) {
+    <app-start-job-modal
+      [jobId]="selectedJobId()!"
+      (closed)="showStartModal.set(false)"
+      (started)="onJobStarted()"
+    />
   }
 </section>

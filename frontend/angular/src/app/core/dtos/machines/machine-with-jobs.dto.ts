@@ -3,6 +3,7 @@ export interface MachineJobSummaryDto {
   partNumber: string;
   dueDate: string;
   lotNumber: string | null;
+  startedDateTime: string | null;
 }
 
 export interface MachineWithJobsDto {
