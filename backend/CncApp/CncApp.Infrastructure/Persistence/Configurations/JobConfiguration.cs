@@ -15,8 +15,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(j => j.OrderId)
             .IsRequired();
 
-        builder.Property(j => j.StockLotId)
-            .IsRequired();
+        builder.Property(j => j.StockLotId);
 
         builder.Property(j => j.MachineId)
             .IsRequired();
@@ -36,6 +35,13 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 
         builder.Property(j => j.EstimatedPartsPerBar);
 
+        builder.Property(j => j.DueDate)
+            .IsRequired();
+
+        builder.Property(j => j.StartedDateTime);
+
+        builder.Property(j => j.EndedDateTime);
+
         // Relationships
         builder.HasOne(j => j.Order)
             .WithMany(o => o.Jobs)
@@ -45,7 +51,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.HasOne(j => j.StockLot)
             .WithMany()
             .HasForeignKey(j => j.StockLotId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasOne(j => j.Machine)
             .WithMany(m => m.Jobs)

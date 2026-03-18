@@ -13,6 +13,8 @@ public class ShiftDto
     [Required(ErrorMessage = "OperatorId is required.")]
     public int OperatorId { get; set; }
 
+    public string OperatorName { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "BarsConsumed is required.")]
     public int BarsConsumed { get; set; }
 
@@ -28,5 +30,9 @@ public class ShiftDto
     public DateTime? StopTime { get; set; }
 
     public TimeSpan? Downtime { get; set; }
+
+    public string PartName { get; set; } = string.Empty;
+
+    public string PartNumber { get; set; } = string.Empty;
 }
 

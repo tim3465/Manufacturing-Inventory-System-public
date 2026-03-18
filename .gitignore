@@ -366,3 +366,8 @@ FodyWeavers.xsd
 appsettings.Local.json
 appsettings.Local.*.json
 .postman_environment.json
+settings.local.json
+
+# Claude Code worktrees
+.claude/worktrees/
+settings.local.json

@@ -1,26 +1,57 @@
 <section class="space-y-6">
   <header class="space-y-1">
     <p class="text-sm text-slate-500">Shipping / Receiving</p>
-    <h1 class="text-2xl font-semibold text-[var(--fg)]">Receive Material</h1>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Materials</h1>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+  <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
     <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
-      Incoming deliveries
+      Material catalog
     </div>
-    <ul class="divide-y divide-[var(--border)]">
-      @for (receipt of receipts; track receipt.id) {
-      <li class="px-4 py-3 flex items-center justify-between text-sm">
-        <div>
-          <p class="font-semibold text-[var(--fg)]">{{ receipt.id }}</p>
-          <p class="text-slate-500">{{ receipt.supplier }}</p>
-        </div>
-        <span class="px-2 py-1 rounded-full border border-[var(--border)] text-xs">
-          {{ receipt.status }}
-        </span>
-      </li>
-      }
-    </ul>
-  </div>
-</section>
 
+    @if (loading()) {
+      <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
+    } @else if (error()) {
+      <div class="px-4 py-3 text-sm text-red-500">{{ error() }}</div>
+    } @else if (materials().length === 0) {
+      <div class="px-4 py-3 text-sm text-slate-500">No materials found.</div>
+    } @else {
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+          <tr>
+            <th class="px-4 py-3 font-medium">Heat number</th>
+            <th class="px-4 py-3 font-medium">Material name</th>
+            <th class="px-4 py-3 font-medium"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          @for (material of materials(); track material.id) {
+            <tr>
+              <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ material.heatNumber }}</td>
+              <td class="px-4 py-3 text-[var(--fg)]">{{ material.materialName }}</td>
+              <td class="px-4 py-3">
+                <button
+                  type="button"
+                  class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-xs"
+                  (click)="openEdit(material)"
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  @if (isEditOpen() && selectedMaterial()) {
+    <app-edit-material-modal
+      [materialId]="selectedMaterial()!.id"
+      [heatNumber]="selectedMaterial()!.heatNumber"
+      [materialName]="selectedMaterial()!.materialName"
+      (closed)="closeEdit()"
+      (updated)="loadMaterials()"
+    />
+  }
+</section>

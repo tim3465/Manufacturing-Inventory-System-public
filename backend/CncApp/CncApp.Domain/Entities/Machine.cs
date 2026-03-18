@@ -73,4 +73,20 @@ public class Machine : AuditableEntityBase
         InactivatedDateTime = DateTimeOffset.UtcNow;
         InactivatedByUserId = inactivatedByUserId;
     }
+
+    /// <summary>
+    /// Activates the machine (reverses a soft-delete).
+    /// Prevents activating an already active machine by throwing a DomainException.
+    /// </summary>
+    /// <exception cref="DomainException">Thrown when the machine is already active.</exception>
+    public void Activate()
+    {
+        if (!InactivatedDateTime.HasValue)
+        {
+            throw new DomainException("Machine is already active and cannot be activated again.");
+        }
+
+        InactivatedDateTime = null;
+        InactivatedByUserId = null;
+    }
 }

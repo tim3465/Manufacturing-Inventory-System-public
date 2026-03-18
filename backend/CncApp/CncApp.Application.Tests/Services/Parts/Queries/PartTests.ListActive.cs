@@ -16,8 +16,8 @@ public partial class PartTests
 
         var parts = new List<Part>
         {
-            new Part(TimeSpan.FromMinutes(5), 10) { Id = 1 },
-            new Part(TimeSpan.FromMinutes(10), 20) { Id = 2 }
+            new Part("Part One", "P-001", TimeSpan.FromMinutes(5), 10) { Id = 1 },
+            new Part("Part Two", "P-002", TimeSpan.FromMinutes(10), 20) { Id = 2 }
         };
 
         var expectedDtos = new List<PartDto>

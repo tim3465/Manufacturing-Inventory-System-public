@@ -39,6 +39,20 @@ public class MachinesController : ControllerBase
     }
 
     /// <summary>
+    /// Gets all active machines with their active jobs.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of active machines with their active jobs.</returns>
+    [HttpGet("with-jobs")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(List<MachineWithJobsDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MachineWithJobsDto>>> ListWithJobsAsync(CancellationToken ct = default)
+    {
+        var machines = await _machineService.ListActiveWithJobsAsync(ct);
+        return Ok(machines);
+    }
+
+    /// <summary>
     /// Gets a machine by ID.
     /// </summary>
     /// <param name="id">The machine ID.</param>
@@ -104,6 +118,27 @@ public class MachinesController : ControllerBase
     public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _machineService.InactivateAsync(id, null, ct);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Activates a previously inactivated machine by ID.
+    /// </summary>
+    /// <param name="id">The machine ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>204 NoContent if successful, otherwise 404.</returns>
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateAsync(int id, CancellationToken ct = default)
+    {
+        var result = await _machineService.ActivateAsync(id, ct);
         if (!result)
         {
             return NotFound();

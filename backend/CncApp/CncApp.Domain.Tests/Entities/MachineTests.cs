@@ -366,5 +366,53 @@ public class MachineTests
     }
 
     #endregion
+
+    #region Activate Method Tests
+
+    [Fact]
+    public void Activate_WhenMachineIsInactive_ClearsInactivatedDateTime()
+    {
+        // Arrange
+        var machine = new Machine(ValidSerialNumber, ValidModelNumber);
+        machine.Inactivate();
+        Assert.NotNull(machine.InactivatedDateTime);
+
+        // Act
+        machine.Activate();
+
+        // Assert
+        Assert.Null(machine.InactivatedDateTime);
+    }
+
+    [Fact]
+    public void Activate_WhenMachineIsInactive_ClearsInactivatedByUserId()
+    {
+        // Arrange
+        var machine = new Machine(ValidSerialNumber, ValidModelNumber);
+        var userId = 42;
+        machine.Inactivate(userId);
+
+        // Act
+        machine.Activate();
+
+        // Assert
+        Assert.Null(machine.InactivatedDateTime);
+        Assert.Null(machine.InactivatedByUserId);
+    }
+
+    [Fact]
+    public void Activate_WhenMachineIsAlreadyActive_ThrowsDomainException()
+    {
+        // Arrange
+        var machine = new Machine(ValidSerialNumber, ValidModelNumber);
+        Assert.Null(machine.InactivatedDateTime);
+
+        // Act & Assert
+        var exception = Assert.Throws<DomainException>(() => machine.Activate());
+        Assert.Contains("already active", exception.Message);
+        Assert.Contains("cannot be activated again", exception.Message);
+    }
+
+    #endregion
 }
 

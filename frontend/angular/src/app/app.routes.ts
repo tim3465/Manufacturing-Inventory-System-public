@@ -6,11 +6,13 @@ import { Roles } from './core/auth/roles';
 import { AuthLoginPageComponent } from './features/auth/login.page';
 import { DashboardPageComponent } from './features/dashboard/dashboard.page';
 import { LogShiftPageComponent } from './features/machinist/log-shift.page';
+import { MachinistMachinesPageComponent } from './features/machinist/machines.page';
 import { MyJobsPageComponent } from './features/machinist/my-jobs.page';
 import { InventoryPageComponent } from './features/shipping/inventory/inventory.page';
 import { ReceiveMaterialPageComponent } from './features/shipping/receive-material/receive-material.page';
-import { JobPlanningPageComponent } from './features/supervisor/job-planning.page';
-import { OrdersPageComponent } from './features/supervisor/orders.page';
+import { ProductionPageComponent } from './features/supervisor/production/production.page';
+import { CustomersPageComponent } from './features/supervisor/customers/customers.page';
+import { NewOrderPageComponent } from './features/supervisor/new-order/new-order.page';
 import { MachinesPageComponent } from './features/admin/machines/machines.page';
 import { UsersPageComponent } from './features/admin/users/users.page';
 import { SettingsPageComponent } from './features/admin/settings/settings.page';
@@ -37,7 +39,8 @@ export const routes: Routes = [
         data: { roles: [Roles.Machinist, Roles.Admin] },
         children: [
           { path: 'my-jobs', component: MyJobsPageComponent },
-          { path: 'log-shift', component: LogShiftPageComponent }
+          { path: 'log-shift', component: LogShiftPageComponent },
+          { path: 'machines', component: MachinistMachinesPageComponent }
         ]
       },
       {
@@ -54,8 +57,9 @@ export const routes: Routes = [
         canMatch: [roleGuard],
         data: { roles: [Roles.Supervisor, Roles.Admin] },
         children: [
-          { path: 'orders', component: OrdersPageComponent },
-          { path: 'job-planning', component: JobPlanningPageComponent }
+          { path: 'production', component: ProductionPageComponent },
+          { path: 'customers', component: CustomersPageComponent },
+          { path: 'new-order', component: NewOrderPageComponent }
         ]
       },
       {
