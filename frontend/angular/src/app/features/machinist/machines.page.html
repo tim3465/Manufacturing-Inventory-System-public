@@ -30,11 +30,12 @@
               </div>
               @for (job of card.jobs; track job.id) {
                 <div
-                  class="grid grid-cols-5 gap-2 text-sm rounded px-1 -mx-1 transition"
+                  class="job-row grid grid-cols-5 gap-2 text-sm rounded px-1 -mx-1 transition"
                   [class.cursor-pointer]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
                   [class.cursor-not-allowed]="!job.hasLotNumber"
                   [class.opacity-40]="!job.hasLotNumber"
                   [class.job-row-selectable]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
+                  [class.job-row-active]="job.isActive"
                   [style.background-color]="job.isActive ? 'var(--primary)' : ''"
                   [style.color]="job.isActive ? 'var(--primary-fg)' : 'var(--fg)'"
                   (click)="onJobRowClick(job)"

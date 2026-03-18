@@ -1,3 +1,3 @@
 .job-row-selectable:hover {
-  background-color: var(--surface);
+  background-color: color-mix(in srgb, var(--fg) 8%, transparent);
 }
