@@ -32,7 +32,8 @@ export class RunningShiftFormComponent implements OnInit {
     scrap: [0, [Validators.required, Validators.min(0)]],
     barsConsumed: [0, [Validators.required, Validators.min(0)]],
     partsPerBar: [null as number | null],
-    downtime: [null as string | null]
+    downtimeHours: [0, [Validators.min(0)]],
+    downtimeMinutes: [0, [Validators.min(0), Validators.max(59)]]
   });
 
   ngOnInit(): void {
@@ -57,6 +58,14 @@ export class RunningShiftFormComponent implements OnInit {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     };
 
+    let downtimeHours = 0;
+    let downtimeMinutes = 0;
+    if (data.downtime) {
+      const parts = data.downtime.split(':');
+      downtimeHours = parseInt(parts[0], 10) || 0;
+      downtimeMinutes = parseInt(parts[1], 10) || 0;
+    }
+
     this.form.patchValue({
       startTime: toDatetimeLocal(data.startTime),
       stopTime: toDatetimeLocal(data.stopTime),
@@ -64,12 +73,19 @@ export class RunningShiftFormComponent implements OnInit {
       scrap: data.scrap,
       barsConsumed: data.barsConsumed,
       partsPerBar: data.partsPerBar,
-      downtime: data.downtime
+      downtimeHours,
+      downtimeMinutes
     });
   }
 
   private buildDto() {
     const raw = this.form.getRawValue();
+    const h = raw.downtimeHours;
+    const m = raw.downtimeMinutes;
+    const downtime = (h === 0 && m === 0)
+      ? null
+      : `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
+
     return {
       startTime: raw.startTime ? new Date(raw.startTime).toISOString() : '',
       stopTime: raw.stopTime ? new Date(raw.stopTime).toISOString() : null,
@@ -77,7 +93,7 @@ export class RunningShiftFormComponent implements OnInit {
       scrap: raw.scrap,
       barsConsumed: raw.barsConsumed,
       partsPerBar: raw.partsPerBar,
-      downtime: raw.downtime
+      downtime
     };
   }
 

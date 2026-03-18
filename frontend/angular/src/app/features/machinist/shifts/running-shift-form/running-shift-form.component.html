@@ -128,16 +128,32 @@
         </label>
 
         <!-- Downtime -->
-        <label class="block sm:col-span-2">
-          <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(hh:mm:ss, optional)</span></div>
-          <input
-            type="text"
-            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-            formControlName="downtime"
-            placeholder="e.g. 00:30:00"
-            autocomplete="off"
-          />
-        </label>
+        <div class="sm:col-span-2">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(optional)</span></div>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="block">
+              <div class="text-xs text-slate-400 mb-1">Hours</div>
+              <input
+                type="number"
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                formControlName="downtimeHours"
+                autocomplete="off"
+                min="0"
+              />
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-400 mb-1">Minutes</div>
+              <input
+                type="number"
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                formControlName="downtimeMinutes"
+                autocomplete="off"
+                min="0"
+                max="59"
+              />
+            </label>
+          </div>
+        </div>
 
       </div>
 
