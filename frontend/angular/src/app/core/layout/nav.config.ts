@@ -26,7 +26,7 @@ export const ROLE_NAV_GROUPS: RoleNavGroup[] = [
     roles: [Roles.Machinist],
     items: [
       { label: 'My Jobs', path: '/machinist/my-jobs' },
-      { label: 'Log Shift', path: '/machinist/log-shift' },
+      { label: 'Shifts', path: '/machinist/shifts' },
       { label: 'Machines', path: '/machinist/machines' }
     ]
   },
