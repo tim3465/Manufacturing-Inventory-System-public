@@ -1,3 +1,24 @@
+---
+category: backend-rules
+area: test-rules
+layer: backend
+activation: passive
+summary: Defines testing boundaries, structure, naming conventions, and responsibilities for domain and application tests.
+keywords:
+  - testing
+  - unit tests
+  - domain tests
+  - application tests
+  - workflow tests
+  - test structure
+  - test naming
+use-when:
+  - writing tests
+  - structuring test files
+  - deciding test boundaries
+  - validating workflows
+---
+
 # Backend Test Rules
 
 Two separate test projects. Each has a distinct responsibility and must not cross the boundary.

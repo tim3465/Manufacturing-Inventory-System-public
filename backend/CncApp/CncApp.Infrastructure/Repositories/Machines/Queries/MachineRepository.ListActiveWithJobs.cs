@@ -11,10 +11,10 @@ public partial class MachineRepository : IMachineRepository
     {
         return await _context.Machines
             .Where(m => !m.InactivatedDateTime.HasValue)
-            .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue))
+            .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue && j.EndedDateTime == null))
                 .ThenInclude(j => j.Order)
                     .ThenInclude(o => o.Part)
-            .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue))
+            .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue && j.EndedDateTime == null))
                 .ThenInclude(j => j.StockLot)
             .ToListAsync(ct);
     }

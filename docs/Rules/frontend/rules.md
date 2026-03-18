@@ -1,3 +1,25 @@
+---
+category: frontend-rules
+area: rules
+layer: frontend
+activation: passive
+summary: Defines frontend behavioral rules for Angular components, templates, dependency injection, state, forms, modal patterns, and UI conventions.
+keywords:
+  - angular rules
+  - frontend conventions
+  - inject
+  - signals
+  - reactive forms
+  - modal pattern
+  - template control flow
+  - ui behavior
+use-when:
+  - writing frontend code
+  - building angular pages
+  - creating components or modals
+  - applying frontend conventions
+---
+
 # Frontend Rules
 
 Rules verified against the current codebase. These supplement `map.md` (structure) with behavioral rules.

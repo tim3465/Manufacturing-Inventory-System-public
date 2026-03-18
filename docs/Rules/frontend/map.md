@@ -1,3 +1,26 @@
+---
+category: frontend-rules
+area: map
+layer: frontend
+activation: passive
+summary: Defines frontend file structure, folder layout, routing organization, API client placement, and component/page/modal patterns for the Angular application.
+keywords:
+  - angular structure
+  - frontend map
+  - file layout
+  - folder layout
+  - standalone components
+  - api clients
+  - routing
+  - pages and modals
+use-when:
+  - creating new frontend features
+  - deciding where files belong
+  - organizing angular code
+  - following frontend project structure
+---
+
+
 # Frontend File & Folder Map
 
 Angular 21 (standalone components) + Tailwind CSS + Signals. No component library.

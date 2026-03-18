@@ -1,3 +1,24 @@
+---
+category: backend-rules
+area: rules
+layer: backend
+activation: passive
+summary: Defines backend behavioral rules for controllers, services, domain entities, mapping, DTO validation, and workflows.
+keywords:
+  - controller rules
+  - domain rules
+  - automapper
+  - dto validation
+  - workflow pattern
+  - transaction rules
+  - api conventions
+use-when:
+  - writing backend code
+  - implementing endpoints
+  - enforcing domain invariants
+  - applying architectural constraints
+---
+
 # Backend Rules
 
 Rules verified against the current codebase. These supplement `map.md` (structure) with behavioral rules.

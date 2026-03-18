@@ -1,3 +1,23 @@
+---
+category: backend-rules
+area: map
+layer: backend
+activation: passive
+summary: Defines backend file structure, folder layout, and architectural slice patterns across API, Application, Domain, Infrastructure, and Tests.
+keywords:
+  - file structure
+  - folder layout
+  - clean architecture
+  - service pattern
+  - repository pattern
+  - workflow service
+use-when:
+  - creating new features
+  - organizing files
+  - deciding where code belongs
+  - following project structure
+---
+
 # Backend File & Folder Map
 
 Golden reference: **Machines** slice. When in doubt, mirror Machines.

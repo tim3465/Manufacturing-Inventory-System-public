@@ -14,7 +14,6 @@ public partial class MachineService
             SerialNumber = m.SerialNumber,
             ModelNumber = m.ModelNumber,
             Jobs = m.Jobs
-                .Where(j => j.EndedDateTime == null)
                 .OrderBy(j => j.DueDate)
                 .Select(j => new MachineJobSummaryDto
                 {
