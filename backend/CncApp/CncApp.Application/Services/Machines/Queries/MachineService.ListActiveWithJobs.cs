@@ -21,7 +21,9 @@ public partial class MachineService
                     PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
                     DueDate = j.DueDate,
                     LotNumber = j.StockLot?.LotNumber,
-                    StartedDateTime = j.StartedDateTime
+                    StartedDateTime = j.StartedDateTime,
+                    BarsInJob = j.BarsInJob,
+                    BarAmountPlanned = j.BarAmountPlanned
                 })
                 .ToList()
         }).ToList();

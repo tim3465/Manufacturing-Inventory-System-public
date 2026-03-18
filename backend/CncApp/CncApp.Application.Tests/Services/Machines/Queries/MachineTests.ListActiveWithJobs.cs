@@ -22,11 +22,11 @@ public partial class MachineTests
 
         var stockLot = new StockLot("LOT-001", 1, 10, 1.5m, 12m, CncApp.Domain.Enums.StockLotConditionEnum.AsReceived, DateTime.UtcNow) { Id = 1 };
 
-        var jobEarlier = new Job(1, 1, 1, 10, 2, TimeSpan.FromMinutes(1), 2, 5, new DateOnly(2026, 1, 15)) { Id = 10 };
+        var jobEarlier = new Job(1, 1, 1, 10, 2, TimeSpan.FromMinutes(1), 5, new DateOnly(2026, 1, 15)) { Id = 10 };
         jobEarlier.Order = order1;
         jobEarlier.StockLot = stockLot;
 
-        var jobLater = new Job(2, null, 1, 5, 1, TimeSpan.FromMinutes(2), 1, 5, new DateOnly(2026, 2, 1)) { Id = 11 };
+        var jobLater = new Job(2, null, 1, 5, 1, TimeSpan.FromMinutes(2), 5, new DateOnly(2026, 2, 1)) { Id = 11 };
         jobLater.Order = order2;
 
         var machine = new Machine("SN-001", "MODEL-001") { Id = 1 };
@@ -123,7 +123,7 @@ public partial class MachineTests
         var order = new Order(1, 1, 10) { Id = 1 };
         order.Part = part;
 
-        var job = new Job(1, null, 1, 10, 2, TimeSpan.FromMinutes(1), 2, 5, new DateOnly(2026, 3, 1)) { Id = 20 };
+        var job = new Job(1, null, 1, 10, 2, TimeSpan.FromMinutes(1), 5, new DateOnly(2026, 3, 1)) { Id = 20 };
         job.Order = order;
         // StockLot is null (not set)
 

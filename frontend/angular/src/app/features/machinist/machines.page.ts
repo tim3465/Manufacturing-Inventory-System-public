@@ -11,6 +11,10 @@ interface JobRow {
   dueDate: string;
   lotNumber: string | null;
   isActive: boolean;
+  barsInJob: number;
+  barAmountPlanned: number;
+  hasLotNumber: boolean;
+  machineHasActiveJob: boolean;
 }
 
 interface MachineCard {
@@ -33,22 +37,29 @@ export class MachinistMachinesPageComponent implements OnInit {
 
   protected readonly loading = signal<boolean>(true);
   protected readonly machines = signal<MachineWithJobsDto[]>([]);
-  protected readonly selectedJobId = signal<number | null>(null);
+  protected readonly selectedJob = signal<JobRow | null>(null);
   protected readonly showStartModal = signal<boolean>(false);
 
   protected readonly machineCards = computed<MachineCard[]>(() =>
-    this.machines().map(m => ({
-      id: m.id,
-      name: m.serialNumber,
-      modelNumber: m.modelNumber,
-      jobs: m.jobs.map(j => ({
-        id: j.id,
-        partNumber: j.partNumber,
-        dueDate: j.dueDate,
-        lotNumber: j.lotNumber,
-        isActive: j.startedDateTime != null
-      }))
-    }))
+    this.machines().map(m => {
+      const hasActiveJob = m.jobs.some(j => j.startedDateTime != null);
+      return {
+        id: m.id,
+        name: m.serialNumber,
+        modelNumber: m.modelNumber,
+        jobs: m.jobs.map(j => ({
+          id: j.id,
+          partNumber: j.partNumber,
+          dueDate: j.dueDate,
+          lotNumber: j.lotNumber,
+          isActive: j.startedDateTime != null,
+          barsInJob: j.barsInJob,
+          barAmountPlanned: j.barAmountPlanned,
+          hasLotNumber: j.lotNumber !== null,
+          machineHasActiveJob: hasActiveJob
+        }))
+      };
+    })
   );
 
   ngOnInit(): void {
@@ -70,8 +81,8 @@ export class MachinistMachinesPageComponent implements OnInit {
   }
 
   protected onJobRowClick(job: JobRow): void {
-    if (job.isActive) return;
-    this.selectedJobId.set(job.id);
+    if (job.isActive || !job.hasLotNumber || job.machineHasActiveJob) return;
+    this.selectedJob.set(job);
     this.showStartModal.set(true);
   }
 

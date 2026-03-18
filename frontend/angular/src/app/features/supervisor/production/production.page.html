@@ -137,22 +137,30 @@
             </thead>
             <tbody>
               @for (job of jobRows(); track job.id) {
-                <tr
-                  class="border-b border-[var(--border)] hover:bg-[var(--surface-hover,var(--surface))] cursor-pointer"
-                  (click)="openAssignLotModal(job)"
-                >
+                <tr class="border-b border-[var(--border)] hover:bg-[var(--surface-hover,var(--surface))]">
                   <td
-                    class="px-4 py-3 text-slate-400 text-xs"
-                    (click)="toggleJobExpanded(job.id); $event.stopPropagation()"
+                    class="px-4 py-3 text-xl cursor-pointer hover:text-[var(--fg)] transition"
+
+                    [class.text-slate-400]="!isJobExpanded(job.id)"
+                    (click)="toggleJobExpanded(job.id)"
                   >
-                    {{ isJobExpanded(job.id) ? '&#9660;' : '&#9654;' }}
+                    {{ isJobExpanded(job.id) ? '▾' : '▸' }}
                   </td>
                   <td class="px-4 py-3 text-[var(--fg)]">{{ job.dueDate }}</td>
                   <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ job.orderId }}</td>
                   <td class="px-4 py-3 text-[var(--fg)]">{{ job.partName }}</td>
                   <td class="px-4 py-3 text-slate-500">{{ job.partNumber }}</td>
                   <td class="px-4 py-3 text-[var(--fg)]">{{ job.machineName }}</td>
-                  <td class="px-4 py-3 text-slate-500">{{ job.lotNumber ?? '—' }}</td>
+                  <td
+                    class="px-4 py-3 cursor-pointer hover:bg-[var(--surface-hover,var(--surface))] transition"
+                    (click)="openAssignLotModal(job)"
+                  >
+                    @if (job.lotNumber !== null) {
+                      <span class="text-[var(--primary)] underline">{{ job.lotNumber }}</span>
+                    } @else {
+                      <span class="text-[var(--primary)] underline">Add Lot</span>
+                    }
+                  </td>
                   <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
                   <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
                   <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>

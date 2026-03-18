@@ -20,7 +20,6 @@ public partial class StartJobTests
             partAmountPlanned: 100,
             barAmountPlanned: 20,
             barCycleTime: TimeSpan.FromMinutes(1),
-            barsInJob: 0,
             estimatedPartsPerBar: 5,
             dueDate: new DateOnly(2026, 6, 1)) { Id = 42 };
 
@@ -115,7 +114,6 @@ public partial class StartJobTests
             partAmountPlanned: 100,
             barAmountPlanned: 20,
             barCycleTime: TimeSpan.FromMinutes(1),
-            barsInJob: 0,
             estimatedPartsPerBar: 5,
             dueDate: new DateOnly(2026, 6, 1)) { Id = 5 };
 
@@ -154,7 +152,6 @@ public partial class StartJobTests
             partAmountPlanned: 100,
             barAmountPlanned: 20,
             barCycleTime: TimeSpan.FromMinutes(1),
-            barsInJob: 0,
             estimatedPartsPerBar: 5,
             dueDate: new DateOnly(2026, 6, 1)) { Id = 7 };
 
@@ -165,7 +162,6 @@ public partial class StartJobTests
             partAmountPlanned: 50,
             barAmountPlanned: 10,
             barCycleTime: TimeSpan.FromMinutes(2),
-            barsInJob: 5,
             estimatedPartsPerBar: 5,
             dueDate: new DateOnly(2026, 5, 1)) { Id = 8 };
 

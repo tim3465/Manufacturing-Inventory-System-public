@@ -45,7 +45,6 @@ public partial class JobTests
             partAmountPlanned: 10,
             barAmountPlanned: 5,
             barCycleTime: TimeSpan.FromSeconds(30),
-            barsInJob: 5,
             estimatedPartsPerBar: 2,
             dueDate: DateOnly.FromDateTime(DateTime.Today.AddDays(7)));
 
@@ -83,7 +82,6 @@ public partial class JobTests
             partAmountPlanned: 10,
             barAmountPlanned: 5,
             barCycleTime: TimeSpan.FromSeconds(30),
-            barsInJob: 5,
             estimatedPartsPerBar: 2,
             dueDate: DateOnly.FromDateTime(DateTime.Today.AddDays(7)));
 

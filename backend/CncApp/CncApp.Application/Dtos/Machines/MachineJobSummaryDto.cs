@@ -7,4 +7,6 @@ public class MachineJobSummaryDto
     public DateOnly DueDate { get; set; }
     public string? LotNumber { get; set; }
     public DateTimeOffset? StartedDateTime { get; set; }
+    public int BarsInJob { get; set; }
+    public int BarAmountPlanned { get; set; }
 }

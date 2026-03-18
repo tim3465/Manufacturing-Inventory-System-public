@@ -4,8 +4,9 @@
 }
 
 a.active {
-  background-color: var(--surface);
-  border-color: var(--border);
+  background-color: var(--primary);
+  color: var(--primary-fg);
+  border-color: transparent;
   font-weight: 600;
 }
 

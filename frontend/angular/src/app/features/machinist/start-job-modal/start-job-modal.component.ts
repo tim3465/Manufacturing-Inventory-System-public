@@ -17,6 +17,7 @@ export class StartJobModalComponent {
   private readonly toast = inject(ToastService);
 
   @Input({ required: true }) jobId!: number;
+  @Input({ required: true }) barAmountPlanned!: number;
   @Output() closed = new EventEmitter<void>();
   @Output() started = new EventEmitter<void>();
 
