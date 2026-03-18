@@ -21,14 +21,21 @@
             <p class="text-sm text-slate-400">No active jobs</p>
           } @else {
             <div class="space-y-1">
-              <div class="grid grid-cols-3 gap-2 text-xs font-medium text-slate-500 pb-1 border-b border-[var(--border)]">
+              <div class="grid grid-cols-5 gap-2 text-xs font-medium text-slate-500 pb-1 border-b border-[var(--border)]">
                 <span>Part #</span>
                 <span>Due Date</span>
                 <span>Lot #</span>
+                <span>Bars In Job</span>
+                <span>Bar Amt Planned</span>
               </div>
               @for (job of card.jobs; track job.id) {
                 <div
-                  class="grid grid-cols-3 gap-2 text-sm cursor-pointer rounded px-1 -mx-1 transition"
+                  class="job-row grid grid-cols-5 gap-2 text-sm rounded px-1 -mx-1 transition"
+                  [class.cursor-pointer]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
+                  [class.cursor-not-allowed]="!job.hasLotNumber"
+                  [class.opacity-40]="!job.hasLotNumber"
+                  [class.job-row-selectable]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
+                  [class.job-row-active]="job.isActive"
                   [style.background-color]="job.isActive ? 'var(--primary)' : ''"
                   [style.color]="job.isActive ? 'var(--primary-fg)' : 'var(--fg)'"
                   (click)="onJobRowClick(job)"
@@ -36,6 +43,8 @@
                   <span>{{ job.partNumber }}</span>
                   <span>{{ job.dueDate }}</span>
                   <span>{{ job.lotNumber ?? '—' }}</span>
+                  <span>{{ job.barsInJob }}</span>
+                  <span>{{ job.barAmountPlanned }}</span>
                 </div>
               }
             </div>
@@ -45,9 +54,10 @@
     </div>
   }
 
-  @if (showStartModal()) {
+  @if (showStartModal() && selectedJob()) {
     <app-start-job-modal
-      [jobId]="selectedJobId()!"
+      [jobId]="selectedJob()!.id"
+      [barAmountPlanned]="selectedJob()!.barAmountPlanned"
       (closed)="showStartModal.set(false)"
       (started)="onJobStarted()"
     />

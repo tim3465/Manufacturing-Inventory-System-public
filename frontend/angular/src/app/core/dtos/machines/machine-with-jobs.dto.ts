@@ -4,6 +4,8 @@ export interface MachineJobSummaryDto {
   dueDate: string;
   lotNumber: string | null;
   startedDateTime: string | null;
+  barsInJob: number;
+  barAmountPlanned: number;
 }
 
 export interface MachineWithJobsDto {

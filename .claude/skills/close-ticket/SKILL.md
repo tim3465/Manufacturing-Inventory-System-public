@@ -18,7 +18,7 @@ User runs `/close-ticket` with no arguments.
 Read these values before executing any step. Substitute them into every command that references them.
 
 - `REPO` = `tim3465/Manufacturing-Inventory-System`
-- `BASE_BRANCH` = `claude-agent-workflows-20260303`
+- `BASE_BRANCH` = `master`
 
 Every place you see `{BASE_BRANCH}` in this skill, replace it with the value above before running the command.
 ---

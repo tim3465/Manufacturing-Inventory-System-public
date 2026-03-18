@@ -25,6 +25,9 @@
       </div>
 
       <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <p class="text-sm text-slate-500">
+          Planned bar amount: <span class="font-semibold text-[var(--fg)]">{{ barAmountPlanned }}</span>
+        </p>
         <label class="block">
           <div class="text-sm font-medium text-[var(--fg)]">Bars to pull</div>
           <input
