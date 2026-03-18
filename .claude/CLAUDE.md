@@ -39,7 +39,7 @@ Manufacturing-Inventory-System/
 |-------|--------------|
 | `backend-implement` | Recon → Plan → Implement a backend feature or change |
 | `frontend-implement` | Recon → Plan → Implement a frontend feature or change |
-| `managing` | Orchestrate backend-implement → frontend-implement; gates new-table creation against an approved plan file |
+| `managing` | Documentation-only orchestration spec. Not used as a runtime orchestrator. |
 
 ## Available Skills
 
@@ -47,7 +47,7 @@ Manufacturing-Inventory-System/
 |---------------|--------------|
 | `/git-commit` | Summarize changes, propose commit message, confirm, then commit locally |
 | `/new-worktree` | Creates a Git worktree for a GitHub issue |
-| `/start-ticket` | Fetch the active GitHub issue, display it, and hand off to the managing agent |
+| `/start-ticket` | Fetch the active GitHub issue, display it, and orchestrate backend then frontend implementation inline by delegating directly to `backend-implement` and `frontend-implement` |
 | `/close-ticket` | Commit, push, open PR linked to issue, post commit summary, delete worktree |
 
 ---
