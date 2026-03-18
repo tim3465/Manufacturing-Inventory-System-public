@@ -370,3 +370,4 @@ settings.local.json
 
 # Claude Code worktrees
 .claude/worktrees/
+settings.local.json
