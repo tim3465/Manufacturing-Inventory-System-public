@@ -1,96 +1,180 @@
 ---
+
 name: start-ticket
-description: Fetch the active GitHub issue, display it, and hand off to the managing agent.
+description: Fully autonomous ticket execution orchestrator. Fetches the active GitHub issue, then runs backend and frontend agents end-to-end with internal validation and minimal user interruption.
+disable-model-invocation: true
+allowed-tools: Bash(echo *), Bash(gh issue view *)
+--------------------------------------------------
+
+## Purpose
+
+This skill is the orchestrator for ticket execution.
+
+It runs inline and:
+
+* retrieves the active GitHub issue
+* delegates work to backend and frontend agents
+* validates outputs internally against the approved plan
+* returns a final packaged result to the user
+
+The user is only involved:
+
+* at the start (confirming the correct ticket)
+* at the end (reviewing final output)
+
 ---
 
-Fetch the active GitHub issue from the environment, display it to the user, and hand it off to the managing agent on confirmation.
+## Step 1 — Read active issue
 
----
-
-## Trigger
-
-User runs `/start-ticket` with no arguments.
-
----
-
-## Configuration
-
-```
-REPO = tim3465/Manufacturing-Inventory-System
-```
-
----
-
-## Steps
-
-### Step 1 — Read the issue number
-
-Read the issue number from the environment variable:
-
-```bash
+```powershell
 echo $env:CURRENT_ISSUE
 ```
 
-If `CURRENT_ISSUE` is not set or is empty, stop and tell the user:
-
-> No active issue found. Make sure you opened this session using /new-worktree, which sets the issue number automatically.
+If missing → STOP
 
 ---
 
-### Step 2 — Fetch the issue from GitHub
+## Step 2 — Fetch issue
 
-```bash
-gh issue view {CURRENT_ISSUE} --repo tim3465/Manufacturing-Inventory-System --json number,title,body,state
+```powershell
+gh issue view $env:CURRENT_ISSUE --json number,title,body,state
 ```
 
-If the issue is not found, stop and tell the user:
-> Issue #{CURRENT_ISSUE} not found in tim3465/Manufacturing-Inventory-System.
+Display:
+
+* number
+* title
+* state
+* full body
+
+Ask user to confirm.
+
+If rejected → STOP
 
 ---
 
-### Step 3 — Display the issue to the user
+## Step 3 — Parse approved plan
 
-Print the issue clearly:
+Treat issue body as the source of truth.
 
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Issue #{number} — {title}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Extract:
 
-{body}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-Then ask the user:
-
-> Ready to hand this off to the managing agent and begin implementation? (yes / no)
+* backend scope
+* frontend scope
+* approved tables
+* constraints
 
 ---
 
-### Step 4 — Hand off to managing agent or exit
+## Step 4 — Backend execution (autonomous)
 
-**If the user says yes:**
+Call backend-implement with:
 
-Invoke the `managing` agent with:
+* issue number
+* title
+* body
 
-- Issue number: `{number}`
-- Issue title: `{title}`
-- Issue body: `{body}` (this is the approved plan)
+Instruction:
 
-**If the user says no:**
-
-Print:
-> Cancelled. No changes have been made. Run /start-ticket again when you are ready.
-
-Then stop.
+* perform full Recon → Plan → Implement
+* return Backend Complete Summary
 
 ---
 
-## Error Cases
+## Step 5 — Backend validation (internal)
 
-| Situation | Response |
-|-----------|----------|
-| `CURRENT_ISSUE` not set | Stop. Tell user to use /new-worktree to open sessions. |
-| Issue not found on GitHub | Stop. Tell user to check the issue number. |
-| User cancels | Exit cleanly. No changes made. |
+Compare backend output to approved plan:
+
+Rules:
+
+* no unapproved tables
+* no schema drift
+* endpoints match intent
+
+If violation:
+→ STOP and emit Orchestration Escalation Report
+
+Otherwise:
+→ continue automatically
+
+---
+
+## Step 6 — Build frontend contract
+
+Prepare:
+
+* endpoints
+* DTOs
+* backend decisions
+
+---
+
+## Step 7 — Frontend execution (autonomous)
+
+Call frontend-implement with:
+
+* issue body
+* backend contract
+
+Instruction:
+
+* perform full implementation
+* return Frontend Complete Summary
+
+---
+
+## Step 8 — Frontend validation (internal)
+
+Check:
+
+* aligns with backend endpoints
+* matches ticket intent
+
+If major mismatch:
+→ STOP and emit Orchestration Escalation Report
+
+---
+
+## Step 9 — Final output
+
+Return:
+
+* backend summary
+* frontend summary
+* files changed
+* endpoints
+* DTOs
+* verification steps
+
+Do NOT commit
+Do NOT push
+
+---
+
+## Behavior Principles
+
+* Fully autonomous execution
+* No mid-process user approvals
+* Orchestrator acts as managing agent
+* Only escalate on blocking conflicts
+
+---
+
+## Safety
+
+Stop if:
+
+* missing issue
+* cannot fetch issue
+* backend introduces unapproved table
+* frontend/backend mismatch cannot be resolved
+
+---
+
+## Architecture Model
+
+/start-ticket = orchestrator
+backend-implement = backend worker
+frontend-implement = frontend worker
+
+User = final reviewer

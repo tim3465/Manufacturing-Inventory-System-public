@@ -6,6 +6,7 @@ export interface MachineJobSummaryDto {
   startedDateTime: string | null;
   barsInJob: number;
   barAmountPlanned: number;
+  runningShiftId: number | null;
 }
 
 export interface MachineWithJobsDto {

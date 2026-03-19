@@ -23,7 +23,9 @@ public partial class MachineService
                     LotNumber = j.StockLot?.LotNumber,
                     StartedDateTime = j.StartedDateTime,
                     BarsInJob = j.BarsInJob,
-                    BarAmountPlanned = j.BarAmountPlanned
+                    BarAmountPlanned = j.BarAmountPlanned,
+                    RunningShiftId = j.Shifts
+                        .FirstOrDefault(s => !s.InactivatedDateTime.HasValue && s.StopTime == null)?.Id
                 })
                 .ToList()
         }).ToList();

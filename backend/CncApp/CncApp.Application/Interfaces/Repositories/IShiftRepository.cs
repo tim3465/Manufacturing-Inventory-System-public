@@ -8,6 +8,10 @@ public interface IShiftRepository
     Task<List<Shift>> ListActiveAsync(CancellationToken ct = default);
     Task<List<Shift>> ListAllAsync(CancellationToken ct = default);
     Task<List<Shift>> ListProductionAsync(CancellationToken ct = default);
+    Task<Shift?> GetRunningShiftForMachineAsync(int machineId, CancellationToken ct = default);
+    Task<Shift?> GetRunningShiftWithContextAsync(int shiftId, CancellationToken ct = default);
+    Task<List<Shift>> ListRunningByOperatorAsync(int operatorId, CancellationToken ct = default);
+    Task<List<Shift>> ListClosedByOperatorAsync(int operatorId, CancellationToken ct = default);
     Task AddAsync(Shift shift, CancellationToken ct = default);
     Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);

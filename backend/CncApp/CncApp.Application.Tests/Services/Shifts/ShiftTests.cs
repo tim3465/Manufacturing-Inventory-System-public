@@ -8,14 +8,16 @@ namespace CncApp.Application.Tests.Services.Shifts;
 public partial class ShiftTests
 {
     protected readonly Mock<IShiftRepository> MockRepository;
+    protected readonly Mock<IJobRepository> MockJobRepository;
     protected readonly Mock<IMapper> MockMapper;
     protected readonly ShiftService ShiftService;
 
     public ShiftTests()
     {
         MockRepository = new Mock<IShiftRepository>();
+        MockJobRepository = new Mock<IJobRepository>();
         MockMapper = new Mock<IMapper>();
-        ShiftService = new ShiftService(MockRepository.Object, MockMapper.Object);
+        ShiftService = new ShiftService(MockRepository.Object, MockJobRepository.Object, MockMapper.Object);
     }
 }
 

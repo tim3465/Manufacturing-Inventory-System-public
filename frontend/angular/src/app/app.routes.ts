@@ -5,7 +5,7 @@ import { roleGuard } from './core/auth/role.guard';
 import { Roles } from './core/auth/roles';
 import { AuthLoginPageComponent } from './features/auth/login.page';
 import { DashboardPageComponent } from './features/dashboard/dashboard.page';
-import { LogShiftPageComponent } from './features/machinist/log-shift.page';
+import { ShiftsPageComponent } from './features/machinist/shifts/shifts.page';
 import { MachinistMachinesPageComponent } from './features/machinist/machines.page';
 import { MyJobsPageComponent } from './features/machinist/my-jobs.page';
 import { InventoryPageComponent } from './features/shipping/inventory/inventory.page';
@@ -39,7 +39,8 @@ export const routes: Routes = [
         data: { roles: [Roles.Machinist, Roles.Admin] },
         children: [
           { path: 'my-jobs', component: MyJobsPageComponent },
-          { path: 'log-shift', component: LogShiftPageComponent },
+          { path: 'shifts', component: ShiftsPageComponent },
+          { path: 'log-shift', redirectTo: 'shifts', pathMatch: 'full' },
           { path: 'machines', component: MachinistMachinesPageComponent }
         ]
       },

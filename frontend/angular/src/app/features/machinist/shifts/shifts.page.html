@@ -1,0 +1,114 @@
+<section class="space-y-6">
+  <header>
+    <p class="text-sm text-slate-500">Machinist</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Shifts</h1>
+  </header>
+
+  <!-- Tab bar -->
+  <div class="flex gap-2 border-b border-[var(--border)]">
+    <button
+      type="button"
+      class="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
+      [class.border-[var(--primary)]]="activeTab() === 'running'"
+      [class.text-[var(--primary)]]="activeTab() === 'running'"
+      [class.border-transparent]="activeTab() !== 'running'"
+      [class.text-slate-500]="activeTab() !== 'running'"
+      (click)="setTab('running')"
+    >
+      Running Shifts
+    </button>
+    <button
+      type="button"
+      class="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
+      [class.border-[var(--primary)]]="activeTab() === 'logs'"
+      [class.text-[var(--primary)]]="activeTab() === 'logs'"
+      [class.border-transparent]="activeTab() !== 'logs'"
+      [class.text-slate-500]="activeTab() !== 'logs'"
+      (click)="setTab('logs')"
+    >
+      Shift Logs
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="text-sm text-slate-500">Loading...</div>
+  } @else {
+
+    <!-- Running Shifts tab -->
+    @if (activeTab() === 'running') {
+      @if (runningShifts().length === 0) {
+        <p class="text-sm text-slate-500">No running shifts.</p>
+      } @else {
+        <div class="space-y-3">
+          @for (shift of runningShifts(); track shift.id) {
+            <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+              <!-- Row header -->
+              <button
+                type="button"
+                class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[var(--bg)] transition"
+                (click)="toggleExpand(shift.id)"
+              >
+                <div class="flex gap-6 text-sm">
+                  <span class="font-medium text-[var(--fg)]">{{ shift.machineSerialNumber }}</span>
+                  <span class="text-slate-500">{{ shift.partNumber }}</span>
+                  <span class="text-slate-500">{{ shift.partName }}</span>
+                </div>
+                <span class="text-slate-400 text-xs">
+                  @if (expandedShiftId() === shift.id) { ▲ } @else { ▼ }
+                </span>
+              </button>
+
+              <!-- Expanded form -->
+              @if (expandedShiftId() === shift.id) {
+                <div class="border-t border-[var(--border)] p-4">
+                  <app-running-shift-form
+                    [shiftId]="shift.id"
+                    (saved)="onShiftSaved()"
+                    (closed)="onShiftClosed()"
+                  />
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Shift Logs tab -->
+    @if (activeTab() === 'logs') {
+      @if (shiftLogs().length === 0) {
+        <p class="text-sm text-slate-500">No shift logs.</p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="border-b border-[var(--border)] text-slate-500 text-xs font-medium">
+                <th class="pb-2 pr-4">Machine</th>
+                <th class="pb-2 pr-4">Job #</th>
+                <th class="pb-2 pr-4">Part #</th>
+                <th class="pb-2 pr-4">Start</th>
+                <th class="pb-2 pr-4">Stop</th>
+                <th class="pb-2 pr-4">Parts Made</th>
+                <th class="pb-2">Scrap</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--border)]">
+              @for (log of shiftLogs(); track log.id) {
+                <tr class="text-[var(--fg)]">
+                  <td class="py-2 pr-4">{{ log.machineSerialNumber }}</td>
+                  <td class="py-2 pr-4">{{ log.jobNumber }}</td>
+                  <td class="py-2 pr-4">{{ log.partNumber }}</td>
+                  <td class="py-2 pr-4">{{ log.startTime | date:'short' }}</td>
+                  <td class="py-2 pr-4">{{ log.stopTime ? (log.stopTime | date:'short') : '—' }}</td>
+                  <td class="py-2 pr-4">{{ log.partsMade }}</td>
+                  <td class="py-2">{{ log.scrap }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+  }
+</section>

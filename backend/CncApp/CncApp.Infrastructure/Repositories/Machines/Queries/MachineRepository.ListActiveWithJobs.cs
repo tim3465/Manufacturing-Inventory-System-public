@@ -16,6 +16,8 @@ public partial class MachineRepository : IMachineRepository
                     .ThenInclude(o => o.Part)
             .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue && j.EndedDateTime == null))
                 .ThenInclude(j => j.StockLot)
+            .Include(m => m.Jobs.Where(j => !j.InactivatedDateTime.HasValue && j.EndedDateTime == null))
+                .ThenInclude(j => j.Shifts.Where(s => !s.InactivatedDateTime.HasValue && s.StopTime == null))
             .ToListAsync(ct);
     }
 }

@@ -1,0 +1,189 @@
+@if (loading()) {
+  <div class="text-sm text-slate-500">Loading shift...</div>
+} @else if (shift() === null) {
+  <div class="text-sm text-red-500">Failed to load shift data.</div>
+} @else {
+  <div class="space-y-5">
+
+    <!-- Read-only context -->
+    <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-2 text-sm">
+      <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wide">Shift Context</h3>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Machine</span>
+          <span class="font-medium text-[var(--fg)]">{{ shift()!.machineSerialNumber }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Part Name</span>
+          <span class="font-medium text-[var(--fg)]">{{ shift()!.partName }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Part Number</span>
+          <span class="font-medium text-[var(--fg)]">{{ shift()!.partNumber }}</span>
+        </div>
+      </div>
+      <div class="border-t border-[var(--border)] pt-2 mt-1">
+        <h4 class="text-xs font-semibold uppercase text-slate-400 tracking-wide mb-1">Job Totals</h4>
+        <div class="grid grid-cols-3 gap-x-6 gap-y-1">
+          <div class="flex gap-2">
+            <span class="text-slate-500 w-28 shrink-0">Parts Made</span>
+            <span class="font-medium text-[var(--fg)]">{{ shift()!.jobTotalPartsMade }}</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-slate-500 w-28 shrink-0">Scrap</span>
+            <span class="font-medium text-[var(--fg)]">{{ shift()!.jobTotalScrap }}</span>
+          </div>
+          <div class="flex gap-2">
+            <span class="text-slate-500 w-28 shrink-0">Bars Consumed</span>
+            <span class="font-medium text-[var(--fg)]">{{ shift()!.jobTotalBarsConsumed }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editable form -->
+    <form [formGroup]="form" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- Start Time -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Start Time</div>
+          <input
+            type="datetime-local"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="startTime"
+            autocomplete="off"
+          />
+          @if (form.controls.startTime.touched && form.controls.startTime.invalid) {
+            <div class="mt-1 text-xs text-red-500">Start time is required</div>
+          }
+        </label>
+
+        <!-- Stop Time -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Stop Time</div>
+          <input
+            type="datetime-local"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="stopTime"
+            autocomplete="off"
+          />
+        </label>
+
+        <!-- Parts Made -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Parts Made</div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="partsMade"
+            autocomplete="off"
+            min="0"
+          />
+          @if (form.controls.partsMade.touched && form.controls.partsMade.invalid) {
+            <div class="mt-1 text-xs text-red-500">Parts made must be 0 or more</div>
+          }
+        </label>
+
+        <!-- Scrap -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Scrap</div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="scrap"
+            autocomplete="off"
+            min="0"
+          />
+          @if (form.controls.scrap.touched && form.controls.scrap.invalid) {
+            <div class="mt-1 text-xs text-red-500">Scrap must be 0 or more</div>
+          }
+        </label>
+
+        <!-- Bars Consumed -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Bars Consumed</div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="barsConsumed"
+            autocomplete="off"
+            min="0"
+          />
+          @if (form.controls.barsConsumed.touched && form.controls.barsConsumed.invalid) {
+            <div class="mt-1 text-xs text-red-500">Bars consumed must be 0 or more</div>
+          }
+        </label>
+
+        <!-- Parts Per Bar -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Parts Per Bar <span class="text-slate-400 text-xs">(optional)</span></div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="partsPerBar"
+            autocomplete="off"
+            min="0"
+          />
+        </label>
+
+        <!-- Downtime -->
+        <div class="sm:col-span-2">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(optional)</span></div>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="block">
+              <div class="text-xs text-slate-400 mb-1">Hours</div>
+              <input
+                type="number"
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                formControlName="downtimeHours"
+                autocomplete="off"
+                min="0"
+              />
+            </label>
+            <label class="block">
+              <div class="text-xs text-slate-400 mb-1">Minutes</div>
+              <input
+                type="number"
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+                formControlName="downtimeMinutes"
+                autocomplete="off"
+                min="0"
+                max="59"
+              />
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="pt-2 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="submittingAction() !== null"
+          (click)="onSave()"
+        >
+          @if (submittingAction() === 'save') {
+            Saving...
+          } @else {
+            Save
+          }
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="submittingAction() !== null"
+          (click)="onClose()"
+        >
+          @if (submittingAction() === 'close') {
+            Closing...
+          } @else {
+            Close Shift
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
