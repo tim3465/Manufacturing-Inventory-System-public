@@ -1,32 +1,79 @@
 <section class="space-y-6">
-  <header class="space-y-1">
+  <header>
     <p class="text-sm text-slate-500">Machinist</p>
     <h1 class="text-2xl font-semibold text-[var(--fg)]">My Jobs</h1>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-    <div class="px-4 py-3 border-b border-[var(--border)] flex justify-between">
-      <span class="text-sm font-medium">Queue</span>
-      <button
-        type="button"
-        class="text-sm text-slate-500 hover:text-[var(--fg)] underline underline-offset-4"
-      >
-        Refresh
-      </button>
-    </div>
-    <ul class="divide-y divide-[var(--border)]">
-      @for (job of jobs; track job.id) {
-      <li class="px-4 py-3 flex items-center justify-between text-sm">
-        <div>
-          <p class="font-semibold text-[var(--fg)]">{{ job.id }}</p>
-          <p class="text-slate-500">{{ job.part }}</p>
-        </div>
-        <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
-          {{ job.status }}
-        </span>
-      </li>
-      }
-    </ul>
-  </div>
-</section>
+  @if (loading()) {
+    <div class="text-sm text-slate-500">Loading...</div>
+  } @else if (error()) {
+    <div class="text-sm text-red-500">{{ error() }}</div>
+  } @else if (jobRows().length === 0) {
+    <p class="text-sm text-slate-500">No jobs found.</p>
+  } @else {
+    <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <table class="w-full text-sm text-left">
+        <thead>
+          <tr class="border-b border-[var(--border)] text-slate-500 text-xs font-medium">
+            <th class="px-4 py-3 pr-4">Job #</th>
+            <th class="px-4 py-3 pr-4">Part Number</th>
+            <th class="px-4 py-3 pr-4">Machine</th>
+            <th class="px-4 py-3">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          @for (row of jobRows(); track row.id) {
+            <tr
+              class="cursor-pointer hover:bg-[var(--bg)] transition text-[var(--fg)]"
+              (click)="toggleJob(row.id)"
+            >
+              <td class="px-4 py-3 pr-4 font-medium">{{ row.jobNumber }}</td>
+              <td class="px-4 py-3 pr-4">{{ row.partNumber }}</td>
+              <td class="px-4 py-3 pr-4">{{ row.machineName }}</td>
+              <td class="px-4 py-3">
+                <span
+                  class="text-xs px-2 py-1 rounded-full border"
+                  [class.border-green-500]="row.status === 'Completed'"
+                  [class.text-green-600]="row.status === 'Completed'"
+                  [class.border-[var(--primary)]]="row.status === 'In Progress'"
+                  [class.text-[var(--primary)]]="row.status === 'In Progress'"
+                >
+                  {{ row.status }}
+                </span>
+              </td>
+            </tr>
 
+            @if (expandedJobId() === row.id) {
+              <tr>
+                <td colspan="4" class="bg-[var(--bg)] px-6 py-4">
+                  @if (row.shifts.length === 0) {
+                    <p class="text-sm text-slate-400">No shifts logged for this job.</p>
+                  } @else {
+                    <table class="w-full text-sm text-left">
+                      <thead>
+                        <tr class="border-b border-[var(--border)] text-slate-500 text-xs font-medium">
+                          <th class="pb-2 pr-6">Machinist</th>
+                          <th class="pb-2 pr-6">Start Time</th>
+                          <th class="pb-2">End Time</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-[var(--border)]">
+                        @for (shift of row.shifts; track shift.id) {
+                          <tr class="text-[var(--fg)]">
+                            <td class="py-2 pr-6">{{ shift.operatorName }}</td>
+                            <td class="py-2 pr-6">{{ shift.startTime | date:'short' }}</td>
+                            <td class="py-2">{{ shift.stopTime ? (shift.stopTime | date:'short') : '—' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

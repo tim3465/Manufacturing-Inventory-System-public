@@ -1,5 +1,6 @@
 using CncApp.Application.Dtos.Jobs;
 using CncApp.Application.Services.Jobs;
+using CncApp.Application.Services.Users;
 using CncApp.Application.Services.Workflows.StartJob;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ public class JobsController : ControllerBase
 {
     private readonly JobService _jobService;
     private readonly StartJobService _startJobService;
+    private readonly UserService _userService;
 
-    public JobsController(JobService jobService, StartJobService startJobService)
+    public JobsController(JobService jobService, StartJobService startJobService, UserService userService)
     {
         _jobService = jobService;
         _startJobService = startJobService;
+        _userService = userService;
     }
 
     // Conventions:
@@ -135,6 +138,16 @@ public class JobsController : ControllerBase
         var success = await _jobService.AssignStockLotAsync(id, dto, ct);
         return success ? NoContent() : NotFound();
 
+    }
+
+    [HttpGet("my-jobs")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(List<MyJobDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MyJobDto>>> ListMyJobsAsync(CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var jobs = await _jobService.ListMyJobsAsync(operator_.Id, ct);
+        return Ok(jobs);
     }
 }
 
