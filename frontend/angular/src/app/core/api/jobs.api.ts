@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { JobProductionDto } from '../dtos/jobs/job-production.dto';
+import { MyJobDto } from '../dtos/jobs/my-job.dto';
 import { ApiClient } from './api-client.service';
 
 const _PATH = '/jobs';
@@ -34,5 +35,10 @@ export class JobsApi {
   assignStockLot(id: number, body: { stockLotId: number | null }): Observable<void> {
     return this.api.patch<void>(`${_PATH}/${id}/assign-stocklot`, body);
 
+  }
+
+  /** GET /api/jobs/my-jobs - jobs assigned to the authenticated machinist (Machinist/Admin) */
+  listMyJobs(): Observable<MyJobDto[]> {
+    return this.api.getCached<MyJobDto[]>(`${_PATH}/my-jobs`);
   }
 }
