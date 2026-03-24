@@ -142,12 +142,24 @@ public class JobsController : ControllerBase
 
     [HttpGet("my-jobs")]
     [Authorize(Roles = "Machinist,Admin")]
-    [ProducesResponseType(typeof(List<MyJobDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<MyJobDto>>> ListMyJobsAsync(CancellationToken ct = default)
+    [ProducesResponseType(typeof(List<MyJobListItemDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MyJobListItemDto>>> ListMyJobsAsync(CancellationToken ct = default)
     {
         var operator_ = await _userService.GetCurrentUserAsync(ct);
         var jobs = await _jobService.ListMyJobsAsync(operator_.Id, ct);
         return Ok(jobs);
+    }
+
+    [HttpGet("my-jobs/{jobId:int}/shifts")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(List<JobShiftDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<List<JobShiftDto>>> GetMyJobShiftsAsync(int jobId, CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var shifts = await _jobService.GetJobShiftsForOperatorAsync(jobId, operator_.Id, ct);
+        if (shifts == null) return Forbid();
+        return Ok(shifts);
     }
 }
 
