@@ -48,6 +48,8 @@ Manufacturing-Inventory-System/
 | `/git-commit` | Summarize changes, propose commit message, confirm, then commit locally |
 | `/new-worktree` | Creates a Git worktree for a GitHub issue |
 | `/start-ticket` | Fetch the active GitHub issue, display it, and orchestrate backend then frontend implementation inline by delegating directly to `backend-implement` and `frontend-implement` |
+| `/amend-ticket` | Fetch the active GitHub issue, confirm the ticket, accept an approved amendment block, triage whether the change is backend-only, frontend-only, or both, then orchestrate the amendment implementation inline on the current branch |
+
 | `/close-ticket` | Commit, push, open PR linked to issue, post commit summary, delete worktree |
 
 ---
