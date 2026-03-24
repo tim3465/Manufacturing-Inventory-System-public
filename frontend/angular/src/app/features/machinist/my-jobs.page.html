@@ -11,6 +11,16 @@
   } @else if (jobRows().length === 0) {
     <p class="text-sm text-slate-500">No jobs found.</p>
   } @else {
+    <div class="flex justify-end">
+      <button
+        type="button"
+        class="text-xs border border-[var(--border)] px-3 py-1 rounded-md text-[var(--fg)] hover:bg-[var(--bg)]"
+        (click)="toggleTimestamps()"
+      >
+        {{ showTimestamps() ? 'Hide Timestamps' : 'Show Timestamps' }}
+      </button>
+    </div>
+
     <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
       <table class="w-full text-sm text-left">
         <thead>
@@ -35,6 +45,8 @@
                   class="text-xs px-2 py-1 rounded-full border"
                   [class.border-green-500]="row.status === 'Completed'"
                   [class.text-green-600]="row.status === 'Completed'"
+                  [class.border-yellow-500]="row.status === 'Paused'"
+                  [class.text-yellow-600]="row.status === 'Paused'"
                   [class.border-[var(--primary)]]="row.status === 'In Progress'"
                   [class.text-[var(--primary)]]="row.status === 'In Progress'"
                 >
@@ -53,16 +65,34 @@
                       <thead>
                         <tr class="border-b border-[var(--border)] text-slate-500 text-xs font-medium">
                           <th class="pb-2 pr-6">Machinist</th>
-                          <th class="pb-2 pr-6">Start Time</th>
-                          <th class="pb-2">End Time</th>
+                          <th class="pb-2 pr-6">Status</th>
+                          @if (showTimestamps()) {
+                            <th class="pb-2 pr-6">Start Time</th>
+                            <th class="pb-2">End Time</th>
+                          }
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-[var(--border)]">
+                      <tbody class="divide-y-2 divide-gray-200">
                         @for (shift of row.shifts; track shift.id) {
                           <tr class="text-[var(--fg)]">
                             <td class="py-2 pr-6">{{ shift.operatorName }}</td>
-                            <td class="py-2 pr-6">{{ shift.startTime | date:'short' }}</td>
-                            <td class="py-2">{{ shift.stopTime ? (shift.stopTime | date:'short') : '—' }}</td>
+                            <td class="py-2 pr-6">
+                              @if (shift.statusIcon === 'play') {
+                                <svg class="inline w-3 h-3 mr-1" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M4 3.5v9L13 8 4 3.5z"/>
+                                </svg>
+                              }
+                              @if (shift.statusIcon === 'check') {
+                                <svg class="inline w-3 h-3 mr-1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M2.5 8l4 4 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              }
+                              {{ shift.status }}
+                            </td>
+                            @if (showTimestamps()) {
+                              <td class="py-2 pr-6">{{ shift.startTime | date:'short' }}</td>
+                              <td class="py-2">{{ shift.stopTime ? (shift.stopTime | date:'short') : '—' }}</td>
+                            }
                           </tr>
                         }
                       </tbody>

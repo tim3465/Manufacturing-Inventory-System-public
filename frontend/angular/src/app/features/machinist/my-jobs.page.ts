@@ -2,16 +2,24 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { JobsApi } from '../../core/api/jobs.api';
 import { MyJobDto } from '../../core/dtos/jobs/my-job.dto';
-import { ShiftDto } from '../../core/dtos/shifts/shift.dto';
 import { ToastService } from '../../core/ui/toast/toast.service';
+
+interface ShiftRow {
+  id: number;
+  operatorName: string;
+  startTime: string;
+  stopTime: string | null;
+  status: 'In Progress' | 'Completed';
+  statusIcon: 'play' | 'check';
+}
 
 interface JobRow {
   id: number;
   jobNumber: string;
   partNumber: string;
   machineName: string;
-  status: 'In Progress' | 'Completed';
-  shifts: ShiftDto[];
+  status: 'In Progress' | 'Paused' | 'Completed';
+  shifts: ShiftRow[];
 }
 
 @Component({
@@ -29,16 +37,37 @@ export class MyJobsPageComponent implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly jobs = signal<MyJobDto[]>([]);
   protected readonly expandedJobId = signal<number | null>(null);
+  protected readonly showTimestamps = signal(false);
 
   protected readonly jobRows = computed<JobRow[]>(() =>
-    this.jobs().map(j => ({
-      id: j.id,
-      jobNumber: j.jobNumber,
-      partNumber: j.partNumber,
-      machineName: j.machineName,
-      status: j.endedDateTime ? 'Completed' as const : 'In Progress' as const,
-      shifts: j.shifts
-    }))
+    this.jobs().map(j => {
+      const shifts: ShiftRow[] = j.shifts.map(s => ({
+        id: s.id,
+        operatorName: s.operatorName,
+        startTime: s.startTime,
+        stopTime: s.stopTime,
+        status: s.stopTime === null ? 'In Progress' as const : 'Completed' as const,
+        statusIcon: s.stopTime === null ? 'play' as const : 'check' as const
+      }));
+
+      let status: 'In Progress' | 'Paused' | 'Completed';
+      if (j.endedDateTime) {
+        status = 'Completed';
+      } else if (shifts.length > 0 && shifts.every(s => s.stopTime !== null)) {
+        status = 'Paused';
+      } else {
+        status = 'In Progress';
+      }
+
+      return {
+        id: j.id,
+        jobNumber: j.jobNumber,
+        partNumber: j.partNumber,
+        machineName: j.machineName,
+        status,
+        shifts
+      };
+    })
   );
 
   ngOnInit(): void {
@@ -57,5 +86,9 @@ export class MyJobsPageComponent implements OnInit {
 
   protected toggleJob(id: number): void {
     this.expandedJobId.set(this.expandedJobId() === id ? null : id);
+  }
+
+  protected toggleTimestamps(): void {
+    this.showTimestamps.update(v => !v);
   }
 }
