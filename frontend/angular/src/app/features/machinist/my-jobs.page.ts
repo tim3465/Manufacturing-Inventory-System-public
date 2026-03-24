@@ -18,7 +18,7 @@ interface JobRow {
   jobNumber: string;
   partNumber: string;
   machineName: string;
-  status: 'In Progress' | 'Paused' | 'Completed';
+  status: 'In Progress' | 'Not Running' | 'Completed';
   shifts: ShiftRow[];
 }
 
@@ -50,11 +50,11 @@ export class MyJobsPageComponent implements OnInit {
         statusIcon: s.stopTime === null ? 'play' as const : 'check' as const
       }));
 
-      let status: 'In Progress' | 'Paused' | 'Completed';
+      let status: 'In Progress' | 'Not Running' | 'Completed';
       if (j.endedDateTime) {
         status = 'Completed';
       } else if (shifts.length > 0 && shifts.every(s => s.stopTime !== null)) {
-        status = 'Paused';
+        status = 'Not Running';
       } else {
         status = 'In Progress';
       }
