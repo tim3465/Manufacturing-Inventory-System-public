@@ -14,33 +14,90 @@
     </button>
   </header>
 
+  <!-- Table -->
   <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
     <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
       Active stock lots
     </div>
 
-    @if (loading()) {
-      <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
-    } @else if (error()) {
-      <div class="px-4 py-3 text-sm text-red-500">{{ error() }}</div>
-    } @else if (stockLots().length === 0) {
-      <div class="px-4 py-3 text-sm text-slate-500">No stock lots found.</div>
-    } @else {
     <table class="min-w-full text-sm">
       <thead class="text-left text-slate-500 border-b border-[var(--border)]">
         <tr>
-            <th class="px-4 py-3 font-medium">Lot number</th>
-            <th class="px-4 py-3 font-medium text-right">Bars</th>
-            <th class="px-4 py-3 font-medium text-right">Diameter</th>
-            <th class="px-4 py-3 font-medium text-right">Bar length</th>
-            <th class="px-4 py-3 font-medium">Condition</th>
-            <th class="px-4 py-3 font-medium">Checked in</th>
-            <th class="px-4 py-3 font-medium"></th>
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="onSortColumn('LotNumber')"
+          >Lot number{{ sortIndicator('LotNumber') }}</th>
+          <th
+            class="px-4 py-3 font-medium text-right cursor-pointer select-none"
+            (click)="onSortColumn('AmountOfBars')"
+          >Bars{{ sortIndicator('AmountOfBars') }}</th>
+          <th
+            class="px-4 py-3 font-medium text-right cursor-pointer select-none"
+            (click)="onSortColumn('Diameter')"
+          >Diameter{{ sortIndicator('Diameter') }}</th>
+          <th class="px-4 py-3 font-medium text-right">Bar length</th>
+          <th class="px-4 py-3 font-medium">Condition</th>
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="onSortColumn('CheckedInDateTime')"
+          >Checked in{{ sortIndicator('CheckedInDateTime') }}</th>
+          <th class="px-4 py-3 font-medium"></th>
+        </tr>
+        <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--bg)]">
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="lotNumber"
+              (input)="onFilterInput()"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal"></th>
+          <th class="px-4 py-2 font-normal text-right">
+            <input
+              formControlName="diameter"
+              (input)="onFilterInput()"
+              type="number"
+              step="any"
+              placeholder="e.g. 2.5"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)] text-right"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal"></th>
+          <th class="px-4 py-2 font-normal"></th>
+          <th class="px-4 py-2 font-normal">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-1">
+                <input
+                  formControlName="checkedInFrom"
+                  (change)="onFilterInput()"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+                <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
+                <input
+                  formControlName="checkedInTo"
+                  (change)="onFilterInput()"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+              </div> 
+            </div>
+          </th>
+          <th class="px-4 py-2 font-normal"></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
-          @for (lot of stockLots(); track lot.id) {
-        <tr>
+        @if (loading()) {
+          <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+        } @else if (error()) {
+          <tr><td colspan="7" class="px-4 py-3 text-sm text-red-500">{{ error() }}</td></tr>
+        } @else if (rows().length === 0) {
+          <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">No stock lots found.</td></tr>
+        } @else {
+          @for (lot of rows(); track lot.id) {
+            <tr>
               <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ lot.lotNumber }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.amountOfBars }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.diameter }}</td>
@@ -56,17 +113,44 @@
                   Adjust
                 </button>
               </td>
-        </tr>
+            </tr>
+          }
         }
       </tbody>
     </table>
-    }
   </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm">
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="currentPage() <= 1"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        Previous
+      </button>
+
+      <span class="text-slate-500">
+        Page {{ currentPage() }} of {{ totalPages() }} ({{ totalCount() }} total)
+      </span>
+
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed"
+        [disabled]="currentPage() >= totalPages()"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
 
   @if (isReceiveShipmentOpen()) {
     <app-receive-shipment-modal
       (closed)="closeReceiveShipment()"
-      (created)="loadInventory()"
+      (created)="executeSearch()"
     />
   }
 
@@ -75,7 +159,7 @@
       [stockLotId]="selectedLotForAdjustment()!.id"
       [lotNumber]="selectedLotForAdjustment()!.lotNumber"
       (closed)="closeAdjustBars()"
-      (adjusted)="loadInventory()"
+      (adjusted)="executeSearch()"
     />
   }
 </section>

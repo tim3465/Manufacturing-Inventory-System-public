@@ -9,6 +9,7 @@ public class StockLotProfile : Profile
     public StockLotProfile()
     {
         CreateMap<StockLot, StockLotDto>();
+        CreateMap<StockLot, StockLotSummaryDto>();
 
         // Create DTO maps only client-provided fields; audit/identity fields are server-controlled.
         // Use constructor to create StockLot with validated invariants.
