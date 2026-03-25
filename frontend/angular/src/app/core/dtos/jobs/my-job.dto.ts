@@ -1,11 +1,8 @@
-import { ShiftDto } from '../shifts/shift.dto';
-
-export interface MyJobDto {
+export interface MyJobListItemDto {
   id: number;
   jobNumber: string;
   partNumber: string;
   partName: string;
   machineName: string;
   endedDateTime: string | null;
-  shifts: ShiftDto[];
 }

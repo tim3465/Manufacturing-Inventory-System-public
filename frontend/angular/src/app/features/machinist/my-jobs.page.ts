@@ -1,25 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { JobsApi } from '../../core/api/jobs.api';
-import { MyJobDto } from '../../core/dtos/jobs/my-job.dto';
+import { JobShiftDto } from '../../core/dtos/jobs/job-shift.dto';
+import { MyJobListItemDto } from '../../core/dtos/jobs/my-job.dto';
 import { ToastService } from '../../core/ui/toast/toast.service';
-
-interface ShiftRow {
-  id: number;
-  operatorName: string;
-  startTime: string;
-  stopTime: string | null;
-  status: 'In Progress' | 'Completed';
-  statusIcon: 'play' | 'check';
-}
 
 interface JobRow {
   id: number;
   jobNumber: string;
   partNumber: string;
   machineName: string;
-  status: 'In Progress' | 'Not Running' | 'Completed';
-  shifts: ShiftRow[];
+  status: 'In Progress' | 'Completed';
 }
 
 @Component({
@@ -35,39 +26,19 @@ export class MyJobsPageComponent implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly jobs = signal<MyJobDto[]>([]);
+  protected readonly jobs = signal<MyJobListItemDto[]>([]);
   protected readonly expandedJobId = signal<number | null>(null);
-  protected readonly showTimestamps = signal(false);
+  private readonly shiftCache = signal<Map<number, JobShiftDto[]>>(new Map());
+  protected readonly loadingShiftForJobId = signal<number | null>(null);
 
   protected readonly jobRows = computed<JobRow[]>(() =>
-    this.jobs().map(j => {
-      const shifts: ShiftRow[] = j.shifts.map(s => ({
-        id: s.id,
-        operatorName: s.operatorName,
-        startTime: s.startTime,
-        stopTime: s.stopTime,
-        status: s.stopTime === null ? 'In Progress' as const : 'Completed' as const,
-        statusIcon: s.stopTime === null ? 'play' as const : 'check' as const
-      }));
-
-      let status: 'In Progress' | 'Not Running' | 'Completed';
-      if (j.endedDateTime) {
-        status = 'Completed';
-      } else if (shifts.length > 0 && shifts.every(s => s.stopTime !== null)) {
-        status = 'Not Running';
-      } else {
-        status = 'In Progress';
-      }
-
-      return {
-        id: j.id,
-        jobNumber: j.jobNumber,
-        partNumber: j.partNumber,
-        machineName: j.machineName,
-        status,
-        shifts
-      };
-    })
+    this.jobs().map(j => ({
+      id: j.id,
+      jobNumber: j.jobNumber,
+      partNumber: j.partNumber,
+      machineName: j.machineName,
+      status: j.endedDateTime ? 'Completed' as const : 'In Progress' as const
+    }))
   );
 
   ngOnInit(): void {
@@ -85,10 +56,36 @@ export class MyJobsPageComponent implements OnInit {
   }
 
   protected toggleJob(id: number): void {
-    this.expandedJobId.set(this.expandedJobId() === id ? null : id);
+    if (this.expandedJobId() === id) {
+      this.expandedJobId.set(null);
+      return;
+    }
+
+    this.expandedJobId.set(id);
+
+    if (!this.shiftCache().has(id)) {
+      this.loadingShiftForJobId.set(id);
+
+      this.jobsApi.getMyJobShifts(id).subscribe({
+        next: (shifts) => {
+          const updated = new Map(this.shiftCache());
+          updated.set(id, shifts);
+          this.shiftCache.set(updated);
+          this.loadingShiftForJobId.set(null);
+        },
+        error: () => {
+          this.toast.error('Failed to load shifts');
+          this.loadingShiftForJobId.set(null);
+        }
+      });
+    }
   }
 
-  protected toggleTimestamps(): void {
-    this.showTimestamps.update(v => !v);
+  protected shiftsForJob(id: number): JobShiftDto[] {
+    return this.shiftCache().get(id) ?? [];
+  }
+
+  protected hasShiftCache(id: number): boolean {
+    return this.shiftCache().has(id);
   }
 }

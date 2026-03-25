@@ -1,4 +1,5 @@
 using AutoMapper;
+using CncApp.Application.Dtos.Jobs;
 using CncApp.Application.Dtos.Shifts;
 using CncApp.Domain.Entities;
 
@@ -29,6 +30,17 @@ public class ShiftProfile : Profile
 
         CreateMap<Shift, ShiftResultDto>();
         CreateMap<CreateShiftRequestDto, Shift>();
+
+        CreateMap<Shift, JobShiftDto>()
+            .ForMember(dest => dest.ShiftId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.MachinistName, opt => opt.MapFrom(src =>
+                src.Operator != null
+                    ? (src.Operator.FirstName != null && src.Operator.LastName != null
+                        ? $"{src.Operator.FirstName} {src.Operator.LastName}"
+                        : src.Operator.UserName)
+                    : string.Empty))
+            .ForMember(dest => dest.StartDateTime, opt => opt.MapFrom(src => src.StartTime))
+            .ForMember(dest => dest.EndDateTime, opt => opt.MapFrom(src => src.StopTime));
     }
 }
 

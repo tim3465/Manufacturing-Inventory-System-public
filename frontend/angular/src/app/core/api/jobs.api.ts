@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { JobProductionDto } from '../dtos/jobs/job-production.dto';
-import { MyJobDto } from '../dtos/jobs/my-job.dto';
+import { JobShiftDto } from '../dtos/jobs/job-shift.dto';
+import { MyJobListItemDto } from '../dtos/jobs/my-job.dto';
 import { ApiClient } from './api-client.service';
 
 const _PATH = '/jobs';
@@ -38,7 +39,12 @@ export class JobsApi {
   }
 
   /** GET /api/jobs/my-jobs - jobs assigned to the authenticated machinist (Machinist/Admin) */
-  listMyJobs(): Observable<MyJobDto[]> {
-    return this.api.getCached<MyJobDto[]>(`${_PATH}/my-jobs`);
+  listMyJobs(): Observable<MyJobListItemDto[]> {
+    return this.api.getCached<MyJobListItemDto[]>(`${_PATH}/my-jobs`);
+  }
+
+  /** GET /api/jobs/my-jobs/{jobId}/shifts - shifts for a specific job (Machinist/Admin) */
+  getMyJobShifts(jobId: number): Observable<JobShiftDto[]> {
+    return this.api.get<JobShiftDto[]>(`${_PATH}/my-jobs/${jobId}/shifts`);
   }
 }
