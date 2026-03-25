@@ -17,7 +17,6 @@ public partial class ShiftService
             throw new InvalidOperationException("Cannot update a closed shift.");
 
         shift.StartTime = dto.StartTime;
-        shift.StopTime = dto.StopTime;
         shift.PartsMade = dto.PartsMade;
         shift.Scrap = dto.Scrap;
         shift.BarsConsumed = dto.BarsConsumed;
