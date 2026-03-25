@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CncApp.Domain.Enums;
 
 namespace CncApp.Application.Dtos.StockLots;
 
@@ -10,6 +11,7 @@ public class StockLotSearchRequestDto
     public decimal? DiameterExact { get; set; }
     public decimal? DiameterMin { get; set; }
     public decimal? DiameterMax { get; set; }
+    public StockLotConditionEnum? Condition { get; set; }
     public string SortColumn { get; set; } = "CheckedInDateTime";
     public string SortDirection { get; set; } = "desc";
 

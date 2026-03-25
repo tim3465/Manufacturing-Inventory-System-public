@@ -1,21 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { StockLotsApi } from '../../../core/api/stock-lots.api';
 import { StockLotSearchRequestDto } from '../../../core/dtos/stock-lots/stock-lot-search-request.dto';
 import { StockLotSearchResultDto } from '../../../core/dtos/stock-lots/stock-lot-search-result.dto';
 import { StockLotSummaryDto } from '../../../core/dtos/stock-lots/stock-lot-summary.dto';
-import { STOCK_LOT_CONDITION_LABELS, StockLotCondition } from '../../../core/dtos/shipping-receiving';
+import { STOCK_LOT_CONDITION_LABELS, STOCK_LOT_CONDITIONS, StockLotCondition } from '../../../core/dtos/shipping-receiving';
 import { ToastService } from '../../../core/ui/toast/toast.service';
+import { PagerComponent, SmartTableState } from '../../../core/ui/smart-table';
 import { ReceiveShipmentModalComponent } from './receive-shipment-modal/receive-shipment-modal.component';
 import { AdjustBarsModalComponent } from './adjust-bars-modal/adjust-bars-modal.component';
 
 @Component({
   selector: 'app-inventory-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ReceiveShipmentModalComponent, AdjustBarsModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, PagerComponent, ReceiveShipmentModalComponent, AdjustBarsModalComponent],
   templateUrl: './inventory.page.html',
   styleUrl: './inventory.page.css'
 })
@@ -24,64 +23,64 @@ export class InventoryPageComponent {
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
+  protected readonly table = new SmartTableState({
+    defaultSortColumn: 'CheckedInDateTime',
+    defaultSortDirection: 'desc',
+    pageSize: 25
+  });
+
+  protected readonly pageSizes = [5, 10, 25, 100];
+
   protected readonly filterForm = this.fb.nonNullable.group({
     lotNumber: [''],
     diameter: [''],
     checkedInFrom: [''],
-    checkedInTo: ['']
+    checkedInTo: [''],
+    condition: ['']
   });
 
-  protected readonly sortColumn = signal<string>('CheckedInDateTime');
-  protected readonly sortDirection = signal<'asc' | 'desc'>('desc');
-  protected readonly currentPage = signal<number>(1);
-  protected readonly pageSize = signal<number>(25);
-  protected readonly searchResult = signal<StockLotSearchResultDto | null>(null);
-  protected readonly loading = signal<boolean>(false);
-  protected readonly error = signal<string | null>(null);
+  private readonly searchResult = signal<StockLotSearchResultDto | null>(null);
 
   protected readonly rows = computed(() => this.searchResult()?.items ?? []);
   protected readonly totalCount = computed(() => this.searchResult()?.totalCount ?? 0);
-  protected readonly totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalCount() / this.table.pageSize()) || 1);
 
   protected readonly isReceiveShipmentOpen = signal<boolean>(false);
   protected readonly isAdjustBarsOpen = signal<boolean>(false);
   protected readonly selectedLotForAdjustment = signal<StockLotSummaryDto | null>(null);
 
   protected readonly conditionLabels = STOCK_LOT_CONDITION_LABELS;
-
-  private readonly textFilterChanged$ = new Subject<void>();
+  protected readonly conditions = STOCK_LOT_CONDITIONS;
 
   constructor() {
-    // Debounce text filter changes
-    this.textFilterChanged$
-      .pipe(debounceTime(300))
-      .subscribe(() => {
-        this.currentPage.set(1);
-        this.executeSearch();
-      });
+    // Debounced text/date/select filter changes → reset to page 1 then search
+    this.table.debouncedFilterChange$.subscribe(() => {
+      this.table.resetPage();
+      this.executeSearch();
+    });
 
-    // React to sort/page changes (also handles initial load)
+    // Sort, page, and page-size changes → search (also handles initial load)
     effect(() => {
-      // Read signals to register as dependencies
-      this.sortColumn();
-      this.sortDirection();
-      this.currentPage();
+      this.table.sortColumn();
+      this.table.sortDirection();
+      this.table.currentPage();
+      this.table.pageSize();
 
       untracked(() => this.executeSearch());
     });
   }
 
   protected executeSearch(): void {
-    this.loading.set(true);
-    this.error.set(null);
+    this.table.loading.set(true);
+    this.table.error.set(null);
 
     const f = this.filterForm.getRawValue();
 
     const request: StockLotSearchRequestDto = {
-      sortColumn: this.sortColumn(),
-      sortDirection: this.sortDirection(),
-      page: this.currentPage(),
-      pageSize: this.pageSize()
+      sortColumn: this.table.sortColumn(),
+      sortDirection: this.table.sortDirection(),
+      page: this.table.currentPage(),
+      pageSize: this.table.pageSize()
     };
 
     if (f.lotNumber?.trim()) {
@@ -96,43 +95,22 @@ export class InventoryPageComponent {
     if (f.checkedInTo) {
       request.checkedInTo = f.checkedInTo;
     }
+    if (f.condition) {
+      request.condition = Number(f.condition) as StockLotCondition;
+    }
 
     this.stockLotsApi.search(request).subscribe({
       next: (result) => {
         this.searchResult.set(result);
-        this.loading.set(false);
+        this.table.loading.set(false);
       },
       error: () => {
         const message = 'Failed to load inventory';
-        this.error.set(message);
+        this.table.error.set(message);
         this.toast.error(message);
-        this.loading.set(false);
+        this.table.loading.set(false);
       }
     });
-  }
-
-  protected onFilterInput(): void {
-    this.textFilterChanged$.next();
-  }
-
-  protected onSortColumn(col: string): void {
-    if (this.sortColumn() === col) {
-      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
-    } else {
-      this.sortColumn.set(col);
-      this.sortDirection.set('asc');
-    }
-    this.currentPage.set(1);
-  }
-
-  protected goToPage(page: number): void {
-    if (page < 1 || page > this.totalPages()) return;
-    this.currentPage.set(page);
-  }
-
-  protected sortIndicator(col: string): string {
-    if (this.sortColumn() !== col) return '';
-    return this.sortDirection() === 'asc' ? ' \u2191' : ' \u2193';
   }
 
   protected openReceiveShipment(): void {

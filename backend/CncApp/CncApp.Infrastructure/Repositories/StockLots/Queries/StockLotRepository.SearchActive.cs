@@ -47,6 +47,11 @@ public partial class StockLotRepository
             }
         }
 
+        if (request.Condition.HasValue)
+        {
+            query = query.Where(sl => sl.Condition == request.Condition.Value);
+        }
+
         var totalCount = await query.CountAsync(ct);
 
         var isAscending = string.Equals(request.SortDirection, "asc", StringComparison.OrdinalIgnoreCase);
