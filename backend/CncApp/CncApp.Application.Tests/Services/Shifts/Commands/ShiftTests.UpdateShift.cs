@@ -62,6 +62,36 @@ public partial class ShiftTests
     }
 
     [Fact]
+    public async Task UpdateShiftAsync_WhenDtoHasStopTime_StopTimeIsNotApplied()
+    {
+        // Arrange
+        var startTime = DateTime.UtcNow.AddHours(-1);
+        var stopTime = DateTime.UtcNow;
+        var dto = new UpdateShiftRequestDto
+        {
+            StartTime = startTime,
+            StopTime = stopTime,
+            PartsMade = 10,
+            Scrap = 0,
+            BarsConsumed = 1
+        };
+        var ct = CancellationToken.None;
+        const int operatorId = 5;
+
+        var shift = new Shift(jobId: 1, operatorId: operatorId, barsConsumed: 0, startTime: startTime);
+        MockRepository.Setup(r => r.GetByIdAsync(shift.Id, ct)).ReturnsAsync(shift);
+        MockRepository.Setup(r => r.SaveChangesAsync(ct)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await ShiftService.UpdateShiftAsync(shift.Id, operatorId, dto, ct);
+
+        // Assert
+        Assert.True(result);
+        Assert.Null(shift.StopTime);
+        MockRepository.Verify(r => r.SaveChangesAsync(ct), Times.Once);
+    }
+
+    [Fact]
     public async Task UpdateShiftAsync_WhenValid_UpdatesAndReturnsTrue()
     {
         // Arrange

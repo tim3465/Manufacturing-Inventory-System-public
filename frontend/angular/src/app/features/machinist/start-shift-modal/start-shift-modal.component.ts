@@ -58,7 +58,7 @@ export class StartShiftModalComponent implements OnInit {
     this.submitting.set(true);
     this.shiftsApi.startShift({
       jobId: this.jobId,
-      startTime: new Date(startTime).toISOString()
+      startTime: startTime + ':00'
     }).subscribe({
       next: () => {
         this.toast.success('Shift started');

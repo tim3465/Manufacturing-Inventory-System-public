@@ -87,8 +87,8 @@ export class RunningShiftFormComponent implements OnInit {
       : `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
 
     return {
-      startTime: raw.startTime ? new Date(raw.startTime).toISOString() : '',
-      stopTime: raw.stopTime ? new Date(raw.stopTime).toISOString() : null,
+      startTime: raw.startTime ? raw.startTime + ':00' : '',
+      stopTime: raw.stopTime ? raw.stopTime + ':00' : null,
       partsMade: raw.partsMade,
       scrap: raw.scrap,
       barsConsumed: raw.barsConsumed,
@@ -128,6 +128,12 @@ export class RunningShiftFormComponent implements OnInit {
     }
 
     const raw = this.form.getRawValue();
+
+    // NEW: require stopTime before closing
+    if (!raw.stopTime) {
+      this.form.controls.stopTime.markAsTouched();
+      return;
+    }
 
     // Client-side validation: stopTime must be after startTime
     if (raw.stopTime) {
