@@ -60,9 +60,12 @@ export class MyJobsPageComponent implements OnInit {
       this.expandedJobId.set(null);
       return;
     }
+
     this.expandedJobId.set(id);
+
     if (!this.shiftCache().has(id)) {
       this.loadingShiftForJobId.set(id);
+
       this.jobsApi.getMyJobShifts(id).subscribe({
         next: (shifts) => {
           const updated = new Map(this.shiftCache());

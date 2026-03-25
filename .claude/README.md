@@ -31,7 +31,7 @@ All skills and agents are invoked inside Claude Code. The terminal context deter
 Paste this prompt with the issue number filled in:
 
 ```
-Fetch GitHub issue #[NUMBER] from repo timjohnmontague/Manufacturing-Inventory-System. Read the following reference files before planning: backend-map.md, backend-rules.md, frontend-map.md, frontend-rules.md, and test-rules.md. Produce a full implementation plan — backend first, then frontend. Include file paths, method signatures, and any new DTOs or entities needed. Do not write any code yet.
+Fetch GitHub issue #[NUMBER] from repo tim3465/Manufacturing-Inventory-System. Read the following reference files before planning: backend-map.md, backend-rules.md, frontend-map.md, frontend-rules.md, and test-rules.md. Produce a full implementation plan — backend first, then frontend. Include file paths, method signatures, and any new DTOs or entities needed. Do not write any code yet.
 ```
 
 ### Step 3 — Review and adjust
@@ -43,7 +43,7 @@ Read the plan. Ask for adjustments as needed. Repeat until the plan looks right.
 Once the plan is finalized, paste this prompt with the issue number filled in:
 
 ```
-Update GitHub issue #[NUMBER] on repo timjohnmontague/Manufacturing-Inventory-System with the finalized implementation plan from this session. Replace the existing issue body with the full plan as we have agreed on it. Do not summarize or shorten it — write the complete plan. Do not implement any code.
+Update GitHub issue #[NUMBER] on repo tim3465/Manufacturing-Inventory-System with the finalized implementation plan from this session. Replace the existing issue body with the full plan as we have agreed on it. Do not summarize or shorten it — write the complete plan. Do not implement any code.
 ```
 
 ### Step 5 — Exit plan mode
