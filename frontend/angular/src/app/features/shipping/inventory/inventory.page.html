@@ -47,7 +47,6 @@
           <th class="px-4 py-2 font-normal">
             <input
               formControlName="lotNumber"
-              (input)="table.onFilterInput()"
               type="text"
               placeholder="Search..."
               class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)]"
@@ -57,7 +56,6 @@
           <th class="px-4 py-2 font-normal text-right">
             <input
               formControlName="diameter"
-              (input)="table.onFilterInput()"
               type="number"
               step="any"
               placeholder="e.g. 2.5"
@@ -68,7 +66,6 @@
           <th class="px-4 py-2 font-normal">
             <select
               formControlName="condition"
-              (change)="table.onFilterInput()"
               class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
             >
               <option value="">All</option>
@@ -81,14 +78,12 @@
             <div class="flex items-center gap-1">
               <input
                 formControlName="checkedInFrom"
-                (change)="table.onFilterInput()"
                 type="date"
                 class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
               />
               <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
               <input
                 formControlName="checkedInTo"
-                (change)="table.onFilterInput()"
                 type="date"
                 class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
               />

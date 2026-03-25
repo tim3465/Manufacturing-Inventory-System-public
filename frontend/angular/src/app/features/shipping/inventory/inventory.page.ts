@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
 import { StockLotsApi } from '../../../core/api/stock-lots.api';
 import { StockLotSearchRequestDto } from '../../../core/dtos/stock-lots/stock-lot-search-request.dto';
 import { StockLotSearchResultDto } from '../../../core/dtos/stock-lots/stock-lot-search-result.dto';
@@ -53,8 +54,10 @@ export class InventoryPageComponent {
   protected readonly conditions = STOCK_LOT_CONDITIONS;
 
   constructor() {
-    // Debounced text/date/select filter changes → reset to page 1 then search
-    this.table.debouncedFilterChange$.subscribe(() => {
+    // filterForm.valueChanges guarantees form values are committed before the debounce fires.
+    // This is more reliable than native (input)/(change) events, which can race Angular's
+    // SelectControlValueAccessor when used on reactive-form-bound select elements.
+    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
       this.table.resetPage();
       this.executeSearch();
     });
