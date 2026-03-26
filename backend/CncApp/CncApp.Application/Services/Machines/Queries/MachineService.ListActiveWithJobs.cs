@@ -15,17 +15,22 @@ public partial class MachineService
             ModelNumber = m.ModelNumber,
             Jobs = m.Jobs
                 .OrderBy(j => j.DueDate)
-                .Select(j => new MachineJobSummaryDto
+                .Select(j =>
                 {
-                    Id = j.Id,
-                    PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
-                    DueDate = j.DueDate,
-                    LotNumber = j.StockLot?.LotNumber,
-                    StartedDateTime = j.StartedDateTime,
-                    BarsInJob = j.BarsInJob,
-                    BarAmountPlanned = j.BarAmountPlanned,
-                    RunningShiftId = j.Shifts
-                        .FirstOrDefault(s => !s.InactivatedDateTime.HasValue && s.StopTime == null)?.Id
+                    var runningShift = j.Shifts
+                        .FirstOrDefault(s => !s.InactivatedDateTime.HasValue && s.StopTime == null);
+                    return new MachineJobSummaryDto
+                    {
+                        Id = j.Id,
+                        PartNumber = j.Order?.Part?.PartNumber ?? string.Empty,
+                        DueDate = j.DueDate,
+                        LotNumber = j.StockLot?.LotNumber,
+                        StartedDateTime = j.StartedDateTime,
+                        BarsInJob = j.BarsInJob,
+                        BarAmountPlanned = j.BarAmountPlanned,
+                        RunningShiftId = runningShift?.Id,
+                        RunningShiftOperatorId = runningShift?.OperatorId
+                    };
                 })
                 .ToList()
         }).ToList();
