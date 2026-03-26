@@ -13,8 +13,9 @@
       @for (card of machineCards(); track card.id) {
         <div
           class="rounded-xl border bg-[var(--surface)] p-4 space-y-3"
-          [class.border-[var(--primary)]]="card.cardState === 'running'"
-          [class.border-[var(--secondary)]]="card.cardState === 'has-job'"
+          [class.border-[var(--primary)]]="card.cardState === 'my-running'"
+          [class.border-[var(--secondary)]]="card.cardState === 'other-running'"
+          [class.border-[var(--success)]]="card.cardState === 'available'"
           [class.border-[var(--border)]]="card.cardState === 'default'"
         >
           <div class="flex items-start justify-between">
@@ -22,12 +23,12 @@
               <p class="text-base font-bold text-[var(--fg)]">{{ card.name }}</p>
               <p class="text-xs text-slate-500">{{ card.modelNumber }}</p>
             </div>
-            @if (card.cardState === 'has-job') {
+            @if (card.cardState === 'available') {
               @for (job of card.jobs; track job.id) {
                 @if (job.isActive) {
                   <button
                     type="button"
-                    class="px-3 py-1 rounded-lg text-xs font-medium border border-[var(--secondary)] text-[var(--secondary)] hover:bg-[var(--secondary)] hover:text-white transition"
+                    class="px-3 py-1 rounded-lg text-xs font-medium border border-[var(--success)] text-[var(--success)] hover:bg-[var(--success)] hover:text-white transition"
                     (click)="openStartShift(job, card.name)"
                   >
                     Start Shift
@@ -62,7 +63,7 @@
                 >
                   <span>{{ job.partNumber }}</span>
                   <span>{{ job.dueDate }}</span>
-                  <span>{{ job.lotNumber ?? '—' }}</span>
+                  <span class="overflow-hidden min-w-0">{{ job.lotNumber ?? '—' }}</span>
                   <span>{{ job.barsInJob }}</span>
                   <span>{{ job.barAmountPlanned }}</span>
                 </div>

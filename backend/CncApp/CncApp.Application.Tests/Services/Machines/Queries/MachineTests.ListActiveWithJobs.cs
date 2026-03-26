@@ -56,11 +56,13 @@ public partial class MachineTests
         Assert.Equal("PN-001", dto.Jobs[0].PartNumber);
         Assert.Equal(new DateOnly(2026, 1, 15), dto.Jobs[0].DueDate);
         Assert.Equal("LOT-001", dto.Jobs[0].LotNumber);
+        Assert.Null(dto.Jobs[0].RunningShiftOperatorId);
 
         Assert.Equal(11, dto.Jobs[1].Id);
         Assert.Equal("PN-002", dto.Jobs[1].PartNumber);
         Assert.Equal(new DateOnly(2026, 2, 1), dto.Jobs[1].DueDate);
         Assert.Null(dto.Jobs[1].LotNumber);
+        Assert.Null(dto.Jobs[1].RunningShiftOperatorId);
 
         MockRepository.Verify(r => r.ListActiveWithJobsAsync(cancellationToken), Times.Once);
         MockMapper.Verify(m => m.Map<It.IsAnyType>(It.IsAny<object>()), Times.Never);
@@ -142,6 +144,46 @@ public partial class MachineTests
         Assert.Single(result);
         Assert.Single(result[0].Jobs);
         Assert.Null(result[0].Jobs[0].LotNumber);
+
+        MockRepository.Verify(r => r.ListActiveWithJobsAsync(cancellationToken), Times.Once);
+        MockMapper.Verify(m => m.Map<It.IsAnyType>(It.IsAny<object>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ListActiveWithJobsAsync_WhenJobHasRunningShift_ReturnsRunningShiftOperatorId()
+    {
+        // Arrange
+        var cancellationToken = CancellationToken.None;
+
+        var part = new Part("Part A", "PN-A", TimeSpan.FromMinutes(1), 1) { Id = 1 };
+        var order = new Order(1, 1, 10) { Id = 1 };
+        order.Part = part;
+
+        var job = new Job(1, null, 1, 10, 2, TimeSpan.FromMinutes(1), 5, new DateOnly(2026, 4, 1)) { Id = 30 };
+        job.Order = order;
+
+        var runningShift = new Shift(jobId: 30, operatorId: 42, barsConsumed: 0, startTime: DateTime.UtcNow) { Id = 5 };
+        job.Shifts.Add(runningShift);
+
+        var machine = new Machine("SN-010", "MODEL-010") { Id = 10 };
+        machine.Jobs = new List<Job> { job };
+
+        MockRepository
+            .Setup(r => r.ListActiveWithJobsAsync(cancellationToken))
+            .ReturnsAsync(new List<Machine> { machine });
+
+        // Act
+        var result = await MachineService.ListActiveWithJobsAsync(cancellationToken);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result);
+        Assert.Single(result[0].Jobs);
+
+        var jobDto = result[0].Jobs[0];
+        Assert.NotNull(jobDto.RunningShiftId);
+        Assert.Equal(5, jobDto.RunningShiftId);
+        Assert.Equal(42, jobDto.RunningShiftOperatorId);
 
         MockRepository.Verify(r => r.ListActiveWithJobsAsync(cancellationToken), Times.Once);
         MockMapper.Verify(m => m.Map<It.IsAnyType>(It.IsAny<object>()), Times.Never);

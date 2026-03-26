@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MachinesApi } from '../../core/api/machines.api';
 import { MachineWithJobsDto } from '../../core/dtos/machines/machine-with-jobs.dto';
 import { ToastService } from '../../core/ui/toast/toast.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { StartJobModalComponent } from './start-job-modal/start-job-modal.component';
 import { StartShiftModalComponent } from './start-shift-modal/start-shift-modal.component';
 
@@ -17,6 +18,7 @@ interface JobRow {
   hasLotNumber: boolean;
   machineHasActiveJob: boolean;
   runningShiftId: number | null;
+  runningShiftOperatorId: number | null;
 }
 
 interface MachineCard {
@@ -24,7 +26,7 @@ interface MachineCard {
   name: string;
   modelNumber: string;
   jobs: JobRow[];
-  cardState: 'default' | 'has-job' | 'running';
+  cardState: 'my-running' | 'other-running' | 'available' | 'default';
 }
 
 @Component({
@@ -37,6 +39,7 @@ interface MachineCard {
 export class MachinistMachinesPageComponent implements OnInit {
   private readonly machinesApi = inject(MachinesApi);
   private readonly toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
 
   protected readonly loading = signal<boolean>(true);
   protected readonly machines = signal<MachineWithJobsDto[]>([]);
@@ -49,17 +52,16 @@ export class MachinistMachinesPageComponent implements OnInit {
 
   protected readonly machineCards = computed<MachineCard[]>(() =>
     this.machines().map(m => {
-      const hasActiveJob = m.jobs.some(j => j.startedDateTime != null);
+      const currentUserId = this.auth.getUserId();
       const hasRunningShift = m.jobs.some(j => j.runningShiftId != null);
+      const isMyShift = m.jobs.some(j => j.runningShiftOperatorId === currentUserId);
+      const hasActiveJob = m.jobs.some(j => j.startedDateTime != null);
 
-      let cardState: 'default' | 'has-job' | 'running';
-      if (hasRunningShift) {
-        cardState = 'running';
-      } else if (hasActiveJob) {
-        cardState = 'has-job';
-      } else {
-        cardState = 'default';
-      }
+      let cardState: 'my-running' | 'other-running' | 'available' | 'default';
+      if (hasRunningShift && isMyShift) cardState = 'my-running';
+      else if (hasRunningShift) cardState = 'other-running';
+      else if (hasActiveJob) cardState = 'available';
+      else cardState = 'default';
 
       return {
         id: m.id,
@@ -76,7 +78,8 @@ export class MachinistMachinesPageComponent implements OnInit {
           barAmountPlanned: j.barAmountPlanned,
           hasLotNumber: j.lotNumber !== null,
           machineHasActiveJob: hasActiveJob,
-          runningShiftId: j.runningShiftId
+          runningShiftId: j.runningShiftId,
+          runningShiftOperatorId: j.runningShiftOperatorId
         }))
       };
     })

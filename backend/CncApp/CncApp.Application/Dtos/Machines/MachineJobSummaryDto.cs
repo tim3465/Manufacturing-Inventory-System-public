@@ -10,4 +10,5 @@ public class MachineJobSummaryDto
     public int BarsInJob { get; set; }
     public int BarAmountPlanned { get; set; }
     public int? RunningShiftId { get; set; }
+    public int? RunningShiftOperatorId { get; set; }
 }
