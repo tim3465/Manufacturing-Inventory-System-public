@@ -1,27 +1,7 @@
 <div class="flex items-center justify-between px-4 py-3 border border-[var(--border)] bg-[var(--surface)] text-sm">
-  <button
-    type="button"
-    class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed"
-    [disabled]="currentPage <= 1"
-    (click)="prev()"
-  >
-    Previous
-  </button>
 
-  <span class="text-slate-500">
-    Page {{ currentPage }} of {{ totalPages }} ({{ totalCount }} total)
-  </span>
-
-  <div class="flex items-center gap-3">
-    <button
-      type="button"
-      class="px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed"
-      [disabled]="currentPage >= totalPages"
-      (click)="next()"
-    >
-      Next
-    </button>
-
+  <!-- Left: page-size dropdown -->
+  <div class="w-32">
     @if (pageSizes && pageSizes.length > 0) {
       <select
         [value]="pageSize"
@@ -29,9 +9,36 @@
         class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--fg)] cursor-pointer"
       >
         @for (size of pageSizes; track size) {
-          <option [value]="size">{{ size }} per page</option>
+          <option [value]="size" [selected]="size === pageSize">{{ size }} per page</option>
         }
       </select>
     }
   </div>
+
+  <!-- Center: prev · page info · next grouped together -->
+  <div class="flex items-center gap-2">
+    <button
+      type="button"
+      class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
+      [disabled]="currentPage <= 1"
+      (click)="prev()"
+      aria-label="Previous page"
+    >&#8249;</button>
+
+    <span class="text-slate-500 tabular-nums">
+      Page {{ currentPage }} of {{ totalPages }} ({{ totalCount }} total)
+    </span>
+
+    <button
+      type="button"
+      class="px-2.5 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition disabled:opacity-40 disabled:cursor-not-allowed text-base leading-none"
+      [disabled]="currentPage >= totalPages"
+      (click)="next()"
+      aria-label="Next page"
+    >&#8250;</button>
+  </div>
+
+  <!-- Right: spacer to balance the left column -->
+  <div class="w-32"></div>
+
 </div>

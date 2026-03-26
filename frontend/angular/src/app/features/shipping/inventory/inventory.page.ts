@@ -27,7 +27,7 @@ export class InventoryPageComponent {
   protected readonly table = new SmartTableState({
     defaultSortColumn: 'CheckedInDateTime',
     defaultSortDirection: 'desc',
-    pageSize: 25
+    pageSize: 10
   });
 
   protected readonly pageSizes = [5, 10, 25, 100];
