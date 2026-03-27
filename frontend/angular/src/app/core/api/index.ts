@@ -10,6 +10,7 @@ export * from './shifts.api';
 export * from './shipping-receiving.api';
 export * from './stock-lot-adjustments.api';
 export * from './stock-lots.api';
+export * from './supervisor-dashboard.api';
 export * from './users.api';
 
 

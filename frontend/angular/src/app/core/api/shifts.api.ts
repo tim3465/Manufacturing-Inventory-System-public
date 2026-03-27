@@ -10,6 +10,7 @@ import { ApiClient } from './api-client.service';
 
 const _PATH = '/shifts';
 const _MACHINES_WITH_JOBS_PATH = '/machines/with-jobs';
+const _SUPERVISOR_DASHBOARD_PATH = '/supervisordashboard';
 
 @Injectable({ providedIn: 'root' })
 export class ShiftsApi {
@@ -26,6 +27,7 @@ export class ShiftsApi {
       tap(() => {
         this.api.clearGetCache(`${_PATH}/running`);
         this.api.clearGetCache(_MACHINES_WITH_JOBS_PATH);
+        this.api.clearGetCache(_SUPERVISOR_DASHBOARD_PATH);
       })
     );
   }
@@ -58,6 +60,7 @@ export class ShiftsApi {
         this.api.clearGetCache(`${_PATH}/${id}/running`);
         this.api.clearGetCache(`${_PATH}/my-logs`);
         this.api.clearGetCache(_MACHINES_WITH_JOBS_PATH);
+        this.api.clearGetCache(_SUPERVISOR_DASHBOARD_PATH);
       })
     );
   }
