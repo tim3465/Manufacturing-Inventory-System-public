@@ -26,7 +26,7 @@ public class SupervisorDashboardController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The current supervisor dashboard snapshot.</returns>
     [HttpGet]
-    [Authorize(Roles = "Supervisor,Admin")]
+    [Authorize(Roles = "Admin,Machinist,Shipping,Supervisor,User")]
     [ProducesResponseType(typeof(SupervisorDashboardDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
