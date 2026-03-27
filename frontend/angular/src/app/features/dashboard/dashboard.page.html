@@ -35,7 +35,11 @@
     } @else {
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         @for (card of operatorCards(); track card.operatorId) {
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 space-y-3">
+          <div
+            class="rounded-xl border bg-[var(--surface)] p-4 space-y-3"
+            [class.border-[var(--primary)]]="card.operatorId === currentUserId()"
+            [class.border-[var(--border)]]="card.operatorId !== currentUserId()"
+          >
             <!-- Card header -->
             <div class="flex items-center justify-between">
               <p class="font-semibold text-[var(--fg)]">{{ card.operatorName }}</p>

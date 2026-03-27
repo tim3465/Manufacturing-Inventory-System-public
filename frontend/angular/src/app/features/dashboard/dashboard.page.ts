@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { AuthService } from '../../core/auth/auth.service';
 import { SupervisorDashboardApi } from '../../core/api/supervisor-dashboard.api';
 import { SupervisorDashboardActiveJobDto } from '../../core/dtos/supervisor-dashboard/supervisor-dashboard-active-job.dto';
 import { SupervisorDashboardDto } from '../../core/dtos/supervisor-dashboard/supervisor-dashboard.dto';
@@ -25,6 +26,9 @@ interface OperatorCard {
 export class DashboardPageComponent implements OnInit {
   private readonly supervisorDashboardApi = inject(SupervisorDashboardApi);
   private readonly toast = inject(ToastService);
+  private readonly auth = inject(AuthService);
+
+  protected readonly currentUserId = computed(() => this.auth.getUserId());
 
   protected readonly loading = signal(true);
   protected readonly dashboard = signal<SupervisorDashboardDto | null>(null);
