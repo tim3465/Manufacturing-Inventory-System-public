@@ -12,6 +12,7 @@ public interface IJobRepository
     Task<Job?> GetWithShiftsByIdForOperatorAsync(int jobId, int operatorId, CancellationToken ct = default);
     Task<Job?> GetActiveJobByMachineAsync(int machineId, CancellationToken ct = default);
     Task<List<Job>> ListLateAsync(DateOnly today, CancellationToken ct = default);
+    Task<List<Job>> ListByOrderWithShiftsAsync(int orderId, CancellationToken ct = default);
     Task AddAsync(Job job, CancellationToken ct = default);
     Task<bool> InactivateAsync(int id, int? inactivatedByUserId = null, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
