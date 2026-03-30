@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShiftsApi } from '../../../../core/api/shifts.api';
 import { RunningShiftDto } from '../../../../core/dtos/shifts/running-shift.dto';
 import { ToastService } from '../../../../core/ui/toast/toast.service';
+import { LogIssueFormComponent } from '../log-issue-form/log-issue-form.component';
 
 @Component({
   selector: 'app-running-shift-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LogIssueFormComponent],
   templateUrl: './running-shift-form.component.html',
   styleUrl: './running-shift-form.component.css'
 })
@@ -24,16 +25,27 @@ export class RunningShiftFormComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly shift = signal<RunningShiftDto | null>(null);
   protected readonly submittingAction = signal<'save' | 'close' | null>(null);
+  protected readonly showIssueForm = signal(false);
+
+  protected toggleIssueForm(): void {
+    this.showIssueForm.update((v) => !v);
+  }
+
+  protected onIssueSubmitted(): void {
+    this.showIssueForm.set(false);
+    this.shiftsApi.getRunning(this.shiftId).subscribe({
+      next: (data) => this.shift.set(data),
+      error: () => {}
+    });
+    this.saved.emit();
+  }
 
   protected readonly form = this.fb.nonNullable.group({
     startTime: ['', Validators.required],
     stopTime: [null as string | null],
     partsMade: [0, [Validators.required, Validators.min(0)]],
-    scrap: [0, [Validators.required, Validators.min(0)]],
     barsConsumed: [0, [Validators.required, Validators.min(0)]],
-    partsPerBar: [null as number | null],
-    downtimeHours: [0, [Validators.min(0)]],
-    downtimeMinutes: [0, [Validators.min(0), Validators.max(59)]]
+    partsPerBar: [null as number | null]
   });
 
   ngOnInit(): void {
@@ -58,42 +70,24 @@ export class RunningShiftFormComponent implements OnInit {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     };
 
-    let downtimeHours = 0;
-    let downtimeMinutes = 0;
-    if (data.downtime) {
-      const parts = data.downtime.split(':');
-      downtimeHours = parseInt(parts[0], 10) || 0;
-      downtimeMinutes = parseInt(parts[1], 10) || 0;
-    }
-
     this.form.patchValue({
       startTime: toDatetimeLocal(data.startTime),
       stopTime: toDatetimeLocal(data.stopTime),
       partsMade: data.partsMade,
-      scrap: data.scrap,
       barsConsumed: data.barsConsumed,
-      partsPerBar: data.partsPerBar,
-      downtimeHours,
-      downtimeMinutes
+      partsPerBar: data.partsPerBar
     });
   }
 
   private buildDto() {
     const raw = this.form.getRawValue();
-    const h = raw.downtimeHours;
-    const m = raw.downtimeMinutes;
-    const downtime = (h === 0 && m === 0)
-      ? null
-      : `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
 
     return {
       startTime: raw.startTime ? raw.startTime + ':00' : '',
       stopTime: raw.stopTime ? raw.stopTime + ':00' : null,
       partsMade: raw.partsMade,
-      scrap: raw.scrap,
       barsConsumed: raw.barsConsumed,
-      partsPerBar: raw.partsPerBar,
-      downtime
+      partsPerBar: raw.partsPerBar
     };
   }
 

@@ -1,0 +1,103 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <!-- Issue Type -->
+    <label class="block">
+      <div class="text-sm font-medium text-[var(--fg)] mb-1">Issue Type</div>
+      <select
+        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+        formControlName="issueType"
+      >
+        @for (opt of issueTypeOptions; track opt) {
+          <option [value]="opt">{{ issueTypeLabels[opt] }}</option>
+        }
+      </select>
+    </label>
+
+    <!-- Scrap Quantity -->
+    <label class="block">
+      <div class="text-sm font-medium text-[var(--fg)] mb-1">Scrap Quantity</div>
+      <input
+        type="number"
+        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+        formControlName="scrapQuantity"
+        autocomplete="off"
+        min="0"
+      />
+      @if (form.controls.scrapQuantity.touched && form.controls.scrapQuantity.invalid) {
+        <div class="mt-1 text-xs text-red-500">Scrap quantity must be 0 or more</div>
+      }
+    </label>
+
+    <!-- Downtime -->
+    <div class="sm:col-span-2">
+      <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(optional)</span></div>
+      <div class="grid grid-cols-2 gap-4">
+        <label class="block">
+          <div class="text-xs text-slate-400 mb-1">Hours</div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="downtimeHours"
+            autocomplete="off"
+            min="0"
+          />
+        </label>
+        <label class="block">
+          <div class="text-xs text-slate-400 mb-1">Minutes</div>
+          <input
+            type="number"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="downtimeMinutes"
+            autocomplete="off"
+            min="0"
+            max="59"
+          />
+        </label>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <label class="block sm:col-span-2">
+      <div class="text-sm font-medium text-[var(--fg)] mb-1">Description</div>
+      <textarea
+        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+        formControlName="description"
+        rows="3"
+        autocomplete="off"
+      ></textarea>
+      @if (form.controls.description.touched && form.controls.description.invalid) {
+        <div class="mt-1 text-xs text-red-500">
+          @if (form.controls.description.errors?.['required']) {
+            Description is required
+          } @else if (form.controls.description.errors?.['maxlength']) {
+            Description must be 2000 characters or fewer
+          }
+        </div>
+      }
+    </label>
+
+  </div>
+
+  <!-- Cross-field validation error -->
+  @if (form.errors?.['scrapOrDowntimeRequired'] && form.touched) {
+    <div class="text-xs text-red-500">At least one of scrap quantity or downtime must be greater than zero</div>
+  }
+
+  <!-- Actions -->
+  <div class="pt-2 flex items-center justify-end">
+    <button
+      type="submit"
+      class="px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+      [disabled]="submitting()"
+    >
+      @if (submitting()) {
+        Logging...
+      } @else {
+        Log Issue
+      }
+    </button>
+  </div>
+
+</form>

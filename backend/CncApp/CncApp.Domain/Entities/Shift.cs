@@ -158,6 +158,8 @@ public class Shift : AuditableEntityBase
 
     public User Operator { get; set; } = null!;
 
+    public ICollection<ShiftIssueLog> ShiftIssueLogs { get; set; } = new List<ShiftIssueLog>();
+
     /// <summary>
     /// Inactivates the shift (soft-delete).
     /// Prevents double-inactivation.

@@ -13,12 +13,7 @@ public class UpdateShiftRequestDto
     public int PartsMade { get; set; }
 
     [Required]
-    public int Scrap { get; set; }
-
-    [Required]
     public int BarsConsumed { get; set; }
 
     public int? PartsPerBar { get; set; }
-
-    public TimeSpan? Downtime { get; set; }
 }
