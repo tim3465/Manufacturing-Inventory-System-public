@@ -238,3 +238,50 @@ Modals that receive data from a parent page use `@Input({ required: true })` for
 ```
 
 The `!` (definite assignment) is needed because Angular sets the value after construction. `required: true` enforces that the parent must provide the binding.
+
+
+---
+
+## Smart Table Pattern
+
+Use the existing **Shipping / Receiving → Inventory** table as the **golden reference** for future smart tables.
+
+### Purpose
+
+The smart table pattern is the default table pattern for data-heavy list pages that need a clean layout, built-in filtering, paging, and a reusable structure.
+
+### Rules
+
+- Reuse or extend the existing smart table pattern before creating a new table style.
+- Match the overall visual layout and behavior established on the Shipping / Receiving → Inventory page.
+- Keep column filters aligned with the table header area.
+- Prefer a consistent filter row and paging layout across pages.
+- Use the same interaction pattern for record loading, filtering, and paging unless the ticket explicitly requires a deviation.
+- When a new page needs a smart table, reference the Shipping / Receiving → Inventory implementation first during reconnaissance.
+
+### Ticket Writing Guidance
+
+When creating a ticket for a new smart table, explicitly state:
+
+- **Use the Shipping / Receiving → Inventory smart table as the golden reference.**
+- Only call out differences from that pattern.
+- Do not redesign the table style unless the ticket explicitly asks for it.
+
+### Scope
+
+This pattern applies to list pages such as inventory, orders, jobs, users, and other record tables where consistency matters more than page-specific styling.
+
+### Visual Hierarchy
+
+Smart tables use layered surfaces to distinguish controls from data:
+
+- Global search bar → neutral surface (gray)
+- Column filter inputs → primary surface (white)
+- Data rows → primary content surface (white)
+
+The goal is to visually separate:
+- global filtering
+- column-level filtering
+- actual data
+
+In dark mode, these surfaces invert appropriately while preserving contrast hierarchy.
