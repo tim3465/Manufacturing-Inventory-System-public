@@ -140,6 +140,15 @@ public class JobsController : ControllerBase
 
     }
 
+    [HttpGet("by-order/{orderId:int}")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<JobProductionDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListByOrder(int orderId, CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListByOrderAsync(orderId, ct);
+        return Ok(jobs);
+    }
+
     [HttpGet("my-jobs")]
     [Authorize(Roles = "Machinist,Admin")]
     [ProducesResponseType(typeof(List<MyJobListItemDto>), StatusCodes.Status200OK)]

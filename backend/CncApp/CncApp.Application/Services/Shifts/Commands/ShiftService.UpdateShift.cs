@@ -18,10 +18,8 @@ public partial class ShiftService
 
         shift.StartTime = dto.StartTime;
         shift.PartsMade = dto.PartsMade;
-        shift.Scrap = dto.Scrap;
         shift.BarsConsumed = dto.BarsConsumed;
         shift.PartsPerBar = dto.PartsPerBar;
-        shift.Downtime = dto.Downtime;
 
         await _shiftRepository.SaveChangesAsync(ct);
         return true;

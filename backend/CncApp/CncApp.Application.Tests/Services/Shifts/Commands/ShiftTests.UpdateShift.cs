@@ -11,7 +11,7 @@ public partial class ShiftTests
     public async Task UpdateShiftAsync_WhenShiftNotFound_ReturnsFalse()
     {
         // Arrange
-        var dto = new UpdateShiftRequestDto { StartTime = DateTime.UtcNow, PartsMade = 10, Scrap = 0, BarsConsumed = 1 };
+        var dto = new UpdateShiftRequestDto { StartTime = DateTime.UtcNow, PartsMade = 10, BarsConsumed = 1 };
         var ct = CancellationToken.None;
 
         MockRepository.Setup(r => r.GetByIdAsync(99, ct)).ReturnsAsync((Shift?)null);
@@ -28,7 +28,7 @@ public partial class ShiftTests
     public async Task UpdateShiftAsync_WhenWrongOperator_ThrowsInvalidOperationException()
     {
         // Arrange
-        var dto = new UpdateShiftRequestDto { StartTime = DateTime.UtcNow, PartsMade = 10, Scrap = 0, BarsConsumed = 1 };
+        var dto = new UpdateShiftRequestDto { StartTime = DateTime.UtcNow, PartsMade = 10, BarsConsumed = 1 };
         var ct = CancellationToken.None;
 
         var shift = new Shift(jobId: 1, operatorId: 5, barsConsumed: 0, startTime: DateTime.UtcNow.AddHours(-1));
@@ -47,7 +47,7 @@ public partial class ShiftTests
         // Arrange
         var startTime = DateTime.UtcNow.AddHours(-2);
         var stopTime = DateTime.UtcNow.AddHours(-1);
-        var dto = new UpdateShiftRequestDto { StartTime = startTime, PartsMade = 10, Scrap = 0, BarsConsumed = 1 };
+        var dto = new UpdateShiftRequestDto { StartTime = startTime, PartsMade = 10, BarsConsumed = 1 };
         var ct = CancellationToken.None;
         const int operatorId = 5;
 
@@ -72,7 +72,6 @@ public partial class ShiftTests
             StartTime = startTime,
             StopTime = stopTime,
             PartsMade = 10,
-            Scrap = 0,
             BarsConsumed = 1
         };
         var ct = CancellationToken.None;
@@ -100,10 +99,8 @@ public partial class ShiftTests
         {
             StartTime = startTime,
             PartsMade = 15,
-            Scrap = 2,
             BarsConsumed = 3,
-            PartsPerBar = 5,
-            Downtime = TimeSpan.FromMinutes(10)
+            PartsPerBar = 5
         };
         var ct = CancellationToken.None;
         const int operatorId = 5;

@@ -47,6 +47,7 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Job> Jobs => Set<Job>();
     public DbSet<Shift> Shifts => Set<Shift>();
+    public DbSet<ShiftIssueLog> ShiftIssueLogs => Set<ShiftIssueLog>();
 
     /// <summary>
     /// Overrides SaveChangesAsync to automatically populate audit fields with DomainUserId.

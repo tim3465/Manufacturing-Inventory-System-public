@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IShiftIssueLogRepository, ShiftIssueLogRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         // Register Transaction Manager

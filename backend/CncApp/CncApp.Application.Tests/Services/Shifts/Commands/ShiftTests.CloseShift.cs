@@ -15,7 +15,7 @@ public partial class ShiftTests
         {
             StartTime = DateTime.UtcNow.AddHours(-1),
             StopTime = DateTime.UtcNow,
-            PartsMade = 10, Scrap = 0, BarsConsumed = 1
+            PartsMade = 10, BarsConsumed = 1
         };
         var ct = CancellationToken.None;
 
@@ -37,7 +37,7 @@ public partial class ShiftTests
         {
             StartTime = DateTime.UtcNow.AddHours(-1),
             StopTime = DateTime.UtcNow,
-            PartsMade = 10, Scrap = 0, BarsConsumed = 1
+            PartsMade = 10, BarsConsumed = 1
         };
         var ct = CancellationToken.None;
 
@@ -59,7 +59,7 @@ public partial class ShiftTests
         {
             StartTime = DateTime.UtcNow.AddHours(-1),
             StopTime = null,
-            PartsMade = 10, Scrap = 0, BarsConsumed = 1
+            PartsMade = 10, BarsConsumed = 1
         };
         var ct = CancellationToken.None;
         const int operatorId = 5;
@@ -83,7 +83,7 @@ public partial class ShiftTests
         {
             StartTime = startTime,
             StopTime = startTime.AddHours(-1), // stop before start
-            PartsMade = 10, Scrap = 0, BarsConsumed = 1
+            PartsMade = 10, BarsConsumed = 1
         };
         var ct = CancellationToken.None;
         const int operatorId = 5;
@@ -108,8 +108,8 @@ public partial class ShiftTests
         {
             StartTime = startTime,
             StopTime = stopTime,
-            PartsMade = 20, Scrap = 1, BarsConsumed = 4,
-            PartsPerBar = 5, Downtime = TimeSpan.FromMinutes(15)
+            PartsMade = 20, BarsConsumed = 4,
+            PartsPerBar = 5
         };
         var ct = CancellationToken.None;
         const int operatorId = 5;

@@ -88,21 +88,6 @@
           }
         </label>
 
-        <!-- Scrap -->
-        <label class="block">
-          <div class="text-sm font-medium text-[var(--fg)] mb-1">Scrap</div>
-          <input
-            type="number"
-            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-            formControlName="scrap"
-            autocomplete="off"
-            min="0"
-          />
-          @if (form.controls.scrap.touched && form.controls.scrap.invalid) {
-            <div class="mt-1 text-xs text-red-500">Scrap must be 0 or more</div>
-          }
-        </label>
-
         <!-- Bars Consumed -->
         <label class="block">
           <div class="text-sm font-medium text-[var(--fg)] mb-1">Bars Consumed</div>
@@ -130,31 +115,19 @@
           />
         </label>
 
-        <!-- Downtime -->
-        <div class="sm:col-span-2">
-          <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(optional)</span></div>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="block">
-              <div class="text-xs text-slate-400 mb-1">Hours</div>
-              <input
-                type="number"
-                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                formControlName="downtimeHours"
-                autocomplete="off"
-                min="0"
-              />
-            </label>
-            <label class="block">
-              <div class="text-xs text-slate-400 mb-1">Minutes</div>
-              <input
-                type="number"
-                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-                formControlName="downtimeMinutes"
-                autocomplete="off"
-                min="0"
-                max="59"
-              />
-            </label>
+        <!-- Shift Scrap Total (read-only) -->
+        <div class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Shift Scrap <span class="text-slate-400 text-xs">(from issue logs)</span></div>
+          <div class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--fg)]">
+            {{ shift()!.scrap }}
+          </div>
+        </div>
+
+        <!-- Shift Downtime Total (read-only) -->
+        <div class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Shift Downtime <span class="text-slate-400 text-xs">(from issue logs)</span></div>
+          <div class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--fg)]">
+            {{ shift()!.downtime ?? '—' }}
           </div>
         </div>
 
@@ -162,6 +135,17 @@
 
       <!-- Actions -->
       <div class="pt-2 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition text-sm"
+          (click)="toggleIssueForm()"
+        >
+          @if (showIssueForm()) {
+            Cancel Issue
+          } @else {
+            Log Issue
+          }
+        </button>
         <button
           type="button"
           class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -188,5 +172,16 @@
         </button>
       </div>
     </form>
+
+    <!-- Log Issue Form -->
+    @if (showIssueForm()) {
+      <div class="mt-4 rounded-lg border border-amber-300 dark:border-amber-700 bg-[var(--surface)] p-4">
+        <h3 class="text-sm font-semibold text-[var(--fg)] mb-3">Log Issue</h3>
+        <app-log-issue-form
+          [shiftId]="shiftId"
+          (submitted)="onIssueSubmitted()"
+        />
+      </div>
+    }
   </div>
 }

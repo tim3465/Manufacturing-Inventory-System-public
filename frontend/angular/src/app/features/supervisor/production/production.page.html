@@ -56,6 +56,7 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-[var(--border)] text-slate-500">
+                  <th class="px-4 py-2 text-left font-medium w-6"></th>
                   <th class="px-4 py-2 text-left font-medium">Order</th>
                   <th class="px-4 py-2 text-left font-medium">Customer</th>
                   <th class="px-4 py-2 text-left font-medium">Part</th>
@@ -65,9 +66,16 @@
                   <th class="px-4 py-2 text-center font-medium w-24">Progress</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[var(--border)]">
+              <tbody>
                 @for (order of orders(); track order.id) {
-                  <tr class="hover:bg-[var(--surface-hover,var(--surface))]">
+                  <tr class="border-b border-[var(--border)] hover:bg-[var(--surface-hover,var(--surface))] cursor-pointer"
+                      (click)="toggleOrderExpanded(order.id)">
+                    <td
+                      class="px-4 py-3 text-xl transition"
+                      [class.text-slate-400]="!isOrderExpanded(order.id)"
+                    >
+                      {{ isOrderExpanded(order.id) ? '▾' : '▸' }}
+                    </td>
                     <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ order.id }}</td>
                     <td class="px-4 py-3 text-[var(--fg)]">{{ order.customerName }}</td>
                     <td class="px-4 py-3 text-[var(--fg)]">{{ order.partName }}</td>
@@ -98,6 +106,42 @@
                       </span>
                     </td>
                   </tr>
+
+                  @if (isOrderExpanded(order.id)) {
+                    @if (isOrderJobsLoading(order.id)) {
+                      <tr class="border-b border-[var(--border)] bg-slate-50 dark:bg-slate-800">
+                        <td colspan="8" class="px-8 py-2 text-xs text-slate-400">Loading jobs...</td>
+                      </tr>
+                    } @else if (getOrderJobs(order.id).length === 0) {
+                      <tr class="border-b border-[var(--border)] bg-slate-50 dark:bg-slate-800">
+                        <td colspan="8" class="px-8 py-2 text-xs text-slate-400">No jobs for this order.</td>
+                      </tr>
+                    } @else {
+                      <!-- Job sub-header -->
+                      <tr class="bg-slate-50 dark:bg-slate-800 border-b border-[var(--border)]">
+                        <td></td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500">Due Date</td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500">Machine</td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500">Lot #</td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Planned</td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Completed</td>
+                        <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">% Done</td>
+                        <td></td>
+                      </tr>
+                      @for (job of getOrderJobs(order.id); track job.id) {
+                        <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
+                          <td></td>
+                          <td class="px-4 py-2 text-xs text-[var(--fg)]">{{ job.dueDate }}</td>
+                          <td class="px-4 py-2 text-xs text-[var(--fg)]">{{ job.machineName }}</td>
+                          <td class="px-4 py-2 text-xs text-[var(--fg)]">{{ job.lotNumber ?? '—' }}</td>
+                          <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
+                          <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
+                          <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>
+                          <td></td>
+                        </tr>
+                      }
+                    }
+                  }
                 }
               </tbody>
             </table>

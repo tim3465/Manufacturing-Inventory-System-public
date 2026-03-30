@@ -38,6 +38,11 @@ export class JobsApi {
 
   }
 
+  /** GET /api/jobs/by-order/{orderId} - jobs for a specific order (Supervisor/Admin) */
+  listByOrder(orderId: number): Observable<JobProductionDto[]> {
+    return this.api.get<JobProductionDto[]>(`${_PATH}/by-order/${orderId}`);
+  }
+
   /** GET /api/jobs/my-jobs - jobs assigned to the authenticated machinist (Machinist/Admin) */
   listMyJobs(): Observable<MyJobListItemDto[]> {
     return this.api.getCached<MyJobListItemDto[]>(`${_PATH}/my-jobs`);

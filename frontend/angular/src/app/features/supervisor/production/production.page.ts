@@ -73,6 +73,11 @@ export class ProductionPageComponent implements OnInit {
   protected readonly isAddPartOpen = signal(false);
   protected readonly selectedJobForLot = signal<JobProductionRow | null>(null);
 
+  // Order expansion state
+  protected readonly expandedOrderIds = signal<Set<number>>(new Set());
+  protected readonly orderJobsMap = signal<Map<number, JobProductionDto[]>>(new Map());
+  protected readonly loadingOrderJobs = signal<Set<number>>(new Set());
+
   protected readonly jobRows = computed<JobProductionRow[]>(() =>
     this.jobs()
       .slice()
@@ -168,6 +173,52 @@ export class ProductionPageComponent implements OnInit {
         this.loadingShifts.set(false);
       }
     });
+  }
+
+  protected toggleOrderExpanded(orderId: number): void {
+    const current = new Set(this.expandedOrderIds());
+    if (current.has(orderId)) {
+      current.delete(orderId);
+    } else {
+      current.add(orderId);
+      // Lazy-load jobs on first expand
+      if (!this.orderJobsMap().has(orderId)) {
+        const loading = new Set(this.loadingOrderJobs());
+        loading.add(orderId);
+        this.loadingOrderJobs.set(loading);
+
+        this.jobsApi.listByOrder(orderId).subscribe({
+          next: (jobs) => {
+            const map = new Map(this.orderJobsMap());
+            map.set(orderId, jobs);
+            this.orderJobsMap.set(map);
+
+            const done = new Set(this.loadingOrderJobs());
+            done.delete(orderId);
+            this.loadingOrderJobs.set(done);
+          },
+          error: () => {
+            this.toast.error('Failed to load jobs for order');
+            const done = new Set(this.loadingOrderJobs());
+            done.delete(orderId);
+            this.loadingOrderJobs.set(done);
+          }
+        });
+      }
+    }
+    this.expandedOrderIds.set(current);
+  }
+
+  protected isOrderExpanded(orderId: number): boolean {
+    return this.expandedOrderIds().has(orderId);
+  }
+
+  protected getOrderJobs(orderId: number): JobProductionDto[] {
+    return this.orderJobsMap().get(orderId) ?? [];
+  }
+
+  protected isOrderJobsLoading(orderId: number): boolean {
+    return this.loadingOrderJobs().has(orderId);
   }
 
   protected goToNewOrder(): void {
