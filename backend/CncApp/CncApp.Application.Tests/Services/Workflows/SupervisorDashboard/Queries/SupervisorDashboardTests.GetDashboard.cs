@@ -334,4 +334,262 @@ public partial class SupervisorDashboardTests
         Assert.Equal("GearA", activeJob.PartName);
         Assert.Equal("SN-XYZ", activeJob.MachineName);
     }
+
+    [Fact]
+    public async Task GetDashboardAsync_WhenActiveOrdersExist_ReturnsOrderDtosWithAggregatedProduction()
+    {
+        // Arrange
+        MockShiftRepository
+            .Setup(r => r.ListOpenWithContextAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockShiftRepository
+            .Setup(r => r.ListStartedTodayAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockJobRepository
+            .Setup(r => r.ListLateAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Job>());
+
+        var part = new Part("WidgetA", "PN-001", TimeSpan.FromMinutes(2), 5) { Id = 1 };
+        var customer = new Customer("Acme Corp", "555-0100", "acme@test.com", "123 Main St") { Id = 1 };
+
+        var order = new Order(partId: 1, customerId: 1, partAmountRequested: 200) { Id = 1 };
+        order.Part = part;
+        order.Customer = customer;
+
+        var job = new Job(orderId: 1, stockLotId: null, machineId: 1,
+            partAmountPlanned: 200, barAmountPlanned: 20,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5))) { Id = 1 };
+
+        var shift1 = new Shift(jobId: 1, operatorId: 1, barsConsumed: 1,
+            startTime: DateTime.UtcNow.AddHours(-4), partsMade: 50, scrap: 3) { Id = 1 };
+        var shift2 = new Shift(jobId: 1, operatorId: 2, barsConsumed: 1,
+            startTime: DateTime.UtcNow.AddHours(-2), partsMade: 30, scrap: 2) { Id = 2 };
+
+        job.Shifts = new List<Shift> { shift1, shift2 };
+        order.Jobs = new List<Job> { job };
+
+        MockOrderRepository
+            .Setup(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Order> { order });
+
+        // Act
+        var result = await Service.GetDashboardAsync();
+
+        // Assert
+        Assert.Single(result.Orders);
+        var orderDto = result.Orders[0];
+        Assert.Equal(1, orderDto.OrderId);
+        Assert.Equal("WidgetA", orderDto.PartName);
+        Assert.Equal("Acme Corp", orderDto.CustomerName);
+        Assert.Equal(200, orderDto.Target);
+        Assert.Equal(80, orderDto.GoodParts);  // 50 + 30
+        Assert.Equal(5, orderDto.Scrap);        // 3 + 2
+
+        MockOrderRepository.Verify(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetDashboardAsync_WhenMoreThanSixActiveOrders_ReturnsOnlySix()
+    {
+        // Arrange
+        MockShiftRepository
+            .Setup(r => r.ListOpenWithContextAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockShiftRepository
+            .Setup(r => r.ListStartedTodayAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockJobRepository
+            .Setup(r => r.ListLateAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Job>());
+
+        var orders = new List<Order>();
+        for (int i = 1; i <= 8; i++)
+        {
+            var part = new Part($"Part{i}", $"PN-{i:D3}", TimeSpan.FromMinutes(2), 5) { Id = i };
+            var customer = new Customer($"Customer{i}", "555-0100", $"c{i}@test.com", "123 Main St") { Id = i };
+            var order = new Order(partId: i, customerId: i, partAmountRequested: 100) { Id = i };
+            order.Part = part;
+            order.Customer = customer;
+
+            var job = new Job(orderId: i, stockLotId: null, machineId: 1,
+                partAmountPlanned: 100, barAmountPlanned: 10,
+                barCycleTime: TimeSpan.FromMinutes(5),
+                estimatedPartsPerBar: 10,
+                dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(i))) { Id = i };
+            job.Shifts = new List<Shift>();
+            order.Jobs = new List<Job> { job };
+
+            orders.Add(order);
+        }
+
+        MockOrderRepository
+            .Setup(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(orders);
+
+        // Act
+        var result = await Service.GetDashboardAsync();
+
+        // Assert
+        Assert.Equal(6, result.Orders.Count);
+    }
+
+    [Fact]
+    public async Task GetDashboardAsync_OrdersAreSortedByEarliestJobDueDate()
+    {
+        // Arrange
+        MockShiftRepository
+            .Setup(r => r.ListOpenWithContextAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockShiftRepository
+            .Setup(r => r.ListStartedTodayAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockJobRepository
+            .Setup(r => r.ListLateAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Job>());
+
+        var part1 = new Part("LateWidget", "PN-001", TimeSpan.FromMinutes(2), 5) { Id = 1 };
+        var part2 = new Part("SoonWidget", "PN-002", TimeSpan.FromMinutes(2), 5) { Id = 2 };
+        var part3 = new Part("FarWidget", "PN-003", TimeSpan.FromMinutes(2), 5) { Id = 3 };
+        var customer = new Customer("Acme Corp", "555-0100", "acme@test.com", "123 Main St") { Id = 1 };
+
+        // Order 1: due in 10 days
+        var order1 = new Order(partId: 1, customerId: 1, partAmountRequested: 100) { Id = 1 };
+        order1.Part = part1;
+        order1.Customer = customer;
+        var job1 = new Job(orderId: 1, stockLotId: null, machineId: 1,
+            partAmountPlanned: 100, barAmountPlanned: 10,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10))) { Id = 1 };
+        job1.Shifts = new List<Shift>();
+        order1.Jobs = new List<Job> { job1 };
+
+        // Order 2: due in 2 days (soonest)
+        var order2 = new Order(partId: 2, customerId: 1, partAmountRequested: 100) { Id = 2 };
+        order2.Part = part2;
+        order2.Customer = customer;
+        var job2 = new Job(orderId: 2, stockLotId: null, machineId: 1,
+            partAmountPlanned: 100, barAmountPlanned: 10,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2))) { Id = 2 };
+        job2.Shifts = new List<Shift>();
+        order2.Jobs = new List<Job> { job2 };
+
+        // Order 3: due in 20 days
+        var order3 = new Order(partId: 3, customerId: 1, partAmountRequested: 100) { Id = 3 };
+        order3.Part = part3;
+        order3.Customer = customer;
+        var job3 = new Job(orderId: 3, stockLotId: null, machineId: 1,
+            partAmountPlanned: 100, barAmountPlanned: 10,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20))) { Id = 3 };
+        job3.Shifts = new List<Shift>();
+        order3.Jobs = new List<Job> { job3 };
+
+        MockOrderRepository
+            .Setup(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Order> { order1, order3, order2 }); // deliberately unsorted
+
+        // Act
+        var result = await Service.GetDashboardAsync();
+
+        // Assert: sorted by earliest job due date
+        Assert.Equal(3, result.Orders.Count);
+        Assert.Equal("SoonWidget", result.Orders[0].PartName);   // due in 2 days
+        Assert.Equal("LateWidget", result.Orders[1].PartName);   // due in 10 days
+        Assert.Equal("FarWidget", result.Orders[2].PartName);    // due in 20 days
+    }
+
+    [Fact]
+    public async Task GetDashboardAsync_WhenNoActiveOrders_ReturnsEmptyOrdersList()
+    {
+        // Arrange
+        MockShiftRepository
+            .Setup(r => r.ListOpenWithContextAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockShiftRepository
+            .Setup(r => r.ListStartedTodayAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockJobRepository
+            .Setup(r => r.ListLateAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Job>());
+
+        // MockOrderRepository default setup in constructor returns empty list
+
+        // Act
+        var result = await Service.GetDashboardAsync();
+
+        // Assert
+        Assert.Empty(result.Orders);
+        MockOrderRepository.Verify(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetDashboardAsync_FiltersOutInactivatedJobsAndShifts()
+    {
+        // Arrange
+        MockShiftRepository
+            .Setup(r => r.ListOpenWithContextAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockShiftRepository
+            .Setup(r => r.ListStartedTodayAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Shift>());
+        MockJobRepository
+            .Setup(r => r.ListLateAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Job>());
+
+        var part = new Part("WidgetA", "PN-001", TimeSpan.FromMinutes(2), 5) { Id = 1 };
+        var customer = new Customer("Acme Corp", "555-0100", "acme@test.com", "123 Main St") { Id = 1 };
+
+        var order = new Order(partId: 1, customerId: 1, partAmountRequested: 200) { Id = 1 };
+        order.Part = part;
+        order.Customer = customer;
+
+        // Active job with active and inactivated shifts
+        var activeJob = new Job(orderId: 1, stockLotId: null, machineId: 1,
+            partAmountPlanned: 200, barAmountPlanned: 20,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5))) { Id = 1 };
+
+        var activeShift = new Shift(jobId: 1, operatorId: 1, barsConsumed: 1,
+            startTime: DateTime.UtcNow.AddHours(-4), partsMade: 50, scrap: 3) { Id = 1 };
+
+        var inactivatedShift = new Shift(jobId: 1, operatorId: 2, barsConsumed: 1,
+            startTime: DateTime.UtcNow.AddHours(-6), partsMade: 100, scrap: 10) { Id = 2 };
+        inactivatedShift.Inactivate();
+
+        activeJob.Shifts = new List<Shift> { activeShift, inactivatedShift };
+
+        // Inactivated job -- should be excluded entirely
+        var inactivatedJob = new Job(orderId: 1, stockLotId: null, machineId: 2,
+            partAmountPlanned: 100, barAmountPlanned: 10,
+            barCycleTime: TimeSpan.FromMinutes(5),
+            estimatedPartsPerBar: 10,
+            dueDate: DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3))) { Id = 2 };
+        inactivatedJob.Inactivate();
+
+        var shiftOnInactivatedJob = new Shift(jobId: 2, operatorId: 3, barsConsumed: 1,
+            startTime: DateTime.UtcNow.AddHours(-3), partsMade: 75, scrap: 5) { Id = 3 };
+        inactivatedJob.Shifts = new List<Shift> { shiftOnInactivatedJob };
+
+        order.Jobs = new List<Job> { activeJob, inactivatedJob };
+
+        MockOrderRepository
+            .Setup(r => r.ListActiveWithDetailsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Order> { order });
+
+        // Act
+        var result = await Service.GetDashboardAsync();
+
+        // Assert: only active shift on active job is counted
+        Assert.Single(result.Orders);
+        var orderDto = result.Orders[0];
+        Assert.Equal(50, orderDto.GoodParts);  // only activeShift.PartsMade
+        Assert.Equal(3, orderDto.Scrap);        // only activeShift.Scrap
+    }
 }

@@ -6,4 +6,5 @@ public class SupervisorDashboardDto
     public int OperatorsActive { get; set; }
     public int LateJobs { get; set; }
     public List<SupervisorDashboardOperatorDto> Operators { get; set; } = new();
+    public List<SupervisorDashboardOrderDto> Orders { get; set; } = new();
 }

@@ -29,6 +29,26 @@
       </div>
     </div>
 
+    <!-- Order progress cards -->
+    @if (orderCards().length > 0) {
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (card of orderCards(); track card.orderId) {
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 flex flex-col items-center text-center gap-3">
+            <app-donut-ring
+              [target]="card.target"
+              [good]="card.goodParts"
+              [scrap]="card.scrap"
+              [size]="160"
+            />
+            <div class="min-w-0 w-full">
+              <p class="font-semibold text-[var(--fg)] truncate">{{ card.partName }}</p>
+              <p class="text-xs text-slate-500 truncate mt-0.5">{{ card.customerName }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
     <!-- Operator activity cards -->
     @if (operatorCards().length === 0) {
       <p class="text-sm text-slate-500">No active operators at this time.</p>
