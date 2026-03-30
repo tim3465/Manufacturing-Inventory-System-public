@@ -49,12 +49,40 @@ public partial class SupervisorDashboardService
             };
         }).ToList();
 
+        var activeOrders = await _orderRepository.ListActiveWithDetailsAsync(ct);
+
+        var orderDtos = activeOrders
+            .Where(o => o.Jobs.Any(j => !j.InactivatedDateTime.HasValue))
+            .OrderBy(o => o.Jobs
+                .Where(j => !j.InactivatedDateTime.HasValue)
+                .Min(j => j.DueDate))
+            .Take(6)
+            .Select(o =>
+            {
+                var activeJobs = o.Jobs.Where(j => !j.InactivatedDateTime.HasValue).ToList();
+                var activeShifts = activeJobs
+                    .SelectMany(j => j.Shifts.Where(s => !s.InactivatedDateTime.HasValue))
+                    .ToList();
+
+                return new SupervisorDashboardOrderDto
+                {
+                    OrderId = o.Id,
+                    PartName = o.Part.PartName,
+                    CustomerName = o.Customer.CompanyName,
+                    Target = o.PartAmountRequested,
+                    GoodParts = activeShifts.Sum(s => s.PartsMade),
+                    Scrap = activeShifts.Sum(s => s.Scrap)
+                };
+            })
+            .ToList();
+
         return new SupervisorDashboardDto
         {
             MachinesRunning = machinesRunning,
             OperatorsActive = operatorsActive,
             LateJobs = lateJobs.Count,
-            Operators = operators
+            Operators = operators,
+            Orders = orderDtos
         };
     }
 }

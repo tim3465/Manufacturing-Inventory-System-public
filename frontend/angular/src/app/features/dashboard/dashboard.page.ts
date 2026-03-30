@@ -5,6 +5,7 @@ import { SupervisorDashboardApi } from '../../core/api/supervisor-dashboard.api'
 import { SupervisorDashboardActiveJobDto } from '../../core/dtos/supervisor-dashboard/supervisor-dashboard-active-job.dto';
 import { SupervisorDashboardDto } from '../../core/dtos/supervisor-dashboard/supervisor-dashboard.dto';
 import { ToastService } from '../../core/ui/toast/toast.service';
+import { DonutRingComponent } from '../../core/ui/donut-ring/donut-ring.component';
 
 interface OperatorCard {
   operatorId: number;
@@ -16,10 +17,19 @@ interface OperatorCard {
   scrapPercentage: string;
 }
 
+interface OrderCard {
+  orderId: number;
+  partName: string;
+  customerName: string;
+  target: number;
+  goodParts: number;
+  scrap: number;
+}
+
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DonutRingComponent],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.css'
 })
@@ -32,6 +42,19 @@ export class DashboardPageComponent implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly dashboard = signal<SupervisorDashboardDto | null>(null);
+
+  protected readonly orderCards = computed<OrderCard[]>(() => {
+    const data = this.dashboard();
+    if (!data?.orders) return [];
+    return data.orders.map((o) => ({
+      orderId: o.orderId,
+      partName: o.partName,
+      customerName: o.customerName,
+      target: o.target,
+      goodParts: o.goodParts,
+      scrap: o.scrap
+    }));
+  });
 
   protected readonly operatorCards = computed<OperatorCard[]>(() => {
     const data = this.dashboard();
