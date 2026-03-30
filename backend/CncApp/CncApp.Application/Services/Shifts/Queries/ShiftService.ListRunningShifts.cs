@@ -10,9 +10,11 @@ public partial class ShiftService
 
         return shifts.Select(shift =>
         {
-            var closedSiblings = shift.Job.Shifts
-                .Where(s => !s.InactivatedDateTime.HasValue && s.StopTime != null)
+            var jobShifts = shift.Job.Shifts
+                .Where(s => !s.InactivatedDateTime.HasValue)
                 .ToList();
+
+            var currentAlreadyIncluded = jobShifts.Any(s => s.Id == shift.Id);
 
             return new RunningShiftDto
             {
@@ -22,9 +24,9 @@ public partial class ShiftService
                 MachineSerialNumber = shift.Job.Machine?.SerialNumber ?? string.Empty,
                 PartName = shift.Job.Order?.Part?.PartName ?? string.Empty,
                 PartNumber = shift.Job.Order?.Part?.PartNumber ?? string.Empty,
-                JobTotalPartsMade = closedSiblings.Sum(s => s.PartsMade),
-                JobTotalScrap = closedSiblings.Sum(s => s.Scrap),
-                JobTotalBarsConsumed = closedSiblings.Sum(s => s.BarsConsumed),
+                JobTotalPartsMade = jobShifts.Sum(s => s.PartsMade) + (currentAlreadyIncluded ? 0 : shift.PartsMade),
+                JobTotalScrap = jobShifts.Sum(s => s.Scrap) + (currentAlreadyIncluded ? 0 : shift.Scrap),
+                JobTotalBarsConsumed = jobShifts.Sum(s => s.BarsConsumed) + (currentAlreadyIncluded ? 0 : shift.BarsConsumed),
                 StartTime = shift.StartTime,
                 StopTime = shift.StopTime,
                 PartsMade = shift.PartsMade,

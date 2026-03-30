@@ -4,6 +4,7 @@ using CncApp.Application.Services.Jobs;
 using CncApp.Application.Services.Materials;
 using CncApp.Application.Services.Orders;
 using CncApp.Application.Services.Parts;
+using CncApp.Application.Services.ShiftIssueLogs;
 using CncApp.Application.Services.Shifts;
 using CncApp.Application.Services.StockLotAdjustments;
 using CncApp.Application.Services.StockLots;
@@ -30,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<PartService>();
         services.AddScoped<OrderService>();
         services.AddScoped<ShiftService>();
+        services.AddScoped<ShiftIssueLogService>();
         services.AddScoped<CustomerService>();
 
         // Register Workflow Services

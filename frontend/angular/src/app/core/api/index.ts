@@ -6,6 +6,7 @@ export * from './materials.api';
 export * from './order-planning.api';
 export * from './orders.api';
 export * from './parts.api';
+export * from './shift-issue-logs.api';
 export * from './shifts.api';
 export * from './shipping-receiving.api';
 export * from './stock-lot-adjustments.api';
