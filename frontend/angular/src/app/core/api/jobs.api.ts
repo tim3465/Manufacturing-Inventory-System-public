@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { JobProductionDto } from '../dtos/jobs/job-production.dto';
+import { JobProductionSearchRequestDto } from '../dtos/jobs/job-production-search-request.dto';
+import { JobProductionSearchResultDto } from '../dtos/jobs/job-production-search-result.dto';
 import { JobShiftDto } from '../dtos/jobs/job-shift.dto';
 import { MyJobListItemDto } from '../dtos/jobs/my-job.dto';
 import { MyJobSearchRequestDto } from '../dtos/jobs/my-job-search-request.dto';
@@ -24,6 +26,11 @@ export class JobsApi {
   /** GET /api/jobs/production - active jobs with shifts (Supervisor/Admin) */
   listProduction(): Observable<JobProductionDto[]> {
     return this.api.get<JobProductionDto[]>(`${_PATH}/production`);
+  }
+
+  /** GET /api/jobs/production/search - paginated/filtered/sorted production jobs (Supervisor/Admin) */
+  searchProduction(request: JobProductionSearchRequestDto): Observable<JobProductionSearchResultDto> {
+    return this.api.get<JobProductionSearchResultDto>(`${_PATH}/production/search`, request as unknown as Record<string, string | number | boolean | null | undefined>);
   }
 
   /** POST /api/jobs/{id}/start - activate a job and pull bars from inventory */

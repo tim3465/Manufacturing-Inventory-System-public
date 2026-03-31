@@ -116,6 +116,16 @@ public class JobsController : ControllerBase
         return Ok(jobs);
     }
 
+    [HttpGet("production/search")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(JobProductionSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<JobProductionSearchResultDto>> SearchProductionAsync(
+        [FromQuery] JobProductionSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _jobService.SearchProductionAsync(request, ct);
+        return Ok(result);
+    }
+
     [HttpPost("{id:int}/start")]
     [Authorize(Roles = "Machinist,Admin")]
     [ProducesResponseType(typeof(StartJobResponseDto), StatusCodes.Status201Created)]

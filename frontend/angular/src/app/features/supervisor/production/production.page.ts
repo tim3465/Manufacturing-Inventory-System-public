@@ -10,6 +10,8 @@ import { ShiftsApi } from '../../../core/api/shifts.api';
 import { OrderProductionSearchRequestDto } from '../../../core/dtos/orders/order-production-search-request.dto';
 import { OrderProductionSearchResultDto } from '../../../core/dtos/orders/order-production-search-result.dto';
 import { JobProductionDto } from '../../../core/dtos/jobs/job-production.dto';
+import { JobProductionSearchRequestDto } from '../../../core/dtos/jobs/job-production-search-request.dto';
+import { JobProductionSearchResultDto } from '../../../core/dtos/jobs/job-production-search-result.dto';
 import { PartSearchRequestDto } from '../../../core/dtos/parts/part-search-request.dto';
 import { PartSearchResultDto } from '../../../core/dtos/parts/part-search-result.dto';
 import { ShiftDto } from '../../../core/dtos/shifts/shift.dto';
@@ -90,11 +92,46 @@ export class ProductionPageComponent implements OnInit {
   protected readonly orderJobsMap = signal<Map<number, JobProductionDto[]>>(new Map());
   protected readonly loadingOrderJobs = signal<Set<number>>(new Set());
 
-  // ─── Jobs tab ──────────────────────────────────────────────────────────────
-  protected readonly loadingJobs = signal(false);
-  protected readonly loadingShifts = signal(false);
+  // ─── Jobs tab — smart table state ─────────────────────────────────────────
+  protected readonly jobsTable = new SmartTableState({
+    defaultSortColumn: 'DueDate',
+    defaultSortDirection: 'asc',
+    pageSize: 10
+  });
 
-  protected readonly jobs = signal<JobProductionDto[]>([]);
+  protected readonly jobsFilterForm = this.fb.nonNullable.group({
+    dueDateFrom: [''],
+    dueDateTo: [''],
+    orderNumber: [''],
+    partName: [''],
+    partNumber: [''],
+    machineName: [''],
+    lotNumber: ['']
+  });
+
+  private readonly jobsSearchResult = signal<JobProductionSearchResultDto | null>(null);
+
+  protected readonly jobRows = computed<JobProductionRow[]>(() =>
+    (this.jobsSearchResult()?.items ?? []).map((j) => ({
+      id: j.id,
+      orderId: j.orderId,
+      dueDate: j.dueDate,
+      partName: j.partName,
+      partNumber: j.partNumber,
+      machineName: j.machineName,
+      partAmountPlanned: j.partAmountPlanned,
+      partsCompleted: j.partsCompleted,
+      percentComplete: j.percentComplete,
+      expanded: false,
+      shifts: j.shifts,
+      stockLotId: j.stockLotId,
+      lotNumber: j.lotNumber
+    }))
+  );
+  protected readonly jobsTotalCount = computed(() => this.jobsSearchResult()?.totalCount ?? 0);
+  protected readonly jobsTotalPages = computed(() => Math.ceil(this.jobsTotalCount() / this.jobsTable.pageSize()) || 1);
+
+  protected readonly loadingShifts = signal(false);
   protected readonly shifts = signal<ShiftDto[]>([]);
 
   // ─── Parts tab — smart table state ────────────────────────────────────────
@@ -120,27 +157,6 @@ export class ProductionPageComponent implements OnInit {
   protected readonly isAddPartOpen = signal(false);
   protected readonly selectedJobForLot = signal<JobProductionRow | null>(null);
 
-  protected readonly jobRows = computed<JobProductionRow[]>(() =>
-    this.jobs()
-      .slice()
-      .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
-      .map((j) => ({
-        id: j.id,
-        orderId: j.orderId,
-        dueDate: j.dueDate,
-        partName: j.partName,
-        partNumber: j.partNumber,
-        machineName: j.machineName,
-        partAmountPlanned: j.partAmountPlanned,
-        partsCompleted: j.partsCompleted,
-        percentComplete: j.percentComplete,
-        expanded: false,
-        shifts: j.shifts,
-        stockLotId: j.stockLotId,
-        lotNumber: j.lotNumber
-      }))
-  );
-
   // Mutable copy of job rows so we can toggle expansion
   protected expandedJobIds = signal<Set<number>>(new Set());
 
@@ -162,6 +178,27 @@ export class ProductionPageComponent implements OnInit {
       untracked(() => {
         if (this.selectedTab() === 'orders') {
           this.executeOrdersSearch();
+        }
+      });
+    });
+
+    // Jobs filter form changes → reset page + search (only when jobs tab is active)
+    this.jobsFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      if (this.selectedTab() !== 'jobs') return;
+      this.jobsTable.resetPage();
+      this.executeJobsSearch();
+    });
+
+    // Jobs sort, page, and page-size changes → search (guard: only when jobs tab active)
+    effect(() => {
+      this.jobsTable.sortColumn();
+      this.jobsTable.sortDirection();
+      this.jobsTable.currentPage();
+      this.jobsTable.pageSize();
+
+      untracked(() => {
+        if (this.selectedTab() === 'jobs') {
+          this.executeJobsSearch();
         }
       });
     });
@@ -197,8 +234,8 @@ export class ProductionPageComponent implements OnInit {
     if (tab === 'orders' && !this.ordersTable.loading()) {
       this.executeOrdersSearch();
     }
-    if (tab === 'jobs' && this.jobs().length === 0 && !this.loadingJobs()) {
-      this.loadJobs();
+    if (tab === 'jobs' && !this.jobsTable.loading()) {
+      this.executeJobsSearch();
     }
     if (tab === 'parts' && !this.partsTable.loading()) {
       this.executePartsSearch();
@@ -248,16 +285,54 @@ export class ProductionPageComponent implements OnInit {
     });
   }
 
-  protected loadJobs(): void {
-    this.loadingJobs.set(true);
-    this.jobsApi.listProduction().subscribe({
-      next: (data) => {
-        this.jobs.set(data);
-        this.loadingJobs.set(false);
+  protected executeJobsSearch(): void {
+    this.jobsTable.loading.set(true);
+    this.jobsTable.error.set(null);
+
+    // Collapse all expanded rows on each search
+    this.expandedJobIds.set(new Set());
+
+    const f = this.jobsFilterForm.getRawValue();
+
+    const request: JobProductionSearchRequestDto = {
+      sortColumn: this.jobsTable.sortColumn(),
+      sortDirection: this.jobsTable.sortDirection(),
+      page: this.jobsTable.currentPage(),
+      pageSize: this.jobsTable.pageSize()
+    };
+
+    if (f.dueDateFrom?.trim()) {
+      request.dueDateFrom = f.dueDateFrom.trim();
+    }
+    if (f.dueDateTo?.trim()) {
+      request.dueDateTo = f.dueDateTo.trim();
+    }
+    if (f.orderNumber?.trim()) {
+      request.orderNumber = f.orderNumber.trim();
+    }
+    if (f.partName?.trim()) {
+      request.partName = f.partName.trim();
+    }
+    if (f.partNumber?.trim()) {
+      request.partNumber = f.partNumber.trim();
+    }
+    if (f.machineName?.trim()) {
+      request.machineName = f.machineName.trim();
+    }
+    if (f.lotNumber?.trim()) {
+      request.lotNumber = f.lotNumber.trim();
+    }
+
+    this.jobsApi.searchProduction(request).subscribe({
+      next: (result) => {
+        this.jobsSearchResult.set(result);
+        this.jobsTable.loading.set(false);
       },
       error: () => {
-        this.toast.error('Failed to load jobs');
-        this.loadingJobs.set(false);
+        const message = 'Failed to load jobs';
+        this.jobsTable.error.set(message);
+        this.toast.error(message);
+        this.jobsTable.loading.set(false);
       }
     });
   }
@@ -399,7 +474,7 @@ export class ProductionPageComponent implements OnInit {
 
   protected onLotAssigned(): void {
     this.selectedJobForLot.set(null);
-    this.loadJobs();
+    this.executeJobsSearch();
   }
 
   protected formatStopTime(stopTime: string | null): string {
