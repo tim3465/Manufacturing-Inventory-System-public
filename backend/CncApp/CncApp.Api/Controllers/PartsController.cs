@@ -38,6 +38,22 @@ public class PartsController : ControllerBase
     }
 
     /// <summary>
+    /// Searches active parts with optional filtering by part name and part number, with paging and sorting.
+    /// </summary>
+    /// <param name="request">Search request with optional filters, sort, and paging parameters.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Paged list of matching active parts.</returns>
+    [HttpGet("search")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(PartSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PartSearchResultDto>> SearchActiveAsync(
+        [FromQuery] PartSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _partService.SearchActiveAsync(request, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gets a part by ID.
     /// </summary>
     /// <param name="id">The part ID.</param>

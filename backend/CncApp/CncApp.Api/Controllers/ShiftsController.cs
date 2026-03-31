@@ -162,6 +162,17 @@ public class ShiftsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("my-logs/search")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(ShiftLogSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ShiftLogSearchResultDto>> SearchMyLogs(
+        [FromQuery] ShiftLogSearchRequestDto request, CancellationToken ct = default)
+    {
+        var user = await _userService.GetCurrentUserAsync(ct);
+        var result = await _shiftService.SearchShiftLogsAsync(user.Id, request, ct);
+        return Ok(result);
+    }
+
     [HttpGet("my-logs")]
     [Authorize(Roles = "Machinist,Admin")]
     [ProducesResponseType(typeof(List<ShiftLogDto>), StatusCodes.Status200OK)]

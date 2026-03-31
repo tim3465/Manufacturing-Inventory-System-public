@@ -1,15 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { debounceTime } from 'rxjs/operators';
 import { JobsApi } from '../../../core/api/jobs.api';
 import { OrdersApi } from '../../../core/api/orders.api';
 import { PartsApi } from '../../../core/api/parts.api';
 import { ShiftsApi } from '../../../core/api/shifts.api';
 import { JobProductionDto } from '../../../core/dtos/jobs/job-production.dto';
 import { OrderProductionDto } from '../../../core/dtos/orders/order-production.dto';
-import { PartDto } from '../../../core/dtos/parts/part.dto';
+import { PartSearchRequestDto } from '../../../core/dtos/parts/part-search-request.dto';
+import { PartSearchResultDto } from '../../../core/dtos/parts/part-search-result.dto';
 import { ShiftDto } from '../../../core/dtos/shifts/shift.dto';
 import { ToastService } from '../../../core/ui/toast/toast.service';
+import { PagerComponent, SmartTableState } from '../../../core/ui/smart-table';
 import { AddPartModalComponent } from './add-part-modal/add-part-modal.component';
 import { AssignStockLotModalComponent } from './assign-stock-lot-modal/assign-stock-lot-modal.component';
 
@@ -39,7 +43,7 @@ export interface JobProductionRow {
 @Component({
   selector: 'app-production-page',
   standalone: true,
-  imports: [CommonModule, AddPartModalComponent, AssignStockLotModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, PagerComponent, AddPartModalComponent, AssignStockLotModalComponent],
   templateUrl: './production.page.html',
   styleUrl: './production.page.css'
 })
@@ -50,6 +54,7 @@ export class ProductionPageComponent implements OnInit {
   private readonly shiftsApi = inject(ShiftsApi);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
   protected readonly selectedTab = signal<Tab>('orders');
 
@@ -62,13 +67,31 @@ export class ProductionPageComponent implements OnInit {
 
   protected readonly loadingOrders = signal(true);
   protected readonly loadingJobs = signal(false);
-  protected readonly loadingParts = signal(false);
   protected readonly loadingShifts = signal(false);
 
   protected readonly orders = signal<OrderProductionDto[]>([]);
   protected readonly jobs = signal<JobProductionDto[]>([]);
-  protected readonly parts = signal<PartDto[]>([]);
   protected readonly shifts = signal<ShiftDto[]>([]);
+
+  // Parts tab — smart table state
+  protected readonly partsTable = new SmartTableState({
+    defaultSortColumn: 'PartName',
+    defaultSortDirection: 'asc',
+    pageSize: 10
+  });
+
+  protected readonly pageSizes = [5, 10, 25, 100];
+
+  protected readonly partsFilterForm = this.fb.nonNullable.group({
+    partName: [''],
+    partNumber: ['']
+  });
+
+  private readonly partsSearchResult = signal<PartSearchResultDto | null>(null);
+
+  protected readonly partRows = computed(() => this.partsSearchResult()?.items ?? []);
+  protected readonly partsTotalCount = computed(() => this.partsSearchResult()?.totalCount ?? 0);
+  protected readonly partsTotalPages = computed(() => Math.ceil(this.partsTotalCount() / this.partsTable.pageSize()) || 1);
 
   protected readonly isAddPartOpen = signal(false);
   protected readonly selectedJobForLot = signal<JobProductionRow | null>(null);
@@ -102,6 +125,29 @@ export class ProductionPageComponent implements OnInit {
   // Mutable copy of job rows so we can toggle expansion
   protected expandedJobIds = signal<Set<number>>(new Set());
 
+  constructor() {
+    // Parts filter form changes → reset page + search (only when parts tab is active)
+    this.partsFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      if (this.selectedTab() !== 'parts') return;
+      this.partsTable.resetPage();
+      this.executePartsSearch();
+    });
+
+    // Sort, page, and page-size changes → search (guard: only when parts tab active)
+    effect(() => {
+      this.partsTable.sortColumn();
+      this.partsTable.sortDirection();
+      this.partsTable.currentPage();
+      this.partsTable.pageSize();
+
+      untracked(() => {
+        if (this.selectedTab() === 'parts') {
+          this.executePartsSearch();
+        }
+      });
+    });
+  }
+
   ngOnInit(): void {
     this.loadOrders();
   }
@@ -111,8 +157,8 @@ export class ProductionPageComponent implements OnInit {
     if (tab === 'jobs' && this.jobs().length === 0 && !this.loadingJobs()) {
       this.loadJobs();
     }
-    if (tab === 'parts' && this.parts().length === 0 && !this.loadingParts()) {
-      this.loadParts();
+    if (tab === 'parts' && !this.partsTable.loading()) {
+      this.executePartsSearch();
     }
     if (tab === 'shifts' && this.shifts().length === 0 && !this.loadingShifts()) {
       this.loadShifts();
@@ -147,16 +193,36 @@ export class ProductionPageComponent implements OnInit {
     });
   }
 
-  protected loadParts(): void {
-    this.loadingParts.set(true);
-    this.partsApi.listActive().subscribe({
-      next: (data) => {
-        this.parts.set(data);
-        this.loadingParts.set(false);
+  protected executePartsSearch(): void {
+    this.partsTable.loading.set(true);
+    this.partsTable.error.set(null);
+
+    const f = this.partsFilterForm.getRawValue();
+
+    const request: PartSearchRequestDto = {
+      sortColumn: this.partsTable.sortColumn(),
+      sortDirection: this.partsTable.sortDirection(),
+      page: this.partsTable.currentPage(),
+      pageSize: this.partsTable.pageSize()
+    };
+
+    if (f.partName?.trim()) {
+      request.partName = f.partName.trim();
+    }
+    if (f.partNumber?.trim()) {
+      request.partNumber = f.partNumber.trim();
+    }
+
+    this.partsApi.search(request).subscribe({
+      next: (result) => {
+        this.partsSearchResult.set(result);
+        this.partsTable.loading.set(false);
       },
       error: () => {
-        this.toast.error('Failed to load parts');
-        this.loadingParts.set(false);
+        const message = 'Failed to load parts';
+        this.partsTable.error.set(message);
+        this.toast.error(message);
+        this.partsTable.loading.set(false);
       }
     });
   }
@@ -255,8 +321,7 @@ export class ProductionPageComponent implements OnInit {
   }
 
   protected onPartCreated(): void {
-    this.parts.set([]);
-    this.loadParts();
+    this.executePartsSearch();
   }
 
   protected openAssignLotModal(job: JobProductionRow): void {
