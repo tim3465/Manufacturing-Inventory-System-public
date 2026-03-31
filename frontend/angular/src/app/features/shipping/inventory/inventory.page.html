@@ -16,13 +16,9 @@
 
   <!-- Table -->
   <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-    <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
-      Active stock lots
-    </div>
-
     <table class="min-w-full text-sm">
       <thead class="text-left text-slate-500 border-b border-[var(--border)]">
-        <tr class="bg-[var(--bg)]">
+        <tr class="bg-[var(--surface)]">
           <th
             class="px-4 py-3 font-medium cursor-pointer select-none"
             (click)="table.onSortColumn('LotNumber')"
@@ -43,13 +39,13 @@
           >Checked in{{ table.sortIndicator('CheckedInDateTime') }}</th>
           <th class="px-4 py-3 font-medium"></th>
         </tr>
-        <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--bg)]">
+        <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
           <th class="px-4 py-2 font-normal">
             <input
               formControlName="lotNumber"
               type="text"
               placeholder="Search..."
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)]"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
             />
           </th>
           <th class="px-4 py-2 font-normal"></th>
@@ -59,14 +55,14 @@
               type="number"
               step="any"
               placeholder="e.g. 2.5"
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)] text-right"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)] text-right"
             />
           </th>
           <th class="px-4 py-2 font-normal"></th>
           <th class="px-4 py-2 font-normal">
             <select
               formControlName="condition"
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
             >
               <option value="">All</option>
               @for (c of conditions; track c) {
@@ -79,13 +75,13 @@
               <input
                 formControlName="checkedInFrom"
                 type="date"
-                class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
               />
               <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
               <input
                 formControlName="checkedInTo"
                 type="date"
-                class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
               />
             </div>
           </th>
@@ -101,7 +97,7 @@
           <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">No stock lots found.</td></tr>
         } @else {
           @for (lot of rows(); track lot.id) {
-            <tr class="bg-[var(--bg)]">
+            <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors">
               <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ lot.lotNumber }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.amountOfBars }}</td>
               <td class="px-4 py-3 text-right text-[var(--fg)]">{{ lot.diameter }}</td>
