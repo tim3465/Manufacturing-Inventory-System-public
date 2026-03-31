@@ -159,6 +159,17 @@ public class JobsController : ControllerBase
         return Ok(jobs);
     }
 
+    [HttpGet("my-jobs/search")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(MyJobSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyJobSearchResultDto>> SearchMyJobsAsync(
+        [FromQuery] MyJobSearchRequestDto request, CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var result = await _jobService.SearchMyJobsAsync(operator_.Id, request, ct);
+        return Ok(result);
+    }
+
     [HttpGet("my-jobs/{jobId:int}/shifts")]
     [Authorize(Roles = "Machinist,Admin")]
     [ProducesResponseType(typeof(List<JobShiftDto>), StatusCodes.Status200OK)]

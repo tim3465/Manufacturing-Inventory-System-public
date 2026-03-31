@@ -5,6 +5,8 @@ import { tap } from 'rxjs/operators';
 import { JobProductionDto } from '../dtos/jobs/job-production.dto';
 import { JobShiftDto } from '../dtos/jobs/job-shift.dto';
 import { MyJobListItemDto } from '../dtos/jobs/my-job.dto';
+import { MyJobSearchRequestDto } from '../dtos/jobs/my-job-search-request.dto';
+import { MyJobSearchResultDto } from '../dtos/jobs/my-job-search-result.dto';
 import { ApiClient } from './api-client.service';
 
 const _PATH = '/jobs';
@@ -51,5 +53,10 @@ export class JobsApi {
   /** GET /api/jobs/my-jobs/{jobId}/shifts - shifts for a specific job (Machinist/Admin) */
   getMyJobShifts(jobId: number): Observable<JobShiftDto[]> {
     return this.api.get<JobShiftDto[]>(`${_PATH}/my-jobs/${jobId}/shifts`);
+  }
+
+  /** GET /api/jobs/my-jobs/search - paginated/filtered/sorted my jobs (Machinist/Admin) */
+  searchMyJobs(request: MyJobSearchRequestDto): Observable<MyJobSearchResultDto> {
+    return this.api.get<MyJobSearchResultDto>(`${_PATH}/my-jobs/search`, request as unknown as Record<string, string | number | boolean | null | undefined>);
   }
 }
