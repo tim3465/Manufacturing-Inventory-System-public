@@ -7,8 +7,9 @@ import { JobsApi } from '../../../core/api/jobs.api';
 import { OrdersApi } from '../../../core/api/orders.api';
 import { PartsApi } from '../../../core/api/parts.api';
 import { ShiftsApi } from '../../../core/api/shifts.api';
+import { OrderProductionSearchRequestDto } from '../../../core/dtos/orders/order-production-search-request.dto';
+import { OrderProductionSearchResultDto } from '../../../core/dtos/orders/order-production-search-result.dto';
 import { JobProductionDto } from '../../../core/dtos/jobs/job-production.dto';
-import { OrderProductionDto } from '../../../core/dtos/orders/order-production.dto';
 import { PartSearchRequestDto } from '../../../core/dtos/parts/part-search-request.dto';
 import { PartSearchResultDto } from '../../../core/dtos/parts/part-search-result.dto';
 import { ShiftDto } from '../../../core/dtos/shifts/shift.dto';
@@ -65,15 +66,38 @@ export class ProductionPageComponent implements OnInit {
     { id: 'shifts', label: 'Shifts' }
   ];
 
-  protected readonly loadingOrders = signal(true);
+  // ─── Orders tab — smart table state ────────────────────────────────────────
+  protected readonly ordersTable = new SmartTableState({
+    defaultSortColumn: 'CustomerName',
+    defaultSortDirection: 'asc',
+    pageSize: 10
+  });
+
+  protected readonly ordersFilterForm = this.fb.nonNullable.group({
+    customerName: [''],
+    partName: [''],
+    partNumber: ['']
+  });
+
+  private readonly ordersSearchResult = signal<OrderProductionSearchResultDto | null>(null);
+
+  protected readonly orderRows = computed(() => this.ordersSearchResult()?.items ?? []);
+  protected readonly ordersTotalCount = computed(() => this.ordersSearchResult()?.totalCount ?? 0);
+  protected readonly ordersTotalPages = computed(() => Math.ceil(this.ordersTotalCount() / this.ordersTable.pageSize()) || 1);
+
+  // Order expansion state (preserved from original)
+  protected readonly expandedOrderIds = signal<Set<number>>(new Set());
+  protected readonly orderJobsMap = signal<Map<number, JobProductionDto[]>>(new Map());
+  protected readonly loadingOrderJobs = signal<Set<number>>(new Set());
+
+  // ─── Jobs tab ──────────────────────────────────────────────────────────────
   protected readonly loadingJobs = signal(false);
   protected readonly loadingShifts = signal(false);
 
-  protected readonly orders = signal<OrderProductionDto[]>([]);
   protected readonly jobs = signal<JobProductionDto[]>([]);
   protected readonly shifts = signal<ShiftDto[]>([]);
 
-  // Parts tab — smart table state
+  // ─── Parts tab — smart table state ────────────────────────────────────────
   protected readonly partsTable = new SmartTableState({
     defaultSortColumn: 'PartName',
     defaultSortDirection: 'asc',
@@ -95,11 +119,6 @@ export class ProductionPageComponent implements OnInit {
 
   protected readonly isAddPartOpen = signal(false);
   protected readonly selectedJobForLot = signal<JobProductionRow | null>(null);
-
-  // Order expansion state
-  protected readonly expandedOrderIds = signal<Set<number>>(new Set());
-  protected readonly orderJobsMap = signal<Map<number, JobProductionDto[]>>(new Map());
-  protected readonly loadingOrderJobs = signal<Set<number>>(new Set());
 
   protected readonly jobRows = computed<JobProductionRow[]>(() =>
     this.jobs()
@@ -126,6 +145,27 @@ export class ProductionPageComponent implements OnInit {
   protected expandedJobIds = signal<Set<number>>(new Set());
 
   constructor() {
+    // Orders filter form changes → reset page + search (only when orders tab is active)
+    this.ordersFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      if (this.selectedTab() !== 'orders') return;
+      this.ordersTable.resetPage();
+      this.executeOrdersSearch();
+    });
+
+    // Orders sort, page, and page-size changes → search (guard: only when orders tab active)
+    effect(() => {
+      this.ordersTable.sortColumn();
+      this.ordersTable.sortDirection();
+      this.ordersTable.currentPage();
+      this.ordersTable.pageSize();
+
+      untracked(() => {
+        if (this.selectedTab() === 'orders') {
+          this.executeOrdersSearch();
+        }
+      });
+    });
+
     // Parts filter form changes → reset page + search (only when parts tab is active)
     this.partsFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
       if (this.selectedTab() !== 'parts') return;
@@ -149,11 +189,14 @@ export class ProductionPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.executeOrdersSearch();
   }
 
   protected selectTab(tab: Tab): void {
     this.selectedTab.set(tab);
+    if (tab === 'orders' && !this.ordersTable.loading()) {
+      this.executeOrdersSearch();
+    }
     if (tab === 'jobs' && this.jobs().length === 0 && !this.loadingJobs()) {
       this.loadJobs();
     }
@@ -165,16 +208,42 @@ export class ProductionPageComponent implements OnInit {
     }
   }
 
-  protected loadOrders(): void {
-    this.loadingOrders.set(true);
-    this.ordersApi.listProduction().subscribe({
-      next: (data) => {
-        this.orders.set(data);
-        this.loadingOrders.set(false);
+  protected executeOrdersSearch(): void {
+    this.ordersTable.loading.set(true);
+    this.ordersTable.error.set(null);
+
+    // Collapse all expanded rows on each search
+    this.expandedOrderIds.set(new Set());
+
+    const f = this.ordersFilterForm.getRawValue();
+
+    const request: OrderProductionSearchRequestDto = {
+      sortColumn: this.ordersTable.sortColumn(),
+      sortDirection: this.ordersTable.sortDirection(),
+      page: this.ordersTable.currentPage(),
+      pageSize: this.ordersTable.pageSize()
+    };
+
+    if (f.customerName?.trim()) {
+      request.customerName = f.customerName.trim();
+    }
+    if (f.partName?.trim()) {
+      request.partName = f.partName.trim();
+    }
+    if (f.partNumber?.trim()) {
+      request.partNumber = f.partNumber.trim();
+    }
+
+    this.ordersApi.searchProduction(request).subscribe({
+      next: (result) => {
+        this.ordersSearchResult.set(result);
+        this.ordersTable.loading.set(false);
       },
       error: () => {
-        this.toast.error('Failed to load orders');
-        this.loadingOrders.set(false);
+        const message = 'Failed to load orders';
+        this.ordersTable.error.set(message);
+        this.toast.error(message);
+        this.ordersTable.loading.set(false);
       }
     });
   }

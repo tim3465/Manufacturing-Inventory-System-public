@@ -118,6 +118,19 @@ public class OrdersController : ControllerBase
     }
 
     /// <summary>
+    /// Searches active orders with production detail using optional filters and server-side paging.
+    /// </summary>
+    [HttpGet("production/search")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(OrderProductionSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<OrderProductionSearchResultDto>> SearchProductionAsync(
+        [FromQuery] OrderProductionSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _orderService.SearchProductionAsync(request, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gets all active orders with production detail (customer, part, computed completion).
     /// </summary>
     [HttpGet("production")]
