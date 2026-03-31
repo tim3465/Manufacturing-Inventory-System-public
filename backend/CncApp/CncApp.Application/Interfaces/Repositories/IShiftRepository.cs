@@ -14,6 +14,7 @@ public interface IShiftRepository
     Task<List<Shift>> ListRunningByOperatorAsync(int operatorId, CancellationToken ct = default);
     Task<List<Shift>> ListClosedByOperatorAsync(int operatorId, CancellationToken ct = default);
     Task<(List<Shift> Items, int TotalCount)> SearchByOperatorAsync(int operatorId, ShiftLogSearchRequestDto request, CancellationToken ct = default);
+    Task<(List<Shift> Items, int TotalCount)> SearchProductionAsync(ShiftProductionSearchRequestDto request, CancellationToken ct = default);
     Task<List<Shift>> ListOpenWithContextAsync(CancellationToken ct = default);
     Task<List<Shift>> ListStartedTodayAsync(DateOnly today, CancellationToken ct = default);
     Task AddAsync(Shift shift, CancellationToken ct = default);

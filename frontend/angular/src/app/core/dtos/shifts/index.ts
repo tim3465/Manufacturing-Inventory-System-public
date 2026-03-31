@@ -3,5 +3,7 @@ export * from './shift.dto';
 export * from './shift-log.dto';
 export * from './shift-log-search-request.dto';
 export * from './shift-log-search-result.dto';
+export * from './shift-production-search-request.dto';
+export * from './shift-production-search-result.dto';
 export * from './start-shift-request.dto';
 export * from './update-shift-request.dto';

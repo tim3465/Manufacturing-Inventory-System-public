@@ -15,6 +15,8 @@ import { JobProductionSearchResultDto } from '../../../core/dtos/jobs/job-produc
 import { PartSearchRequestDto } from '../../../core/dtos/parts/part-search-request.dto';
 import { PartSearchResultDto } from '../../../core/dtos/parts/part-search-result.dto';
 import { ShiftDto } from '../../../core/dtos/shifts/shift.dto';
+import { ShiftProductionSearchRequestDto } from '../../../core/dtos/shifts/shift-production-search-request.dto';
+import { ShiftProductionSearchResultDto } from '../../../core/dtos/shifts/shift-production-search-result.dto';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 import { PagerComponent, SmartTableState } from '../../../core/ui/smart-table';
 import { AddPartModalComponent } from './add-part-modal/add-part-modal.component';
@@ -131,8 +133,27 @@ export class ProductionPageComponent implements OnInit {
   protected readonly jobsTotalCount = computed(() => this.jobsSearchResult()?.totalCount ?? 0);
   protected readonly jobsTotalPages = computed(() => Math.ceil(this.jobsTotalCount() / this.jobsTable.pageSize()) || 1);
 
-  protected readonly loadingShifts = signal(false);
-  protected readonly shifts = signal<ShiftDto[]>([]);
+  // ─── Shifts tab — smart table state ───────────────────────────────────────
+  protected readonly shiftsTable = new SmartTableState({
+    defaultSortColumn: 'StartTime',
+    defaultSortDirection: 'desc',
+    pageSize: 10
+  });
+
+  protected readonly shiftsFilterForm = this.fb.nonNullable.group({
+    operatorName: [''],
+    jobNumber: [''],
+    startTimeFrom: [''],
+    startTimeTo: [''],
+    stopTimeFrom: [''],
+    stopTimeTo: ['']
+  });
+
+  private readonly shiftsSearchResult = signal<ShiftProductionSearchResultDto | null>(null);
+
+  protected readonly shiftRows = computed(() => this.shiftsSearchResult()?.items ?? []);
+  protected readonly shiftsTotalCount = computed(() => this.shiftsSearchResult()?.totalCount ?? 0);
+  protected readonly shiftsTotalPages = computed(() => Math.ceil(this.shiftsTotalCount() / this.shiftsTable.pageSize()) || 1);
 
   // ─── Parts tab — smart table state ────────────────────────────────────────
   protected readonly partsTable = new SmartTableState({
@@ -223,6 +244,27 @@ export class ProductionPageComponent implements OnInit {
         }
       });
     });
+
+    // Shifts filter form changes → reset page + search (only when shifts tab is active)
+    this.shiftsFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      if (this.selectedTab() !== 'shifts') return;
+      this.shiftsTable.resetPage();
+      this.executeShiftsSearch();
+    });
+
+    // Shifts sort, page, and page-size changes → search (guard: only when shifts tab active)
+    effect(() => {
+      this.shiftsTable.sortColumn();
+      this.shiftsTable.sortDirection();
+      this.shiftsTable.currentPage();
+      this.shiftsTable.pageSize();
+
+      untracked(() => {
+        if (this.selectedTab() === 'shifts') {
+          this.executeShiftsSearch();
+        }
+      });
+    });
   }
 
   ngOnInit(): void {
@@ -240,8 +282,8 @@ export class ProductionPageComponent implements OnInit {
     if (tab === 'parts' && !this.partsTable.loading()) {
       this.executePartsSearch();
     }
-    if (tab === 'shifts' && this.shifts().length === 0 && !this.loadingShifts()) {
-      this.loadShifts();
+    if (tab === 'shifts' && !this.shiftsTable.loading()) {
+      this.executeShiftsSearch();
     }
   }
 
@@ -371,16 +413,48 @@ export class ProductionPageComponent implements OnInit {
     });
   }
 
-  protected loadShifts(): void {
-    this.loadingShifts.set(true);
-    this.shiftsApi.listProduction().subscribe({
-      next: (data) => {
-        this.shifts.set(data);
-        this.loadingShifts.set(false);
+  protected executeShiftsSearch(): void {
+    this.shiftsTable.loading.set(true);
+    this.shiftsTable.error.set(null);
+
+    const f = this.shiftsFilterForm.getRawValue();
+
+    const request: ShiftProductionSearchRequestDto = {
+      sortColumn: this.shiftsTable.sortColumn(),
+      sortDirection: this.shiftsTable.sortDirection(),
+      page: this.shiftsTable.currentPage(),
+      pageSize: this.shiftsTable.pageSize()
+    };
+
+    if (f.operatorName?.trim()) {
+      request.operatorName = f.operatorName.trim();
+    }
+    if (f.jobNumber?.trim()) {
+      request.jobNumber = f.jobNumber.trim();
+    }
+    if (f.startTimeFrom?.trim()) {
+      request.startTimeFrom = f.startTimeFrom.trim();
+    }
+    if (f.startTimeTo?.trim()) {
+      request.startTimeTo = f.startTimeTo.trim();
+    }
+    if (f.stopTimeFrom?.trim()) {
+      request.stopTimeFrom = f.stopTimeFrom.trim();
+    }
+    if (f.stopTimeTo?.trim()) {
+      request.stopTimeTo = f.stopTimeTo.trim();
+    }
+
+    this.shiftsApi.searchProduction(request).subscribe({
+      next: (result) => {
+        this.shiftsSearchResult.set(result);
+        this.shiftsTable.loading.set(false);
       },
       error: () => {
-        this.toast.error('Failed to load shifts');
-        this.loadingShifts.set(false);
+        const message = 'Failed to load shifts';
+        this.shiftsTable.error.set(message);
+        this.toast.error(message);
+        this.shiftsTable.loading.set(false);
       }
     });
   }
