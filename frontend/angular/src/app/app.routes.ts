@@ -13,6 +13,7 @@ import { ReceiveMaterialPageComponent } from './features/shipping/receive-materi
 import { ProductionPageComponent } from './features/supervisor/production/production.page';
 import { CustomersPageComponent } from './features/supervisor/customers/customers.page';
 import { NewOrderPageComponent } from './features/supervisor/new-order/new-order.page';
+import { JobReportPageComponent } from './features/supervisor/job-report/job-report.page';
 import { MachinesPageComponent } from './features/admin/machines/machines.page';
 import { UsersPageComponent } from './features/admin/users/users.page';
 import { SettingsPageComponent } from './features/admin/settings/settings.page';
@@ -59,6 +60,7 @@ export const routes: Routes = [
         data: { roles: [Roles.Supervisor, Roles.Admin] },
         children: [
           { path: 'production', component: ProductionPageComponent },
+          { path: 'job-report/:id', component: JobReportPageComponent },
           { path: 'customers', component: CustomersPageComponent },
           { path: 'new-order', component: NewOrderPageComponent }
         ]

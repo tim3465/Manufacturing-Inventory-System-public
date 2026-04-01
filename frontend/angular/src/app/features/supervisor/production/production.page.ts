@@ -551,6 +551,10 @@ export class ProductionPageComponent implements OnInit {
     this.executeJobsSearch();
   }
 
+  protected viewJobReport(jobId: number): void {
+    this.router.navigate(['/supervisor/job-report', jobId]);
+  }
+
   protected formatStopTime(stopTime: string | null): string {
     if (!stopTime) return 'In Progress';
     return new Date(stopTime).toLocaleString();

@@ -150,6 +150,21 @@ public class JobsController : ControllerBase
 
     }
 
+    [HttpGet("{id:int}/report")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(JobReportDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<JobReportDto>> GetReportAsync(int id, CancellationToken ct = default)
+    {
+        var report = await _jobService.GetReportAsync(id, ct);
+        if (report == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(report);
+    }
+
     [HttpGet("by-order/{orderId:int}")]
     [Authorize(Roles = "Supervisor,Admin")]
     [ProducesResponseType(typeof(List<JobProductionDto>), StatusCodes.Status200OK)]

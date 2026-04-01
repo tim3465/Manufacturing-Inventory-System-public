@@ -1,0 +1,133 @@
+<section class="space-y-6">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between gap-4">
+    <div class="space-y-1">
+      <p class="text-sm text-slate-500">Supervisor</p>
+      <h1 class="text-2xl font-semibold text-[var(--fg)]">Job Report</h1>
+    </div>
+    <a
+      routerLink="/supervisor/production"
+      class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm text-[var(--fg)]"
+    >
+      &larr; Back to Production
+    </a>
+  </header>
+
+  @if (loading()) {
+    <div class="text-sm text-slate-500">Loading report...</div>
+  } @else if (report() === null) {
+    <div class="text-sm text-red-500">Failed to load job report.</div>
+  } @else {
+
+    <!-- Job Context Panel -->
+    <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-2 text-sm">
+      <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wide">Job Context</h3>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-1">
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Machine</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.machineName }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Part Name</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.partName }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Part Number</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.partNumber }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Order ID</span>
+          <span class="font-medium text-[var(--fg)]">#{{ report()!.orderId }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Due Date</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.dueDate }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Started</span>
+          <span class="font-medium text-[var(--fg)]">{{ formatDateTime(report()!.startedDateTime) }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Ended</span>
+          <span class="font-medium text-[var(--fg)]">{{ formatDateTime(report()!.endedDateTime) }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Status</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.jobStatus }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Totals Panel -->
+    <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-2 text-sm">
+      <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wide">Job Totals</h3>
+      <div class="grid grid-cols-3 gap-x-6 gap-y-1">
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Parts Made</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.totalPartsMade }} / {{ report()!.partAmountPlanned }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Scrap</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.totalScrap }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Bars Consumed</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.totalBarsConsumed }} / {{ report()!.barAmountPlanned }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Downtime</span>
+          <span class="font-medium text-[var(--fg)]">{{ report()!.totalDowntime }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Est. Parts/Bar</span>
+          <span class="font-medium text-[var(--fg)]">{{ formatNumber(report()!.estimatedPartsPerBar) }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-28 shrink-0">Actual Parts/Bar</span>
+          <span class="font-medium text-[var(--fg)]">{{ formatNumber(report()!.actualPartsPerBar) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shift History Table -->
+    <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+          <tr class="bg-[var(--surface)]">
+            <th class="px-4 py-3 font-medium">Operator</th>
+            <th class="px-4 py-3 font-medium">Start Time</th>
+            <th class="px-4 py-3 font-medium">Stop Time</th>
+            <th class="px-4 py-3 font-medium text-right">Parts Made</th>
+            <th class="px-4 py-3 font-medium text-right">Scrap</th>
+            <th class="px-4 py-3 font-medium text-right">Bars Consumed</th>
+            <th class="px-4 py-3 font-medium text-right">Parts/Bar</th>
+            <th class="px-4 py-3 font-medium text-right">Downtime</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          @if (report()!.shifts.length === 0) {
+            <tr>
+              <td colspan="8" class="px-4 py-3 text-sm text-slate-500">No shifts recorded for this job.</td>
+            </tr>
+          } @else {
+            @for (shift of report()!.shifts; track shift.id) {
+              <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors">
+                <td class="px-4 py-3 text-[var(--fg)]">{{ shift.operatorName }}</td>
+                <td class="px-4 py-3 text-slate-500">{{ formatDateTime(shift.startTime) }}</td>
+                <td class="px-4 py-3 text-slate-500">{{ formatDateTime(shift.stopTime) }}</td>
+                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
+                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.scrap }}</td>
+                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ formatNumber(shift.partsPerBar) }}</td>
+                <td class="px-4 py-3 text-right text-[var(--fg)]">{{ formatDowntime(shift.downtime) }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+  }
+
+</section>
