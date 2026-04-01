@@ -1,4 +1,4 @@
-<div class="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 space-y-4">
+<div class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 space-y-2">
 
   <!-- Header -->
   <div class="flex items-center justify-between">
@@ -36,12 +36,12 @@
 
           <!-- Footer: metadata -->
           <div class="flex gap-4 text-slate-500">
-            <span>{{ log.issueTypeLabel }}</span>
-            <span>Scrap: {{ log.scrapQuantity }}</span>
+            <span class="font-semibold">{{ log.issueTypeLabel }}</span>
+            <span><span class="font-semibold">Scrap:</span> {{ log.scrapQuantity }}</span>
             @if (log.downtimeHours > 0 || log.downtimeMinutes > 0) {
-              <span>{{ log.downtimeHours }}h {{ log.downtimeMinutes }}m</span>
+              <span><span class="font-semibold">Downtime:</span> {{ log.downtimeHours }}h {{ log.downtimeMinutes }}m</span>
             } @else {
-              <span>Downtime: —</span>
+              <span><span class="font-semibold">Downtime:</span> —</span>
             }
           </div>
         </div>
@@ -50,7 +50,7 @@
   </div>
 
   <!-- Create form -->
-  <div class="border-t border-[var(--border)] pt-4">
+  <div class="border-t border-[var(--border)] pt-2">
     <app-log-issue-form
       [shiftId]="shiftId"
       (submitted)="onIssueSubmitted()"
