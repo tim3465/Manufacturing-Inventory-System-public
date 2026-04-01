@@ -8,4 +8,6 @@ export interface ShiftIssueLogDto {
   downtime: string | null; // "HH:MM:SS" or null
   description: string;
   createdDateTime: string; // ISO 8601 DateTimeOffset
+  createdByUserId: number | null;
+  createdByUserDisplayName: string;
 }

@@ -23,4 +23,8 @@ public class ShiftIssueLogResultDto
     public TimeSpan? Downtime { get; set; }
 
     public DateTimeOffset CreatedDateTime { get; set; }
+
+    public int? CreatedByUserId { get; set; }
+
+    public string CreatedByUserDisplayName { get; set; } = string.Empty;
 }

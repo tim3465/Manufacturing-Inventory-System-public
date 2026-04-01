@@ -10,6 +10,7 @@ public partial class ShiftIssueLogTests
 {
     protected readonly Mock<IShiftIssueLogRepository> MockRepository;
     protected readonly Mock<IShiftRepository> MockShiftRepository;
+    protected readonly Mock<IUserRepository> MockUserRepository;
     protected readonly Mock<ITransactionManager> MockTransactionManager;
     protected readonly Mock<IMapper> MockMapper;
     protected readonly ShiftIssueLogService ShiftIssueLogService;
@@ -18,11 +19,13 @@ public partial class ShiftIssueLogTests
     {
         MockRepository = new Mock<IShiftIssueLogRepository>();
         MockShiftRepository = new Mock<IShiftRepository>();
+        MockUserRepository = new Mock<IUserRepository>();
         MockTransactionManager = new Mock<ITransactionManager>();
         MockMapper = new Mock<IMapper>();
         ShiftIssueLogService = new ShiftIssueLogService(
             MockRepository.Object,
             MockShiftRepository.Object,
+            MockUserRepository.Object,
             MockTransactionManager.Object,
             MockMapper.Object);
     }

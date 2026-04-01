@@ -3,6 +3,7 @@ import { ShiftIssueLogsApi } from '../../../../core/api/shift-issue-logs.api';
 import { ShiftIssueLogDto } from '../../../../core/dtos/shift-issue-logs/shift-issue-log.dto';
 import { ISSUE_TYPE_LABELS, IssueType } from '../../../../core/dtos/shift-issue-logs/create-shift-issue-log-request.dto';
 import { LogIssueFormComponent } from '../log-issue-form/log-issue-form.component';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 interface IssueLogRow {
   id: number;
@@ -12,6 +13,8 @@ interface IssueLogRow {
   downtimeMinutes: number;
   description: string;
   createdDateTime: string;
+  createdByUserId: number | null;
+  createdByUserDisplayName: string;
 }
 
 @Component({
@@ -22,6 +25,7 @@ interface IssueLogRow {
 })
 export class IssueLogsPanelComponent implements OnInit {
   private readonly issueLogsApi = inject(ShiftIssueLogsApi);
+  private readonly auth = inject(AuthService);
 
   @Input({ required: true }) shiftId!: number;
   @Output() closed = new EventEmitter<void>();
@@ -29,6 +33,7 @@ export class IssueLogsPanelComponent implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly issueLogs = signal<IssueLogRow[]>([]);
+  protected readonly currentUserId = this.auth.getUserId();
 
   ngOnInit(): void {
     this.loadLogs();
@@ -65,6 +70,15 @@ export class IssueLogsPanelComponent implements OnInit {
       downtimeMinutes = parseInt(parts[1], 10) || 0;
     }
 
+    const date = new Date(dto.createdDateTime);
+    const formatted = date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+
     return {
       id: dto.id,
       issueTypeLabel: ISSUE_TYPE_LABELS[dto.issueType as IssueType] ?? 'Unknown',
@@ -72,7 +86,9 @@ export class IssueLogsPanelComponent implements OnInit {
       downtimeHours,
       downtimeMinutes,
       description: dto.description,
-      createdDateTime: new Date(dto.createdDateTime).toLocaleString()
+      createdDateTime: formatted,
+      createdByUserId: dto.createdByUserId,
+      createdByUserDisplayName: dto.createdByUserDisplayName
     };
   }
 }
