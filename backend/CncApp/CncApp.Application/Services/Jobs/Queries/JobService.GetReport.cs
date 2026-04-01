@@ -66,6 +66,24 @@ public partial class JobService
                     PartsPerBar = s.PartsPerBar,
                     Downtime = s.Downtime
                 })
+                .ToList(),
+            IssueLogs = activeShifts
+                .SelectMany(s => s.ShiftIssueLogs.Select(log => new JobReportIssueLogDto
+                {
+                    Id = log.Id,
+                    ShiftId = s.Id,
+                    OperatorName = s.Operator != null
+                        ? (s.Operator.FirstName != null && s.Operator.LastName != null
+                            ? $"{s.Operator.FirstName} {s.Operator.LastName}"
+                            : s.Operator.UserName)
+                        : string.Empty,
+                    CreatedDateTime = log.CreatedDateTime,
+                    IssueType = log.IssueType,
+                    Description = log.Description,
+                    ScrapQuantity = log.ScrapQuantity,
+                    Downtime = log.Downtime
+                }))
+                .OrderBy(l => l.CreatedDateTime)
                 .ToList()
         };
     }

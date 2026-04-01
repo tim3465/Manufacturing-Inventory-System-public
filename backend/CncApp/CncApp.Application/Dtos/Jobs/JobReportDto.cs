@@ -25,4 +25,7 @@ public class JobReportDto
 
     // Shift history
     public List<JobReportShiftDto> Shifts { get; set; } = new();
+
+    // Issue logs (all shifts, chronological)
+    public List<JobReportIssueLogDto> IssueLogs { get; set; } = new();
 }

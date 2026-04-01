@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JobsApi } from '../../../core/api/jobs.api';
-import { JobReportDto } from '../../../core/dtos/jobs/job-report.dto';
+import { JobReportDto, JobReportIssueLogDto } from '../../../core/dtos/jobs/job-report.dto';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 
 @Component({
@@ -19,6 +19,12 @@ export class JobReportPageComponent implements OnInit {
 
   protected readonly loading = signal<boolean>(true);
   protected readonly report = signal<JobReportDto | null>(null);
+
+  protected readonly issueLogRows = computed(() => {
+    const r = this.report();
+    if (!r || !r.issueLogs) return [];
+    return r.issueLogs.map((log) => this.toIssueLogRow(log));
+  });
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -53,4 +59,47 @@ export class JobReportPageComponent implements OnInit {
     if (value === null || value === undefined) return '\u2014';
     return String(value);
   }
+
+  private toIssueLogRow(dto: JobReportIssueLogDto): IssueLogRow {
+    const issueTypeLabels: Record<number, string> = { 1: 'Setup', 2: 'Production' };
+
+    let downtimeHours = 0;
+    let downtimeMinutes = 0;
+    if (dto.downtime) {
+      const parts = dto.downtime.split(':');
+      downtimeHours = parseInt(parts[0], 10) || 0;
+      downtimeMinutes = parseInt(parts[1], 10) || 0;
+    }
+
+    const date = new Date(dto.createdDateTime);
+    const formatted = date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+
+    return {
+      id: dto.id,
+      operatorName: dto.operatorName,
+      issueTypeLabel: issueTypeLabels[dto.issueType] ?? 'Unknown',
+      scrapQuantity: dto.scrapQuantity,
+      downtimeHours,
+      downtimeMinutes,
+      description: dto.description,
+      createdDateTime: formatted
+    };
+  }
+}
+
+interface IssueLogRow {
+  id: number;
+  operatorName: string;
+  issueTypeLabel: string;
+  scrapQuantity: number;
+  downtimeHours: number;
+  downtimeMinutes: number;
+  description: string;
+  createdDateTime: string;
 }

@@ -1,3 +1,14 @@
+export interface JobReportIssueLogDto {
+  id: number;
+  shiftId: number;
+  operatorName: string;
+  createdDateTime: string;
+  issueType: number;
+  description: string;
+  scrapQuantity: number;
+  downtime: string | null;
+}
+
 export interface JobReportShiftDto {
   id: number;
   operatorName: string;
@@ -29,4 +40,5 @@ export interface JobReportDto {
   actualPartsPerBar: number | null;
   totalDowntime: string;
   shifts: JobReportShiftDto[];
+  issueLogs: JobReportIssueLogDto[];
 }

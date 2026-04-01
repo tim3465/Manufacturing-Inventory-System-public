@@ -1,4 +1,5 @@
 using CncApp.Domain.Entities;
+using CncApp.Domain.Enums;
 using Moq;
 using Xunit;
 
@@ -65,6 +66,26 @@ public partial class JobTests
             Operator = operator2
         };
 
+        // Issue logs across both shifts
+        var log1 = new ShiftIssueLog(shiftId: 100, issueType: IssueTypeEnum.Setup, scrapQuantity: 1, description: "Tool broke")
+        {
+            Id = 200,
+            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 10, 0, 0, TimeSpan.Zero)
+        };
+        var log2 = new ShiftIssueLog(shiftId: 101, issueType: IssueTypeEnum.Production, scrapQuantity: 0, description: "Coolant leak", downtime: TimeSpan.FromMinutes(10))
+        {
+            Id = 201,
+            CreatedDateTime = new DateTimeOffset(2026, 3, 2, 9, 0, 0, TimeSpan.Zero)
+        };
+        var log3 = new ShiftIssueLog(shiftId: 100, issueType: IssueTypeEnum.Production, scrapQuantity: 2, description: "Material defect")
+        {
+            Id = 202,
+            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 14, 0, 0, TimeSpan.Zero)
+        };
+
+        shift1.ShiftIssueLogs = new List<ShiftIssueLog> { log1, log3 };
+        shift2.ShiftIssueLogs = new List<ShiftIssueLog> { log2 };
+
         job.Shifts = new List<Shift> { shift1, shift2 };
 
         MockRepository
@@ -100,6 +121,86 @@ public partial class JobTests
         Assert.Equal(100, result.Shifts[1].Id); // shift1 (2026-03-01) second
         Assert.Equal("Jane Smith", result.Shifts[0].OperatorName);
         Assert.Equal("John Doe", result.Shifts[1].OperatorName);
+
+        // Issue logs merged and sorted chronologically
+        Assert.Equal(3, result.IssueLogs.Count);
+        Assert.Equal(200, result.IssueLogs[0].Id); // log1: 2026-03-01 10:00
+        Assert.Equal(202, result.IssueLogs[1].Id); // log3: 2026-03-01 14:00
+        Assert.Equal(201, result.IssueLogs[2].Id); // log2: 2026-03-02 09:00
+
+        // Verify operator names come from the shift's operator
+        Assert.Equal("John Doe", result.IssueLogs[0].OperatorName);   // shift1 operator
+        Assert.Equal("John Doe", result.IssueLogs[1].OperatorName);   // shift1 operator
+        Assert.Equal("Jane Smith", result.IssueLogs[2].OperatorName); // shift2 operator
+
+        // Verify shift IDs
+        Assert.Equal(100, result.IssueLogs[0].ShiftId);
+        Assert.Equal(100, result.IssueLogs[1].ShiftId);
+        Assert.Equal(101, result.IssueLogs[2].ShiftId);
+
+        // Verify issue log fields
+        Assert.Equal(IssueTypeEnum.Setup, result.IssueLogs[0].IssueType);
+        Assert.Equal("Tool broke", result.IssueLogs[0].Description);
+        Assert.Equal(1, result.IssueLogs[0].ScrapQuantity);
+
+        MockRepository.Verify(r => r.GetByIdWithShiftsAsync(jobId, cancellationToken), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetReportAsync_WhenJobHasNoIssueLogs_ReturnsEmptyIssueLogsList()
+    {
+        // Arrange
+        var jobId = 2;
+        var cancellationToken = CancellationToken.None;
+
+        var part = new Part("Bolt", "BLT-001", TimeSpan.FromMinutes(1), 10) { Id = 2 };
+        var order = new Order(partId: 2, customerId: 1, partAmountRequested: 50) { Id = 2 };
+        order.Part = part;
+
+        var job = new Job(
+            orderId: 2,
+            stockLotId: 1,
+            machineId: 1,
+            partAmountPlanned: 50,
+            barAmountPlanned: 5,
+            barCycleTime: TimeSpan.FromMinutes(3),
+            estimatedPartsPerBar: 10,
+            dueDate: new DateOnly(2026, 7, 1))
+        {
+            Id = jobId,
+            Machine = new Machine("CNC-002", "MODEL-B") { Id = 1 },
+            Order = order
+        };
+
+        var shift = new Shift(
+            jobId: jobId,
+            operatorId: 10,
+            barsConsumed: 2,
+            startTime: new DateTime(2026, 4, 1, 8, 0, 0),
+            partsMade: 20,
+            scrap: 0,
+            partsPerBar: 10,
+            stopTime: new DateTime(2026, 4, 1, 16, 0, 0),
+            downtime: null)
+        {
+            Id = 300,
+            Operator = new User { Id = 10, UserName = "op1", FirstName = "John", LastName = "Doe" },
+            ShiftIssueLogs = new List<ShiftIssueLog>()
+        };
+
+        job.Shifts = new List<Shift> { shift };
+
+        MockRepository
+            .Setup(r => r.GetByIdWithShiftsAsync(jobId, cancellationToken))
+            .ReturnsAsync(job);
+
+        // Act
+        var result = await JobService.GetReportAsync(jobId, cancellationToken);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.IssueLogs);
+        Assert.Single(result.Shifts);
 
         MockRepository.Verify(r => r.GetByIdWithShiftsAsync(jobId, cancellationToken), Times.Once);
     }

@@ -15,6 +15,8 @@ public partial class JobRepository : IJobRepository
                 .ThenInclude(o => o.Part)
             .Include(j => j.Shifts.Where(s => !s.InactivatedDateTime.HasValue))
                 .ThenInclude(s => s.Operator)
+            .Include(j => j.Shifts.Where(s => !s.InactivatedDateTime.HasValue))
+                .ThenInclude(s => s.ShiftIssueLogs.Where(l => !l.InactivatedDateTime.HasValue))
             .FirstOrDefaultAsync(j => j.Id == id, ct);
     }
 }
