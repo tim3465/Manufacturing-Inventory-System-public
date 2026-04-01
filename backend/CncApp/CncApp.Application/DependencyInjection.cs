@@ -11,6 +11,7 @@ using CncApp.Application.Services.StockLots;
 using CncApp.Application.Services.Users;
 using CncApp.Application.Services.Workflows.OrderPlanning;
 using CncApp.Application.Services.Workflows.ShippingReceiving;
+using CncApp.Application.Services.Workflows.CloseJob;
 using CncApp.Application.Services.Workflows.StartJob;
 using CncApp.Application.Services.Workflows.SupervisorDashboard;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<ShippingReceivingService>();
         services.AddScoped<OrderPlanningService>();
         services.AddScoped<StartJobService>();
+        services.AddScoped<CloseJobService>();
         services.AddScoped<SupervisorDashboardService>();
 
         // Register AutoMapper

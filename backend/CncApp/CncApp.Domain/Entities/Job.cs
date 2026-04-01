@@ -226,6 +226,19 @@ public class Job : AuditableEntityBase
     }
 
     /// <summary>
+    /// Closes the job by recording the end time.
+    /// </summary>
+    /// <exception cref="DomainException">Thrown when the job has not been started or has already been closed.</exception>
+    public void Close()
+    {
+        if (!StartedDateTime.HasValue)
+            throw new DomainException("Job cannot be closed because it has not been started.");
+        if (EndedDateTime.HasValue)
+            throw new DomainException("Job has already been closed.");
+        EndedDateTime = DateTimeOffset.UtcNow;
+    }
+
+    /// <summary>
     /// Inactivates the job (soft-delete).
     /// Prevents double-inactivation by throwing a DomainException if already inactivated.
     /// </summary>
