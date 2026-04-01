@@ -57,6 +57,16 @@ public class ShiftsController : ControllerBase
         return Ok(shifts);
     }
 
+    [HttpGet("production/search")]
+    [Authorize(Roles = "Admin,Supervisor")]
+    [ProducesResponseType(typeof(ShiftProductionSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ShiftProductionSearchResultDto>> SearchProductionAsync(
+        [FromQuery] ShiftProductionSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _shiftService.SearchProductionAsync(request, ct);
+        return Ok(result);
+    }
+
     [HttpGet("all")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(List<ShiftDto>), StatusCodes.Status200OK)]
@@ -160,6 +170,17 @@ public class ShiftsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("my-logs/search")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(ShiftLogSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ShiftLogSearchResultDto>> SearchMyLogs(
+        [FromQuery] ShiftLogSearchRequestDto request, CancellationToken ct = default)
+    {
+        var user = await _userService.GetCurrentUserAsync(ct);
+        var result = await _shiftService.SearchShiftLogsAsync(user.Id, request, ct);
+        return Ok(result);
     }
 
     [HttpGet("my-logs")]

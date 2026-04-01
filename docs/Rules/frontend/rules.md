@@ -256,6 +256,7 @@ The smart table pattern is the default table pattern for data-heavy list pages t
 - Match the overall visual layout and behavior established on the Shipping / Receiving → Inventory page.
 - Keep column filters aligned with the table header area.
 - Prefer a consistent filter row and paging layout across pages.
+- Date range filters use two `type="date"` inputs rendered side by side inside `<div class="flex items-center gap-1">`, separated by `<span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>`. Do not stack them vertically.
 - Use the same interaction pattern for record loading, filtering, and paging unless the ticket explicitly requires a deviation.
 - When a new page needs a smart table, reference the Shipping / Receiving → Inventory implementation first during reconnaissance.
 

@@ -4,29 +4,51 @@
     <h1 class="text-2xl font-semibold text-[var(--fg)]">Materials</h1>
   </header>
 
+  <!-- Table -->
   <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-    <div class="px-4 py-3 border-b border-[var(--border)] text-sm font-medium">
-      Material catalog
-    </div>
-
-    @if (loading()) {
-      <div class="px-4 py-3 text-sm text-slate-500">Loading...</div>
-    } @else if (error()) {
-      <div class="px-4 py-3 text-sm text-red-500">{{ error() }}</div>
-    } @else if (materials().length === 0) {
-      <div class="px-4 py-3 text-sm text-slate-500">No materials found.</div>
-    } @else {
-      <table class="min-w-full text-sm">
-        <thead class="text-left text-slate-500 border-b border-[var(--border)]">
-          <tr>
-            <th class="px-4 py-3 font-medium">Heat number</th>
-            <th class="px-4 py-3 font-medium">Material name</th>
-            <th class="px-4 py-3 font-medium"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--border)]">
-          @for (material of materials(); track material.id) {
-            <tr>
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+        <tr class="bg-[var(--surface)]">
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="table.onSortColumn('HeatNumber')"
+          >Heat number{{ table.sortIndicator('HeatNumber') }}</th>
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="table.onSortColumn('MaterialName')"
+          >Material name{{ table.sortIndicator('MaterialName') }}</th>
+          <th class="px-4 py-3 font-medium"></th>
+        </tr>
+        <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="heatNumber"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="materialName"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--border)]">
+        @if (table.loading()) {
+          <tr><td colspan="3" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+        } @else if (table.error()) {
+          <tr><td colspan="3" class="px-4 py-3 text-sm text-red-500">{{ table.error() }}</td></tr>
+        } @else if (rows().length === 0) {
+          <tr><td colspan="3" class="px-4 py-3 text-sm text-slate-500">No materials found.</td></tr>
+        } @else {
+          @for (material of rows(); track material.id) {
+            <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors">
               <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ material.heatNumber }}</td>
               <td class="px-4 py-3 text-[var(--fg)]">{{ material.materialName }}</td>
               <td class="px-4 py-3">
@@ -40,9 +62,19 @@
               </td>
             </tr>
           }
-        </tbody>
-      </table>
-    }
+        }
+      </tbody>
+    </table>
+    <!-- Pagination -->
+    <app-pager
+      [currentPage]="table.currentPage()"
+      [totalPages]="totalPages()"
+      [totalCount]="totalCount()"
+      (pageChange)="table.goToPage($event)"
+      [pageSize]="table.pageSize()"
+      [pageSizes]="pageSizes"
+      (pageSizeChange)="table.onPageSizeChange($event)"
+    />
   </div>
 
   @if (isEditOpen() && selectedMaterial()) {
@@ -51,7 +83,7 @@
       [heatNumber]="selectedMaterial()!.heatNumber"
       [materialName]="selectedMaterial()!.materialName"
       (closed)="closeEdit()"
-      (updated)="loadMaterials()"
+      (updated)="executeSearch()"
     />
   }
 </section>

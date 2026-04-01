@@ -25,6 +25,22 @@ public class MaterialsController : ControllerBase
     // - Most resources allow anonymous read access; Users requires authentication.
 
     /// <summary>
+    /// Searches active materials with filtering, sorting, and paging.
+    /// </summary>
+    /// <param name="request">Search parameters including optional HeatNumber/MaterialName filters, sort, and page.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Paged result of matching active materials.</returns>
+    [HttpGet("search")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(MaterialSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<MaterialSearchResultDto>> SearchActiveAsync(
+        [FromQuery] MaterialSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _materialService.SearchActiveAsync(request, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gets all active materials.
     /// </summary>
     /// <param name="ct">Cancellation token.</param>
