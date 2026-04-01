@@ -159,7 +159,7 @@
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-4 py-2 rounded-lg bg-yellow-500 text-black hover:bg-yellow-600 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="submittingAction() !== null"
             (click)="onClose()"
           >
@@ -168,6 +168,14 @@
             } @else {
               Close Shift
             }
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="submittingAction() !== null"
+            (click)="onCloseJob()"
+          >
+            Close Job
           </button>
         </div>
       </form>
@@ -186,4 +194,15 @@
     }
 
   </div>
+
+  @if (showCloseJobModal()) {
+    <app-close-job-modal
+      [shiftId]="shiftId"
+      [jobId]="shift()!.jobId"
+      [shiftData]="buildDto()"
+      [machineName]="shift()!.machineSerialNumber"
+      [partName]="shift()!.partName"
+      (closed)="onCloseJobModalDismissed()"
+      (jobClosed)="onJobClosed()" />
+  }
 }

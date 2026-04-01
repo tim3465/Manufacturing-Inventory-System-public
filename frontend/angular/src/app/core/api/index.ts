@@ -1,4 +1,5 @@
 export * from './auth.api';
+export * from './close-job.api';
 export * from './customers.api';
 export * from './jobs.api';
 export * from './machines.api';
