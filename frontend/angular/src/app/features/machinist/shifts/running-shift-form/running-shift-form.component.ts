@@ -4,12 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShiftsApi } from '../../../../core/api/shifts.api';
 import { RunningShiftDto } from '../../../../core/dtos/shifts/running-shift.dto';
 import { ToastService } from '../../../../core/ui/toast/toast.service';
-import { LogIssueFormComponent } from '../log-issue-form/log-issue-form.component';
+import { IssueLogsPanelComponent } from '../issue-logs-panel/issue-logs-panel.component';
 
 @Component({
   selector: 'app-running-shift-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LogIssueFormComponent],
+  imports: [CommonModule, ReactiveFormsModule, IssueLogsPanelComponent],
   templateUrl: './running-shift-form.component.html',
   styleUrl: './running-shift-form.component.css'
 })
@@ -25,14 +25,13 @@ export class RunningShiftFormComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly shift = signal<RunningShiftDto | null>(null);
   protected readonly submittingAction = signal<'save' | 'close' | null>(null);
-  protected readonly showIssueForm = signal(false);
+  protected readonly showLogsPanel = signal(false);
 
-  protected toggleIssueForm(): void {
-    this.showIssueForm.update((v) => !v);
+  protected toggleLogsPanel(): void {
+    this.showLogsPanel.update((v) => !v);
   }
 
-  protected onIssueSubmitted(): void {
-    this.showIssueForm.set(false);
+  protected onIssueCreated(): void {
     this.shiftsApi.getRunning(this.shiftId).subscribe({
       next: (data) => this.shift.set(data),
       error: () => {}

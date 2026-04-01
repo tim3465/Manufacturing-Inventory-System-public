@@ -21,4 +21,6 @@ public class ShiftIssueLogResultDto
     public string Description { get; set; } = string.Empty;
 
     public TimeSpan? Downtime { get; set; }
+
+    public DateTimeOffset CreatedDateTime { get; set; }
 }
