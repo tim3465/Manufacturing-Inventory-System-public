@@ -8,7 +8,8 @@ public class ShiftIssueLogProfile : Profile
 {
     public ShiftIssueLogProfile()
     {
-        CreateMap<ShiftIssueLog, ShiftIssueLogResultDto>();
+        CreateMap<ShiftIssueLog, ShiftIssueLogResultDto>()
+            .ForMember(dest => dest.CreatedByUserDisplayName, opt => opt.Ignore());
 
         // Create DTO maps only client-provided fields; audit/identity fields are server-controlled.
         CreateMap<CreateShiftIssueLogRequestDto, ShiftIssueLog>()

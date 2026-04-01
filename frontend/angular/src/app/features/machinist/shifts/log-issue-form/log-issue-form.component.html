@@ -1,83 +1,52 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-2">
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-    <!-- Issue Type -->
-    <label class="block">
-      <div class="text-sm font-medium text-[var(--fg)] mb-1">Issue Type</div>
-      <select
-        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-        formControlName="issueType"
-      >
-        @for (opt of issueTypeOptions; track opt) {
-          <option [value]="opt">{{ issueTypeLabels[opt] }}</option>
-        }
-      </select>
-    </label>
-
-    <!-- Scrap Quantity -->
-    <label class="block">
-      <div class="text-sm font-medium text-[var(--fg)] mb-1">Scrap Quantity</div>
-      <input
-        type="number"
-        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-        formControlName="scrapQuantity"
-        autocomplete="off"
-        min="0"
-      />
-      @if (form.controls.scrapQuantity.touched && form.controls.scrapQuantity.invalid) {
-        <div class="mt-1 text-xs text-red-500">Scrap quantity must be 0 or more</div>
-      }
-    </label>
-
-    <!-- Downtime -->
-    <div class="sm:col-span-2">
-      <div class="text-sm font-medium text-[var(--fg)] mb-1">Downtime <span class="text-slate-400 text-xs">(optional)</span></div>
-      <div class="grid grid-cols-2 gap-4">
-        <label class="block">
-          <div class="text-xs text-slate-400 mb-1">Hours</div>
-          <input
-            type="number"
-            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-            formControlName="downtimeHours"
-            autocomplete="off"
-            min="0"
-          />
-        </label>
-        <label class="block">
-          <div class="text-xs text-slate-400 mb-1">Minutes</div>
-          <input
-            type="number"
-            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-            formControlName="downtimeMinutes"
-            autocomplete="off"
-            min="0"
-            max="59"
-          />
-        </label>
+ 
+  <!-- Downtime — inline -->
+  <div>
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-[var(--fg)] shrink-0 w-20">Downtime</label>
+      <div class="flex flex-1 items-center gap-2">
+        <input
+          type="number"
+          class="w-16 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm"
+          formControlName="downtimeHours"
+          autocomplete="off"
+          min="0"
+          placeholder="Hrs"
+        />
+        <span class="text-xs text-slate-400">h</span>
+        <input
+          type="number"
+          class="w-16 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm"
+          formControlName="downtimeMinutes"
+          autocomplete="off"
+          min="0"
+          max="59"
+          placeholder="Min"
+        />
+        <span class="text-xs text-slate-400">m</span>
       </div>
     </div>
+  </div>
 
-    <!-- Description -->
-    <label class="block sm:col-span-2">
-      <div class="text-sm font-medium text-[var(--fg)] mb-1">Description</div>
-      <textarea
-        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
-        formControlName="description"
-        rows="3"
-        autocomplete="off"
-      ></textarea>
-      @if (form.controls.description.touched && form.controls.description.invalid) {
-        <div class="mt-1 text-xs text-red-500">
-          @if (form.controls.description.errors?.['required']) {
-            Description is required
-          } @else if (form.controls.description.errors?.['maxlength']) {
-            Description must be 2000 characters or fewer
-          }
-        </div>
-      }
-    </label>
-
+  <!-- Description — stacked -->
+  <div>
+    <label class="text-sm font-medium text-[var(--fg)]">Description</label>
+    <textarea
+      class="mt-0.5 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm"
+      formControlName="description"
+      rows="2"
+      autocomplete="off"
+    ></textarea>
+    @if (form.controls.description.touched && form.controls.description.invalid) {
+      <div class="mt-0.5 text-xs text-red-500">
+        @if (form.controls.description.errors?.['required']) {
+          Description is required
+        } @else if (form.controls.description.errors?.['maxlength']) {
+          Description must be 2000 characters or fewer
+        }
+      </div>
+    }
   </div>
 
   <!-- Cross-field validation error -->
@@ -86,16 +55,50 @@
   }
 
   <!-- Actions -->
-  <div class="pt-2 flex items-center justify-end">
+  <div class="flex items-center justify-end gap-2">
+    <!-- Issue Type + Scrap Quantity — inline labels -->
+<div class="flex items-start gap-2">
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-0">
+      <label class="text-sm font-medium text-[var(--fg)] shrink-0 w-20">Issue Type</label>
+      <select
+        class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm"
+        formControlName="issueType"
+      >
+        @for (opt of issueTypeOptions; track opt) {
+          <option [value]="opt">{{ issueTypeLabels[opt] }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="shrink-0">
+    <div class="flex items-center gap-0">
+      <label class="text-sm font-medium text-[var(--fg)] shrink-0 w-20">Scrap Qty</label>
+      <input
+        type="number"
+        class="w-12 shrink-0 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm"
+        formControlName="scrapQuantity"
+        autocomplete="off"
+        min="0"
+      />
+    </div>
+
+    @if (form.controls.scrapQuantity.touched && form.controls.scrapQuantity.invalid) {
+      <div class="mt-0.5 text-xs text-red-500 pl-20">Must be 0 or more</div>
+    }
+  </div>
+</div>
+
     <button
       type="submit"
-      class="px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+      class="min-w-[7.5rem] whitespace-nowrap px-3 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
       [disabled]="submitting()"
     >
       @if (submitting()) {
-        Logging...
+        Creating...
       } @else {
-        Log Issue
+        Create Log
       }
     </button>
   </div>

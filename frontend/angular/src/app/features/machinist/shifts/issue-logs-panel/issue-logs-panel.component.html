@@ -1,0 +1,60 @@
+<div class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 space-y-2">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-[var(--fg)]">Issue Logs</h3>
+    <button
+      type="button"
+      class="text-xs text-slate-400 hover:text-[var(--fg)] transition"
+      (click)="onClose()"
+    >
+      Close
+    </button>
+  </div>
+
+  <!-- Scrollable feed -->
+  <div class="max-h-64 overflow-y-auto space-y-2">
+    @if (loading()) {
+      <div class="text-sm text-slate-500">Loading...</div>
+    } @else if (issueLogs().length === 0) {
+      <div class="text-sm text-slate-500">No issue logs yet.</div>
+    } @else {
+      @for (log of issueLogs(); track log.id) {
+        <div
+          class="rounded-md border-2 bg-[var(--surface)] px-3 py-2 space-y-1.5 text-xs"
+          [class.border-[var(--primary)]]="log.createdByUserId === currentUserId"
+          [class.border-[var(--secondary)]]="log.createdByUserId !== currentUserId"
+        >
+          <!-- Header: creator name + timestamp -->
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-[var(--fg)]">{{ log.createdByUserDisplayName }}</span>
+            <span class="text-slate-400">{{ log.createdDateTime }}</span>
+          </div>
+
+          <!-- Body: description -->
+          <div class="text-[var(--fg)]">{{ log.description }}</div>
+
+          <!-- Footer: metadata -->
+          <div class="flex gap-4 text-slate-500">
+            <span class="font-semibold">{{ log.issueTypeLabel }}</span>
+            <span><span class="font-semibold">Scrap:</span> {{ log.scrapQuantity }}</span>
+            @if (log.downtimeHours > 0 || log.downtimeMinutes > 0) {
+              <span><span class="font-semibold">Downtime:</span> {{ log.downtimeHours }}h {{ log.downtimeMinutes }}m</span>
+            } @else {
+              <span><span class="font-semibold">Downtime:</span> —</span>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create form -->
+  <div class="border-t border-[var(--border)] pt-2">
+    <app-log-issue-form
+      [shiftId]="shiftId"
+      (submitted)="onIssueSubmitted()"
+    />
+  </div>
+
+</div>

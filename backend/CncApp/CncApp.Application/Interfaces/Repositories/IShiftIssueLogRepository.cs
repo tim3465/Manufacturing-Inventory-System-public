@@ -6,4 +6,5 @@ public interface IShiftIssueLogRepository
 {
     Task AddAsync(ShiftIssueLog shiftIssueLog, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
+    Task<List<ShiftIssueLog>> ListByShiftAsync(int shiftId, CancellationToken ct = default);
 }
