@@ -39,6 +39,7 @@ export interface JobProductionRow {
   partAmountPlanned: number;
   partsCompleted: number;
   percentComplete: number;
+  status: 'In Progress' | 'Completed';
   expanded: boolean;
   shifts: ShiftDto[];
   stockLotId: number | null;
@@ -108,13 +109,16 @@ export class ProductionPageComponent implements OnInit {
     partName: [''],
     partNumber: [''],
     machineName: [''],
-    lotNumber: ['']
+    lotNumber: [''],
+    status: ['']
   });
 
   private readonly jobsSearchResult = signal<JobProductionSearchResultDto | null>(null);
 
-  protected readonly jobRows = computed<JobProductionRow[]>(() =>
-    (this.jobsSearchResult()?.items ?? []).map((j) => ({
+  private readonly jobStatusFilter = signal<string>('');
+
+  protected readonly jobRows = computed<JobProductionRow[]>(() => {
+    const items = (this.jobsSearchResult()?.items ?? []).map((j) => ({
       id: j.id,
       orderId: j.orderId,
       dueDate: j.dueDate,
@@ -124,12 +128,17 @@ export class ProductionPageComponent implements OnInit {
       partAmountPlanned: j.partAmountPlanned,
       partsCompleted: j.partsCompleted,
       percentComplete: j.percentComplete,
+      status: j.percentComplete >= 100 ? 'Completed' as const : 'In Progress' as const,
       expanded: false,
       shifts: j.shifts,
       stockLotId: j.stockLotId,
       lotNumber: j.lotNumber
-    }))
-  );
+    }));
+
+    const statusFilter = this.jobStatusFilter();
+    if (!statusFilter) return items;
+    return items.filter(row => row.status === statusFilter);
+  });
   protected readonly jobsTotalCount = computed(() => this.jobsSearchResult()?.totalCount ?? 0);
   protected readonly jobsTotalPages = computed(() => Math.ceil(this.jobsTotalCount() / this.jobsTable.pageSize()) || 1);
 
@@ -206,6 +215,7 @@ export class ProductionPageComponent implements OnInit {
     // Jobs filter form changes → reset page + search (only when jobs tab is active)
     this.jobsFilterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => {
       if (this.selectedTab() !== 'jobs') return;
+      this.jobStatusFilter.set(this.jobsFilterForm.getRawValue().status);
       this.jobsTable.resetPage();
       this.executeJobsSearch();
     });

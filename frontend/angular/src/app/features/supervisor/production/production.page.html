@@ -227,6 +227,7 @@
             <th class="px-4 py-3 font-medium text-right">Planned</th>
             <th class="px-4 py-3 font-medium text-right">Completed</th>
             <th class="px-4 py-3 font-medium text-right">% Done</th>
+            <th class="px-4 py-3 font-medium">Status</th>
             <th class="px-4 py-3 font-medium w-24"></th>
           </tr>
           <tr [formGroup]="jobsFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
@@ -289,16 +290,26 @@
             <th class="px-4 py-2 font-normal"></th>
             <th class="px-4 py-2 font-normal"></th>
             <th class="px-4 py-2 font-normal"></th>
+            <th class="px-4 py-2 font-normal">
+              <select
+                formControlName="status"
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
+              >
+                <option value="">All</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </th>
             <th class="px-4 py-2 font-normal"></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
           @if (jobsTable.loading()) {
-            <tr><td colspan="11" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+            <tr><td colspan="12" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
           } @else if (jobsTable.error()) {
-            <tr><td colspan="11" class="px-4 py-3 text-sm text-red-500">{{ jobsTable.error() }}</td></tr>
+            <tr><td colspan="12" class="px-4 py-3 text-sm text-red-500">{{ jobsTable.error() }}</td></tr>
           } @else if (jobRows().length === 0) {
-            <tr><td colspan="11" class="px-4 py-3 text-sm text-slate-500">No active jobs found.</td></tr>
+            <tr><td colspan="12" class="px-4 py-3 text-sm text-slate-500">No active jobs found.</td></tr>
           } @else {
             @for (job of jobRows(); track job.id) {
               <tr
@@ -329,6 +340,17 @@
                 <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
                 <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
                 <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="text-xs px-2 py-1 rounded-full border"
+                    [class.border-green-500]="job.status === 'Completed'"
+                    [class.text-green-600]="job.status === 'Completed'"
+                    [class.border-[var(--primary)]]="job.status === 'In Progress'"
+                    [class.text-[var(--primary)]]="job.status === 'In Progress'"
+                  >
+                    {{ job.status }}
+                  </span>
+                </td>
                 <td
                   class="px-4 py-3 text-center"
                   (click)="$event.stopPropagation(); viewJobReport(job.id)"
@@ -340,7 +362,7 @@
               @if (isJobExpanded(job.id)) {
                 @if (job.shifts.length === 0) {
                   <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
-                    <td colspan="11" class="px-8 py-2 text-xs text-slate-400">No shifts recorded for this job.</td>
+                    <td colspan="12" class="px-8 py-2 text-xs text-slate-400">No shifts recorded for this job.</td>
                   </tr>
                 } @else {
                   <!-- Shift sub-header -->
@@ -355,6 +377,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                   </tr>
                   @for (shift of job.shifts; track shift.id) {
                     <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
@@ -365,6 +388,7 @@
                       <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
                       <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.scrap }}</td>
                       <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+                      <td></td>
                       <td></td>
                       <td></td>
                       <td></td>
