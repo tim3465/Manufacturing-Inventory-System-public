@@ -46,6 +46,7 @@
         <thead class="text-left text-slate-500 border-b border-[var(--border)]">
           <tr class="bg-[var(--surface)]">
             <th class="px-4 py-3 font-medium w-6"></th>
+            <th class="px-4 py-3 font-medium">Order #</th>
             <th
               class="px-4 py-3 font-medium cursor-pointer select-none"
               (click)="ordersTable.onSortColumn('CustomerName')"
@@ -63,6 +64,7 @@
             <th class="px-4 py-3 font-medium text-center w-24">Progress</th>
           </tr>
           <tr [formGroup]="ordersFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+            <th class="px-4 py-2 font-normal"></th>
             <th class="px-4 py-2 font-normal"></th>
             <th class="px-4 py-2 font-normal">
               <input
@@ -95,11 +97,11 @@
         </thead>
         <tbody class="divide-y divide-[var(--border)]">
           @if (ordersTable.loading()) {
-            <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+            <tr><td colspan="8" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
           } @else if (ordersTable.error()) {
-            <tr><td colspan="7" class="px-4 py-3 text-sm text-red-500">{{ ordersTable.error() }}</td></tr>
+            <tr><td colspan="8" class="px-4 py-3 text-sm text-red-500">{{ ordersTable.error() }}</td></tr>
           } @else if (orderRows().length === 0) {
-            <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">No active orders found.</td></tr>
+            <tr><td colspan="8" class="px-4 py-3 text-sm text-slate-500">No active orders found.</td></tr>
           } @else {
             @for (order of orderRows(); track order.id) {
               <tr
@@ -112,6 +114,7 @@
                 >
                   {{ isOrderExpanded(order.id) ? '▾' : '▸' }}
                 </td>
+                <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ order.id }}</td>
                 <td class="px-4 py-3 text-[var(--fg)]">{{ order.customerName }}</td>
                 <td class="px-4 py-3 text-[var(--fg)]">{{ order.partName }}</td>
                 <td class="px-4 py-3 text-slate-500">{{ order.partNumber }}</td>
@@ -147,11 +150,11 @@
               @if (isOrderExpanded(order.id)) {
                 @if (isOrderJobsLoading(order.id)) {
                   <tr class="border-b border-[var(--border)] bg-slate-50 dark:bg-slate-800">
-                    <td colspan="7" class="px-8 py-2 text-xs text-slate-400">Loading jobs...</td>
+                    <td colspan="8" class="px-8 py-2 text-xs text-slate-400">Loading jobs...</td>
                   </tr>
                 } @else if (getOrderJobs(order.id).length === 0) {
                   <tr class="border-b border-[var(--border)] bg-slate-50 dark:bg-slate-800">
-                    <td colspan="7" class="px-8 py-2 text-xs text-slate-400">No jobs for this order.</td>
+                    <td colspan="8" class="px-8 py-2 text-xs text-slate-400">No jobs for this order.</td>
                   </tr>
                 } @else {
                   <!-- Job sub-header -->
@@ -162,7 +165,8 @@
                     <td class="px-4 py-1 text-xs font-semibold text-slate-500">Lot #</td>
                     <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Planned</td>
                     <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Completed</td>
-                    <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">% Done</td>
+                    <td class="px-4 py-1 text-xs font-semibold text-slate-500">Status</td>
+                    <td class="px-4 py-1 text-xs font-semibold text-slate-500"></td>
                   </tr>
                   @for (job of getOrderJobs(order.id); track job.id) {
                     <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
@@ -172,7 +176,23 @@
                       <td class="px-4 py-2 text-xs text-[var(--fg)]">{{ job.lotNumber ?? '—' }}</td>
                       <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
                       <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
-                      <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>
+                      <td class="px-4 py-2">
+                        <span
+                          class="text-xs px-2 py-1 rounded-full border"
+                          [class.border-green-500]="job.percentComplete >= 100"
+                          [class.text-green-600]="job.percentComplete >= 100"
+                          [class.border-[var(--primary)]]="job.percentComplete < 100"
+                          [class.text-[var(--primary)]]="job.percentComplete < 100"
+                        >
+                          {{ job.percentComplete >= 100 ? 'Completed' : 'In Progress' }}
+                        </span>
+                      </td>
+                      <td
+                        class="px-4 py-2 text-center"
+                        (click)="$event.stopPropagation(); viewJobReport(job.id)"
+                      >
+                        <span class="text-[var(--primary)] underline cursor-pointer text-xs">View Report</span>
+                      </td>
                     </tr>
                   }
                 }
