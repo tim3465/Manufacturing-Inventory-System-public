@@ -151,11 +151,20 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet("{id:int}/report")]
-    [Authorize(Roles = "Supervisor,Admin")]
+    [Authorize(Roles = "Supervisor,Admin,Machinist")]
     [ProducesResponseType(typeof(JobReportDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<JobReportDto>> GetReportAsync(int id, CancellationToken ct = default)
     {
+        if (User.IsInRole("Machinist") && !User.IsInRole("Supervisor") && !User.IsInRole("Admin"))
+        {
+            var operator_ = await _userService.GetCurrentUserAsync(ct);
+            var shifts = await _jobService.GetJobShiftsForOperatorAsync(id, operator_.Id, ct);
+            if (shifts == null)
+                return NotFound();
+        }
+
         var report = await _jobService.GetReportAsync(id, ct);
         if (report == null)
         {

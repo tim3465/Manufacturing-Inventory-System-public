@@ -19,6 +19,8 @@ export class JobReportPageComponent implements OnInit {
 
   protected readonly loading = signal<boolean>(true);
   protected readonly report = signal<JobReportDto | null>(null);
+  protected readonly backRoute = signal<string>('/supervisor/production');
+  protected readonly backLabel = signal<string>('Back to Production');
 
   protected readonly chartData = computed(() => {
     const r = this.report();
@@ -69,10 +71,16 @@ export class JobReportPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const url = this.router.url;
+    if (url.startsWith('/machinist')) {
+      this.backRoute.set('/machinist/my-jobs');
+      this.backLabel.set('Back to My Jobs');
+    }
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) {
       this.toast.error('Invalid job ID');
-      this.router.navigate(['/supervisor/production']);
+      this.router.navigate([this.backRoute()]);
       return;
     }
 

@@ -7,10 +7,10 @@
       <h1 class="text-2xl font-semibold text-[var(--fg)]">Job Report</h1>
     </div>
     <a
-      routerLink="/supervisor/production"
+      [routerLink]="backRoute()"
       class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm text-[var(--fg)]"
     >
-      &larr; Back to Production
+      &larr; {{ backLabel() }}
     </a>
   </header>
 

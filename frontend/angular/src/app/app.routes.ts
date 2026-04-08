@@ -40,6 +40,7 @@ export const routes: Routes = [
         data: { roles: [Roles.Machinist, Roles.Admin] },
         children: [
           { path: 'my-jobs', component: MyJobsPageComponent },
+          { path: 'job-report/:id', component: JobReportPageComponent },
           { path: 'shifts', component: ShiftsPageComponent },
           { path: 'log-shift', redirectTo: 'shifts', pathMatch: 'full' },
           { path: 'machines', component: MachinistMachinesPageComponent }
