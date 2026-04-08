@@ -19,6 +19,17 @@ public partial class JobService
             .Where(s => s.Downtime.HasValue)
             .Aggregate(TimeSpan.Zero, (acc, s) => acc + s.Downtime!.Value);
 
+        var closedShifts = activeShifts.Where(s => s.StopTime.HasValue).ToList();
+        var closedShiftDuration = closedShifts
+            .Aggregate(TimeSpan.Zero, (acc, s) =>
+                acc + (s.StopTime!.Value - s.StartTime));
+        var closedShiftDowntime = closedShifts
+            .Where(s => s.Downtime.HasValue)
+            .Aggregate(TimeSpan.Zero, (acc, s) => acc + s.Downtime!.Value);
+        var totalUptime = closedShiftDuration - closedShiftDowntime;
+        if (totalUptime < TimeSpan.Zero)
+            totalUptime = TimeSpan.Zero;
+
         var actualPartsPerBar = totalBarsConsumed > 0
             ? Math.Round((decimal)totalPartsMade / totalBarsConsumed, 2)
             : (decimal?)null;
@@ -48,6 +59,7 @@ public partial class JobService
             EstimatedPartsPerBar = job.EstimatedPartsPerBar,
             ActualPartsPerBar = actualPartsPerBar,
             TotalDowntime = totalDowntime,
+            TotalUptime = totalUptime,
             Shifts = activeShifts
                 .OrderByDescending(s => s.StartTime)
                 .Select(s => new JobReportShiftDto

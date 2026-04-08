@@ -39,6 +39,7 @@ export interface JobReportDto {
   estimatedPartsPerBar: number | null;
   actualPartsPerBar: number | null;
   totalDowntime: string;
+  totalUptime: string;
   shifts: JobReportShiftDto[];
   issueLogs: JobReportIssueLogDto[];
 }

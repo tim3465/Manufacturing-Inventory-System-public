@@ -22,6 +22,7 @@ public class JobReportDto
     public int? EstimatedPartsPerBar { get; set; }
     public decimal? ActualPartsPerBar { get; set; }
     public TimeSpan TotalDowntime { get; set; }
+    public TimeSpan TotalUptime { get; set; }
 
     // Shift history
     public List<JobReportShiftDto> Shifts { get; set; } = new();

@@ -37,6 +37,10 @@ export class JobReportPageComponent implements OnInit {
     const estimatedPpb = r.estimatedPartsPerBar ?? 0;
     const ppbMax = Math.max(actualPpb, estimatedPpb, 1);
 
+    const uptimeMinutes = this.parseTimeSpanMinutes(r.totalUptime);
+    const downtimeMinutes = this.parseTimeSpanMinutes(r.totalDowntime);
+    const timeMax = Math.max(uptimeMinutes, downtimeMinutes, 1);
+
     return {
       parts: {
         made: { value: partsMade, pct: (partsMade / partsMax) * 100 },
@@ -50,6 +54,10 @@ export class JobReportPageComponent implements OnInit {
       ppb: {
         actual: { value: actualPpb, pct: (actualPpb / ppbMax) * 100 },
         estimated: { value: estimatedPpb, pct: (estimatedPpb / ppbMax) * 100 }
+      },
+      time: {
+        uptime: { value: this.formatTimeSpan(r.totalUptime), pct: (uptimeMinutes / timeMax) * 100 },
+        downtime: { value: this.formatTimeSpan(r.totalDowntime), pct: (downtimeMinutes / timeMax) * 100 }
       }
     };
   });
@@ -86,12 +94,38 @@ export class JobReportPageComponent implements OnInit {
   }
 
   protected formatDowntime(value: string | null): string {
-    return value ?? '\u2014';
+    if (!value) return '\u2014';
+    return this.formatTimeSpan(value);
+  }
+
+  protected formatTimeSpan(ts: string): string {
+    const { hours, minutes } = this.parseTimeSpanParts(ts);
+    return `${hours}h ${minutes}m`;
   }
 
   protected formatNumber(value: number | null): string {
     if (value === null || value === undefined) return '\u2014';
     return String(value);
+  }
+
+  private parseTimeSpanParts(ts: string): { hours: number; minutes: number } {
+    // .NET TimeSpan formats: "d.hh:mm:ss", "hh:mm:ss", or "hh:mm:ss.fffffff"
+    let days = 0;
+    let timePart = ts;
+    if (ts.includes('.') && ts.indexOf('.') < ts.indexOf(':')) {
+      const dotIdx = ts.indexOf('.');
+      days = parseInt(ts.substring(0, dotIdx), 10) || 0;
+      timePart = ts.substring(dotIdx + 1);
+    }
+    const parts = timePart.split(':');
+    const h = parseInt(parts[0], 10) || 0;
+    const m = parseInt(parts[1], 10) || 0;
+    return { hours: days * 24 + h, minutes: m };
+  }
+
+  private parseTimeSpanMinutes(ts: string): number {
+    const { hours, minutes } = this.parseTimeSpanParts(ts);
+    return hours * 60 + minutes;
   }
 
   private toIssueLogRow(dto: JobReportIssueLogDto): IssueLogRow {

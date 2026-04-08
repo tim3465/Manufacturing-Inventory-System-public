@@ -84,8 +84,12 @@
               <span class="font-medium text-[var(--fg)]">{{ report()!.totalScrap }}</span>
             </div>
             <div class="flex gap-2">
+              <span class="text-slate-500 w-28 shrink-0">Uptime</span>
+              <span class="font-medium text-[var(--fg)]">{{ formatTimeSpan(report()!.totalUptime) }}</span>
+            </div>
+            <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Downtime</span>
-              <span class="font-medium text-[var(--fg)]">{{ report()!.totalDowntime }}</span>
+              <span class="font-medium text-[var(--fg)]">{{ formatTimeSpan(report()!.totalDowntime) }}</span>
             </div>
             <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Bars Consumed</span>
@@ -161,6 +165,23 @@
                     <span class="chart-bar-value">{{ formatNumber(chart.ppb.estimated.value) }}</span>
                     <div class="chart-bar chart-bar--secondary" [style.height.%]="chart.ppb.estimated.pct"></div>
                     <span class="chart-bar-label">Estimated</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Time group -->
+              <div class="chart-group">
+                <span class="chart-group-label">Time</span>
+                <div class="chart-bars">
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.time.uptime.value }}</span>
+                    <div class="chart-bar chart-bar--primary" [style.height.%]="chart.time.uptime.pct"></div>
+                    <span class="chart-bar-label">Uptime</span>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.time.downtime.value }}</span>
+                    <div class="chart-bar chart-bar--danger" [style.height.%]="chart.time.downtime.pct"></div>
+                    <span class="chart-bar-label">Downtime</span>
                   </div>
                 </div>
               </div>
