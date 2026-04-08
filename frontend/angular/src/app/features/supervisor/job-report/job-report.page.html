@@ -66,34 +66,107 @@
         </div>
 
         <!-- Job Totals Panel -->
-        <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-2 text-sm">
+        <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-4 text-sm">
           <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wide">Job Totals</h3>
-          <div class="grid grid-cols-3 gap-x-6 gap-y-1">
+
+          <!-- Totals values grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-1">
             <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Parts Made</span>
-              <span class="font-medium text-[var(--fg)]">{{ report()!.totalPartsMade }} / {{ report()!.partAmountPlanned }}</span>
+              <span class="font-medium text-[var(--fg)]">{{ report()!.totalPartsMade }}</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-slate-500 w-28 shrink-0">Parts Planned</span>
+              <span class="font-medium text-[var(--fg)]">{{ report()!.partAmountPlanned }}</span>
             </div>
             <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Scrap</span>
               <span class="font-medium text-[var(--fg)]">{{ report()!.totalScrap }}</span>
             </div>
             <div class="flex gap-2">
-              <span class="text-slate-500 w-28 shrink-0">Bars Consumed</span>
-              <span class="font-medium text-[var(--fg)]">{{ report()!.totalBarsConsumed }} / {{ report()!.barAmountPlanned }}</span>
-            </div>
-            <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Downtime</span>
               <span class="font-medium text-[var(--fg)]">{{ report()!.totalDowntime }}</span>
             </div>
             <div class="flex gap-2">
-              <span class="text-slate-500 w-28 shrink-0">Est. Parts/Bar</span>
-              <span class="font-medium text-[var(--fg)]">{{ formatNumber(report()!.estimatedPartsPerBar) }}</span>
+              <span class="text-slate-500 w-28 shrink-0">Bars Consumed</span>
+              <span class="font-medium text-[var(--fg)]">{{ report()!.totalBarsConsumed }}</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="text-slate-500 w-28 shrink-0">Bars Planned</span>
+              <span class="font-medium text-[var(--fg)]">{{ report()!.barAmountPlanned }}</span>
             </div>
             <div class="flex gap-2">
               <span class="text-slate-500 w-28 shrink-0">Actual Parts/Bar</span>
               <span class="font-medium text-[var(--fg)]">{{ formatNumber(report()!.actualPartsPerBar) }}</span>
             </div>
+            <div class="flex gap-2">
+              <span class="text-slate-500 w-28 shrink-0">Est. Parts/Bar</span>
+              <span class="font-medium text-[var(--fg)]">{{ formatNumber(report()!.estimatedPartsPerBar) }}</span>
+            </div>
           </div>
+
+          <!-- Grouped vertical bar charts -->
+          @if (chartData(); as chart) {
+            <div class="chart-groups">
+
+              <!-- Parts group -->
+              <div class="chart-group">
+                <span class="chart-group-label">Parts</span>
+                <div class="chart-bars">
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.parts.made.value }}</span>
+                    <div class="chart-bar chart-bar--primary" [style.height.%]="chart.parts.made.pct"></div>
+                    <span class="chart-bar-label">Made</span>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.parts.planned.value }}</span>
+                    <div class="chart-bar chart-bar--secondary" [style.height.%]="chart.parts.planned.pct"></div>
+                    <span class="chart-bar-label">Planned</span>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.parts.scrap.value }}</span>
+                    <div class="chart-bar chart-bar--danger" [style.height.%]="chart.parts.scrap.pct"></div>
+                    <span class="chart-bar-label">Scrap</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bars group -->
+              <div class="chart-group">
+                <span class="chart-group-label">Bars</span>
+                <div class="chart-bars">
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.bars.consumed.value }}</span>
+                    <div class="chart-bar chart-bar--primary" [style.height.%]="chart.bars.consumed.pct"></div>
+                    <span class="chart-bar-label">Consumed</span>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ chart.bars.planned.value }}</span>
+                    <div class="chart-bar chart-bar--secondary" [style.height.%]="chart.bars.planned.pct"></div>
+                    <span class="chart-bar-label">Planned</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Parts Per Bar group -->
+              <div class="chart-group">
+                <span class="chart-group-label">Parts Per Bar</span>
+                <div class="chart-bars">
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ formatNumber(chart.ppb.actual.value) }}</span>
+                    <div class="chart-bar chart-bar--primary" [style.height.%]="chart.ppb.actual.pct"></div>
+                    <span class="chart-bar-label">Actual</span>
+                  </div>
+                  <div class="chart-bar-wrapper">
+                    <span class="chart-bar-value">{{ formatNumber(chart.ppb.estimated.value) }}</span>
+                    <div class="chart-bar chart-bar--secondary" [style.height.%]="chart.ppb.estimated.pct"></div>
+                    <span class="chart-bar-label">Estimated</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          }
         </div>
 
         <!-- Shift History Table -->

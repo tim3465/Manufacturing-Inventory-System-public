@@ -20,6 +20,40 @@ export class JobReportPageComponent implements OnInit {
   protected readonly loading = signal<boolean>(true);
   protected readonly report = signal<JobReportDto | null>(null);
 
+  protected readonly chartData = computed(() => {
+    const r = this.report();
+    if (!r) return null;
+
+    const partsMade = r.totalPartsMade;
+    const partsPlanned = r.partAmountPlanned;
+    const scrap = r.totalScrap;
+    const partsMax = Math.max(partsMade, partsPlanned, scrap, 1);
+
+    const barsConsumed = r.totalBarsConsumed;
+    const barsPlanned = r.barAmountPlanned;
+    const barsMax = Math.max(barsConsumed, barsPlanned, 1);
+
+    const actualPpb = r.actualPartsPerBar ?? 0;
+    const estimatedPpb = r.estimatedPartsPerBar ?? 0;
+    const ppbMax = Math.max(actualPpb, estimatedPpb, 1);
+
+    return {
+      parts: {
+        made: { value: partsMade, pct: (partsMade / partsMax) * 100 },
+        planned: { value: partsPlanned, pct: (partsPlanned / partsMax) * 100 },
+        scrap: { value: scrap, pct: (scrap / partsMax) * 100 }
+      },
+      bars: {
+        consumed: { value: barsConsumed, pct: (barsConsumed / barsMax) * 100 },
+        planned: { value: barsPlanned, pct: (barsPlanned / barsMax) * 100 }
+      },
+      ppb: {
+        actual: { value: actualPpb, pct: (actualPpb / ppbMax) * 100 },
+        estimated: { value: estimatedPpb, pct: (estimatedPpb / ppbMax) * 100 }
+      }
+    };
+  });
+
   protected readonly issueLogRows = computed(() => {
     const r = this.report();
     if (!r || !r.issueLogs) return [];
