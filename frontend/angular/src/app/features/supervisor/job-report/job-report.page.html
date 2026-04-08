@@ -66,8 +66,8 @@
         </div>
 
         <!-- Job Totals Panel -->
+        <h3 class="text-sm font-bold text-[var(--fg)]">Job Totals</h3>
         <div class="rounded-lg bg-[var(--bg)] border border-[var(--border)] px-4 py-3 space-y-4 text-sm">
-          <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wide">Job Totals</h3>
 
           <!-- Totals values grid -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-1">
@@ -170,10 +170,12 @@
         </div>
 
         <!-- Shift History Table -->
+        <h3 class="text-sm font-bold text-[var(--fg)]">Shifts</h3>
         <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
           <table class="min-w-full text-sm">
             <thead class="text-left text-slate-500 border-b border-[var(--border)]">
               <tr class="bg-[var(--surface)]">
+                <th class="px-4 py-3 font-medium">Shift #</th>
                 <th class="px-4 py-3 font-medium">Operator</th>
                 <th class="px-4 py-3 font-medium">Start Time</th>
                 <th class="px-4 py-3 font-medium">Stop Time</th>
@@ -187,11 +189,12 @@
             <tbody class="divide-y divide-[var(--border)]">
               @if (report()!.shifts.length === 0) {
                 <tr>
-                  <td colspan="8" class="px-4 py-3 text-sm text-slate-500">No shifts recorded for this job.</td>
+                  <td colspan="9" class="px-4 py-3 text-sm text-slate-500">No shifts recorded for this job.</td>
                 </tr>
               } @else {
                 @for (shift of report()!.shifts; track shift.id) {
                   <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors">
+                    <td class="px-4 py-3 text-[var(--fg)]">{{ shift.id }}</td>
                     <td class="px-4 py-3 text-[var(--fg)]">{{ shift.operatorName }}</td>
                     <td class="px-4 py-3 text-slate-500">{{ formatDateTime(shift.startTime) }}</td>
                     <td class="px-4 py-3 text-slate-500">{{ formatDateTime(shift.stopTime) }}</td>
