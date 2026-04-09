@@ -13,10 +13,6 @@ public partial class ShiftService
         if (shift.OperatorId != operatorId)
             throw new InvalidOperationException("You can only close your own shifts.");
 
-        var job = await _jobRepository.GetByIdAsync(shift.JobId, ct);
-        if (job == null)
-            throw new InvalidOperationException("The related job was not found.");
-
         var closedAt = DateTime.UtcNow;
 
         shift.StartTime = dto.StartTime;
@@ -24,8 +20,6 @@ public partial class ShiftService
         shift.PartsMade = dto.PartsMade;
         shift.BarsConsumed = dto.BarsConsumed;
         shift.PartsPerBar = dto.PartsPerBar;
-
-        job.End();
 
         await _shiftRepository.SaveChangesAsync(ct);
         return true;
