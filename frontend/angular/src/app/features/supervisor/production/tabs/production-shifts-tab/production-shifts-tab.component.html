@@ -1,0 +1,111 @@
+<div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+  <table class="min-w-full text-sm">
+    <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+      <tr class="bg-[var(--surface)]">
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="shiftsTable.onSortColumn('OperatorName')"
+        >Operator{{ shiftsTable.sortIndicator('OperatorName') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="shiftsTable.onSortColumn('JobNumber')"
+        >Job #{{ shiftsTable.sortIndicator('JobNumber') }}</th>
+        <th class="px-4 py-3 font-medium">Part</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="shiftsTable.onSortColumn('StartTime')"
+        >Start Time{{ shiftsTable.sortIndicator('StartTime') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="shiftsTable.onSortColumn('StopTime')"
+        >Stop Time{{ shiftsTable.sortIndicator('StopTime') }}</th>
+        <th class="px-4 py-3 font-medium text-right">Parts Made</th>
+        <th class="px-4 py-3 font-medium text-right">Scrap</th>
+        <th class="px-4 py-3 font-medium text-right">Bars</th>
+      </tr>
+      <tr [formGroup]="shiftsFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="operatorName"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="jobNumber"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal">
+          <div class="flex items-center gap-1">
+            <input
+              formControlName="startTimeFrom"
+              type="date"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+            <span class="text-xs text-slate-400">/</span>
+            <input
+              formControlName="startTimeTo"
+              type="date"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </div>
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <div class="flex items-center gap-1">
+            <input
+              formControlName="stopTimeFrom"
+              type="date"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+            <span class="text-xs text-slate-400">/</span>
+            <input
+              formControlName="stopTimeTo"
+              type="date"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </div>
+        </th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--border)]">
+      @if (shiftsTable.loading()) {
+        <tr><td colspan="8" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+      } @else if (shiftsTable.error()) {
+        <tr><td colspan="8" class="px-4 py-3 text-sm text-red-500">{{ shiftsTable.error() }}</td></tr>
+      } @else if (shiftRows().length === 0) {
+        <tr><td colspan="8" class="px-4 py-3 text-sm text-slate-500">No shifts found.</td></tr>
+      } @else {
+        @for (shift of shiftRows(); track shift.id) {
+          <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors">
+            <td class="px-4 py-3 text-[var(--fg)]">{{ shift.operatorName }}</td>
+            <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ shift.jobId }}</td>
+            <td class="px-4 py-3 text-[var(--fg)]">{{ shift.partName }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ formatStartTime(shift.startTime) }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ formatStopTime(shift.stopTime) }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.scrap }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+  <app-pager
+    [currentPage]="shiftsTable.currentPage()"
+    [totalPages]="shiftsTotalPages()"
+    [totalCount]="shiftsTotalCount()"
+    (pageChange)="shiftsTable.goToPage($event)"
+    [pageSize]="shiftsTable.pageSize()"
+    [pageSizes]="pageSizes"
+    (pageSizeChange)="shiftsTable.onPageSizeChange($event)"
+  />
+</div>

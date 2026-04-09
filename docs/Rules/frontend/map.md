@@ -240,8 +240,10 @@ features/
 │   │   └── tabs/
 │   │       ├── production-orders-tab/
 │   │       │   └── production-orders-tab.component.ts/html/css
-│   │       └── production-parts-tab/
-│   │           └── production-parts-tab.component.ts/html/css
+│   │       ├── production-parts-tab/
+│   │       │   └── production-parts-tab.component.ts/html/css
+│   │       └── production-shifts-tab/
+│   │           └── production-shifts-tab.component.ts/html/css
 │   ├── orders.page.ts/html/css
 │   └── job-planning.page.ts/html/css
 └── admin/                    (Admin role)
