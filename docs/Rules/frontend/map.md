@@ -231,6 +231,21 @@ features/
 │       └── adjust-bars-modal/
 │           └── adjust-bars-modal.component.ts/html/css
 ├── supervisor/               (Supervisor role)
+│   ├── production/
+│   │   ├── production.page.ts/html/css
+│   │   ├── add-part-modal/
+│   │   │   └── add-part-modal.component.ts/html/css
+│   │   ├── assign-stock-lot-modal/
+│   │   │   └── assign-stock-lot-modal.component.ts/html/css
+│   │   └── tabs/
+│   │       ├── production-jobs-tab/
+│   │       │   └── production-jobs-tab.component.ts/html/css
+│   │       ├── production-orders-tab/
+│   │       │   └── production-orders-tab.component.ts/html/css
+│   │       ├── production-parts-tab/
+│   │       │   └── production-parts-tab.component.ts/html/css
+│   │       └── production-shifts-tab/
+│   │           └── production-shifts-tab.component.ts/html/css
 │   ├── orders.page.ts/html/css
 │   └── job-planning.page.ts/html/css
 └── admin/                    (Admin role)

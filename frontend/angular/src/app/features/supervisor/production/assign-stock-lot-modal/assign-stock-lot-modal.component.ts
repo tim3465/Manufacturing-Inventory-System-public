@@ -5,7 +5,7 @@ import { JobsApi } from '../../../../core/api/jobs.api';
 import { StockLotsApi } from '../../../../core/api/stock-lots.api';
 import { StockLotDto } from '../../../../core/dtos/stock-lots/stock-lot.dto';
 import { ToastService } from '../../../../core/ui/toast/toast.service';
-import { JobProductionRow } from '../production.page';
+import { JobProductionRow } from '../tabs/production-jobs-tab/production-jobs-tab.component';
 
 @Component({
   selector: 'app-assign-stock-lot-modal',

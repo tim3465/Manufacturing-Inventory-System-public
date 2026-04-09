@@ -286,3 +286,41 @@ The goal is to visually separate:
 - actual data
 
 In dark mode, these surfaces invert appropriately while preserving contrast hierarchy.
+
+---
+
+## Tab Component Rule
+
+Page-level tabbed screens must extract each tab into its own child component under a `tabs/` folder inside the owning page folder.
+
+### Responsibilities
+
+**Route page owns:**
+- Tab selection signal and tab bar rendering
+- High-level state coordination (e.g., modal open/close signals that live in the page header)
+- Rendering the correct tab component via `@if`
+
+**Tab component owns:**
+- Its own UI, table/filter/display logic
+- Tab-specific interactions (sorting, paging, filtering)
+- Its own SmartTableState, filter form, and data signals
+- Initial data load via `OnInit`
+
+### Folder Structure
+
+```
+features/{role}/{page}/
+  tabs/
+    {page}-{tab-name}-tab/
+      {page}-{tab-name}-tab.component.ts
+      {page}-{tab-name}-tab.component.html
+      {page}-{tab-name}-tab.component.css
+```
+
+### Rules
+
+- Do NOT keep tab content inline in the parent page template
+- Do NOT put tab components in shared folders or `core/`
+- Tab components are standalone and imported by the parent page
+- The parent page can call public methods on the tab via `@ViewChild` (e.g., `refresh()`)
+- Tab components are conditionally rendered by the parent via `@if`, so Angular creates/destroys them on tab switch — no tab-active guard needed inside the component
