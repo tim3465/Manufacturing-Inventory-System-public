@@ -25,7 +25,6 @@ public class ShiftsController : ControllerBase
     // - Most resources allow anonymous read access; Users requires authentication.
 
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<ShiftDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<ShiftDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -34,7 +33,6 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "GetShift")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(ShiftDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ShiftDto>> GetAsync(int id, CancellationToken ct = default)

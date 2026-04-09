@@ -31,7 +31,6 @@ public class OrdersController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active orders.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<OrderDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -46,7 +45,6 @@ public class OrdersController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The order if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetOrder")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<OrderDto>> GetAsync(int id, CancellationToken ct = default)

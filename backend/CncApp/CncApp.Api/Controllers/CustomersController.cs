@@ -28,7 +28,6 @@ public class CustomersController : ControllerBase
     /// Gets all active customers.
     /// </summary>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<CustomerDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<CustomerDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -40,7 +39,6 @@ public class CustomersController : ControllerBase
     /// Gets a customer by ID.
     /// </summary>
     [HttpGet("{id:int}", Name = "GetCustomer")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(CustomerDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CustomerDto>> GetAsync(int id, CancellationToken ct = default)

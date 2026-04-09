@@ -30,7 +30,6 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all Active machines.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MachineDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -44,7 +43,6 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of active machines with their active jobs.</returns>
     [HttpGet("with-jobs")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MachineWithJobsDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MachineWithJobsDto>>> ListWithJobsAsync(CancellationToken ct = default)
     {
@@ -59,7 +57,6 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The machine if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetMachine")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(MachineDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MachineDto>> GetAsync(int id, CancellationToken ct = default)
