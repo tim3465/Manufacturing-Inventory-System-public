@@ -238,6 +238,8 @@ features/
 │   │   ├── assign-stock-lot-modal/
 │   │   │   └── assign-stock-lot-modal.component.ts/html/css
 │   │   └── tabs/
+│   │       ├── production-orders-tab/
+│   │       │   └── production-orders-tab.component.ts/html/css
 │   │       └── production-parts-tab/
 │   │           └── production-parts-tab.component.ts/html/css
 │   ├── orders.page.ts/html/css
