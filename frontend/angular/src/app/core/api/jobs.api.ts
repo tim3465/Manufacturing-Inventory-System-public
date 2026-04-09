@@ -6,6 +6,7 @@ import { JobProductionDto } from '../dtos/jobs/job-production.dto';
 import { JobProductionSearchRequestDto } from '../dtos/jobs/job-production-search-request.dto';
 import { JobProductionSearchResultDto } from '../dtos/jobs/job-production-search-result.dto';
 import { JobShiftDto } from '../dtos/jobs/job-shift.dto';
+import { JobReportDto } from '../dtos/jobs/job-report.dto';
 import { MyJobListItemDto } from '../dtos/jobs/my-job.dto';
 import { MyJobSearchRequestDto } from '../dtos/jobs/my-job-search-request.dto';
 import { MyJobSearchResultDto } from '../dtos/jobs/my-job-search-result.dto';
@@ -60,6 +61,11 @@ export class JobsApi {
   /** GET /api/jobs/my-jobs/{jobId}/shifts - shifts for a specific job (Machinist/Admin) */
   getMyJobShifts(jobId: number): Observable<JobShiftDto[]> {
     return this.api.get<JobShiftDto[]>(`${_PATH}/my-jobs/${jobId}/shifts`);
+  }
+
+  /** GET /api/jobs/{id}/report - full job report with totals and shift history (Supervisor/Admin) */
+  getReport(id: number): Observable<JobReportDto> {
+    return this.api.getCached<JobReportDto>(`${_PATH}/${id}/report`);
   }
 
   /** GET /api/jobs/my-jobs/search - paginated/filtered/sorted my jobs (Machinist/Admin) */

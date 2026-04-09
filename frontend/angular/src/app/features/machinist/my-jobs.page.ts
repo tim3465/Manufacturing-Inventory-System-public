@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { debounceTime } from 'rxjs/operators';
 import { JobsApi } from '../../core/api/jobs.api';
 import { JobShiftDto } from '../../core/dtos/jobs/job-shift.dto';
@@ -28,6 +29,7 @@ export class MyJobsPageComponent {
   private readonly jobsApi = inject(JobsApi);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   protected readonly table = new SmartTableState({
     defaultSortColumn: 'JobNumber',
@@ -152,5 +154,10 @@ export class MyJobsPageComponent {
 
   protected hasShiftCache(id: number): boolean {
     return this.shiftCache().has(id);
+  }
+
+  protected viewJobReport(jobId: number, event: Event): void {
+    event.stopPropagation();
+    this.router.navigate(['/machinist/job-report', jobId]);
   }
 }

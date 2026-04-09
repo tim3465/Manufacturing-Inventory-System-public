@@ -226,6 +226,19 @@ public class Job : AuditableEntityBase
     }
 
     /// <summary>
+    /// Ends the job by recording the end time.
+    /// </summary>
+    /// <exception cref="DomainException">Thrown when the job is already ended.</exception>
+    public void End()
+    {
+        if (EndedDateTime.HasValue)
+        {
+            throw new DomainException("Job has already been ended.");
+        }
+                EndedDateTime = DateTimeOffset.UtcNow;
+    }
+
+
     /// Closes the job by recording the end time.
     /// </summary>
     /// <exception cref="DomainException">Thrown when the job has not been started or has already been closed.</exception>

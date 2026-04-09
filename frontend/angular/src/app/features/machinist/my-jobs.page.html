@@ -21,6 +21,7 @@
             (click)="table.onSortColumn('MachineName')"
           >Machine{{ table.sortIndicator('MachineName') }}</th>
           <th class="px-4 py-3 font-medium">Status</th>
+          <th class="px-4 py-3 font-medium"></th>
         </tr>
         <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
           <th class="px-4 py-2 font-normal">
@@ -57,15 +58,16 @@
               <option value="Completed">Completed</option>
             </select>
           </th>
+          <th class="px-4 py-2 font-normal"></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-[var(--border)]">
         @if (table.loading()) {
-          <tr><td colspan="4" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
         } @else if (table.error()) {
-          <tr><td colspan="4" class="px-4 py-3 text-sm text-red-500">{{ table.error() }}</td></tr>
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-red-500">{{ table.error() }}</td></tr>
         } @else if (rows().length === 0) {
-          <tr><td colspan="4" class="px-4 py-3 text-sm text-slate-500">No jobs found.</td></tr>
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-slate-500">No jobs found.</td></tr>
         } @else {
           @for (row of rows(); track row.id) {
             <tr
@@ -86,11 +88,17 @@
                   {{ row.status }}
                 </span>
               </td>
+              <td class="px-4 py-3 text-right">
+                <button
+                  class="text-xs text-[var(--primary)] hover:underline"
+                  (click)="viewJobReport(row.id, $event)"
+                >Report</button>
+              </td>
             </tr>
 
             @if (expandedJobId() === row.id) {
               <tr>
-                <td colspan="4" class="bg-[var(--bg)] px-6 py-4">
+                <td colspan="5" class="bg-[var(--bg)] px-6 py-4">
                   @if (loadingShiftForJobId() === row.id) {
                     <p class="text-sm text-slate-400">Loading shifts...</p>
                   } @else if (hasShiftCache(row.id) && shiftsForJob(row.id).length === 0) {
