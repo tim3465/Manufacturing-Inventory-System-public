@@ -31,7 +31,6 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Paged result of matching active materials.</returns>
     [HttpGet("search")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(MaterialSearchResultDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<MaterialSearchResultDto>> SearchActiveAsync(
         [FromQuery] MaterialSearchRequestDto request, CancellationToken ct = default)
@@ -46,7 +45,6 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active materials.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MaterialDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -61,7 +59,6 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The material if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetMaterial")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MaterialDto>> GetAsync(int id, CancellationToken ct = default)

@@ -29,7 +29,6 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active parts.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<PartDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -44,7 +43,6 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>Paged list of matching active parts.</returns>
     [HttpGet("search")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PartSearchResultDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<PartSearchResultDto>> SearchActiveAsync(
         [FromQuery] PartSearchRequestDto request, CancellationToken ct = default)
@@ -60,7 +58,6 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The part if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetPart")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PartDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PartDto>> GetAsync(int id, CancellationToken ct = default)

@@ -29,7 +29,6 @@ public class JobsController : ControllerBase
     // - Most resources allow anonymous read access; Users requires authentication.
 
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<JobDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -38,7 +37,6 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "GetJob")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobDto>> GetAsync(int id, CancellationToken ct = default)

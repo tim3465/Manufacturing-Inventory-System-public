@@ -37,6 +37,7 @@ public class AuthController : ControllerBase
     /// Login endpoint that validates credentials and returns a JWT access token.
     /// </summary>
     [HttpPost("login")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)

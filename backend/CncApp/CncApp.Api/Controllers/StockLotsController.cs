@@ -31,7 +31,6 @@ public class StockLotsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>A paged result of matching stock lots.</returns>
     [HttpGet("search")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(StockLotSearchResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<StockLotSearchResultDto>> SearchAsync(
@@ -47,7 +46,6 @@ public class StockLotsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active stock lots.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<StockLotDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<StockLotDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -62,7 +60,6 @@ public class StockLotsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The stock lot if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetStockLot")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(StockLotDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<StockLotDto>> GetAsync(int id, CancellationToken ct = default)
