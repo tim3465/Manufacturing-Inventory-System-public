@@ -4,12 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ShiftsApi } from '../../../../core/api/shifts.api';
 import { RunningShiftDto } from '../../../../core/dtos/shifts/running-shift.dto';
 import { ToastService } from '../../../../core/ui/toast/toast.service';
+import { CloseJobModalComponent } from '../close-job-modal/close-job-modal.component';
 import { IssueLogsPanelComponent } from '../issue-logs-panel/issue-logs-panel.component';
 
 @Component({
   selector: 'app-running-shift-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IssueLogsPanelComponent],
+  imports: [CommonModule, ReactiveFormsModule, CloseJobModalComponent, IssueLogsPanelComponent],
   templateUrl: './running-shift-form.component.html',
   styleUrl: './running-shift-form.component.css'
 })
@@ -26,6 +27,7 @@ export class RunningShiftFormComponent implements OnInit {
   protected readonly shift = signal<RunningShiftDto | null>(null);
   protected readonly submittingAction = signal<'save' | 'close' | null>(null);
   protected readonly showLogsPanel = signal(false);
+  protected readonly showCloseJobModal = signal(false);
 
   protected toggleLogsPanel(): void {
     this.showLogsPanel.update((v) => !v);
@@ -78,7 +80,7 @@ export class RunningShiftFormComponent implements OnInit {
     });
   }
 
-  private buildDto() {
+  protected buildDto() {
     const raw = this.form.getRawValue();
 
     return {
@@ -149,5 +151,40 @@ export class RunningShiftFormComponent implements OnInit {
         this.submittingAction.set(null);
       }
     });
+  }
+
+  protected onCloseJob(): void {
+    if (this.submittingAction() !== null) return;
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const raw = this.form.getRawValue();
+
+    if (!raw.stopTime) {
+      this.form.controls.stopTime.markAsTouched();
+      return;
+    }
+
+    if (raw.stopTime) {
+      const start = new Date(raw.startTime).getTime();
+      const stop = new Date(raw.stopTime).getTime();
+      if (stop <= start) {
+        this.toast.error('Stop time must be after start time');
+        return;
+      }
+    }
+
+    this.showCloseJobModal.set(true);
+  }
+
+  protected onJobClosed(): void {
+    this.closed.emit();
+  }
+
+  protected onCloseJobModalDismissed(): void {
+    this.showCloseJobModal.set(false);
   }
 }

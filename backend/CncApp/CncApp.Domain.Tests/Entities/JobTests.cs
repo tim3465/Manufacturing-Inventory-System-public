@@ -344,6 +344,47 @@ public class JobTests
         Assert.Contains("BarsToAdd", ex.Message);
     }
 
+    #endregion
+
+    #region Close Tests
+
+    [Fact]
+    public void Close_WhenJobIsStarted_SetsEndedDateTime()
+    {
+        var job = CreateValidJob();
+        job.Start(1);
+
+        job.Close();
+
+        Assert.NotNull(job.EndedDateTime);
+        Assert.True(job.EndedDateTime.Value <= DateTimeOffset.UtcNow);
+        Assert.True(job.EndedDateTime.Value >= DateTimeOffset.UtcNow.AddSeconds(-1));
+    }
+
+    [Fact]
+    public void Close_WhenJobIsNotStarted_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+
+        var ex = Assert.Throws<DomainException>(() => job.Close());
+        Assert.Contains("has not been started", ex.Message);
+    }
+
+    [Fact]
+    public void Close_WhenJobIsAlreadyClosed_ThrowsDomainException()
+    {
+        var job = CreateValidJob();
+        job.Start(1);
+        job.Close();
+
+        var ex = Assert.Throws<DomainException>(() => job.Close());
+        Assert.Contains("already been closed", ex.Message);
+    }
+
+    #endregion
+
+    #region Inactivate Tests
+
     [Fact]
     public void Inactivate_WhenJobIsActive_SetsInactivatedDateTime()
     {
