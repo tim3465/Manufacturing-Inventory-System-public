@@ -39,17 +39,15 @@
         <th class="px-4 py-2 font-normal"></th>
         <th class="px-4 py-2 font-normal">
           <div class="flex items-center gap-1">
-            <input
-              formControlName="dueDateFrom"
-              type="date"
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
-            />
-            <span class="text-xs text-slate-400">/</span>
-            <input
-              formControlName="dueDateTo"
-              type="date"
-              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
-            />
+            <input formControlName="dueDateFrom"
+                   type="date"
+                   class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]" />
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
+            <input formControlName="dueDateTo"
+                   type="date"
+                   class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]" />
           </div>
         </th>
         <th class="px-4 py-2 font-normal">
