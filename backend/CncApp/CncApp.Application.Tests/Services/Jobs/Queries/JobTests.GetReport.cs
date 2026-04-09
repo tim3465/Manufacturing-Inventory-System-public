@@ -70,17 +70,20 @@ public partial class JobTests
         var log1 = new ShiftIssueLog(shiftId: 100, issueType: IssueTypeEnum.Setup, scrapQuantity: 1, description: "Tool broke")
         {
             Id = 200,
-            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 10, 0, 0, TimeSpan.Zero)
+            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 10, 0, 0, TimeSpan.Zero),
+            CreatedByUserId = 10
         };
         var log2 = new ShiftIssueLog(shiftId: 101, issueType: IssueTypeEnum.Production, scrapQuantity: 0, description: "Coolant leak", downtime: TimeSpan.FromMinutes(10))
         {
             Id = 201,
-            CreatedDateTime = new DateTimeOffset(2026, 3, 2, 9, 0, 0, TimeSpan.Zero)
+            CreatedDateTime = new DateTimeOffset(2026, 3, 2, 9, 0, 0, TimeSpan.Zero),
+            CreatedByUserId = 11
         };
         var log3 = new ShiftIssueLog(shiftId: 100, issueType: IssueTypeEnum.Production, scrapQuantity: 2, description: "Material defect")
         {
             Id = 202,
-            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 14, 0, 0, TimeSpan.Zero)
+            CreatedDateTime = new DateTimeOffset(2026, 3, 1, 14, 0, 0, TimeSpan.Zero),
+            CreatedByUserId = null
         };
 
         shift1.ShiftIssueLogs = new List<ShiftIssueLog> { log1, log3 };
@@ -144,6 +147,11 @@ public partial class JobTests
         Assert.Equal(IssueTypeEnum.Setup, result.IssueLogs[0].IssueType);
         Assert.Equal("Tool broke", result.IssueLogs[0].Description);
         Assert.Equal(1, result.IssueLogs[0].ScrapQuantity);
+
+        // Verify CreatedByUserId mapping
+        Assert.Equal(10, result.IssueLogs[0].CreatedByUserId);   // log1: set to operator1's user id
+        Assert.Null(result.IssueLogs[1].CreatedByUserId);         // log3: null
+        Assert.Equal(11, result.IssueLogs[2].CreatedByUserId);   // log2: set to operator2's user id
 
         MockRepository.Verify(r => r.GetByIdWithShiftsAsync(jobId, cancellationToken), Times.Once);
     }

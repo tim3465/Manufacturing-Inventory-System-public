@@ -7,6 +7,7 @@ export interface JobReportIssueLogDto {
   description: string;
   scrapQuantity: number;
   downtime: string | null;
+  createdByUserId: number | null;
 }
 
 export interface JobReportShiftDto {

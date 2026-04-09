@@ -9,6 +9,7 @@ public class JobReportIssueLogDto
     public string OperatorName { get; set; } = string.Empty;
     public DateTimeOffset CreatedDateTime { get; set; }
     public IssueTypeEnum IssueType { get; set; }
+    public int? CreatedByUserId { get; set; }
     public string Description { get; set; } = string.Empty;
     public int ScrapQuantity { get; set; }
     public TimeSpan? Downtime { get; set; }

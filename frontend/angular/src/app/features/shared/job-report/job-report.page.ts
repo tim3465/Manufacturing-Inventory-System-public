@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { JobsApi } from '../../../core/api/jobs.api';
 import { JobReportDto, JobReportIssueLogDto } from '../../../core/dtos/jobs/job-report.dto';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ToastService } from '../../../core/ui/toast/toast.service';
 
 @Component({
@@ -15,8 +16,10 @@ export class JobReportPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly jobsApi = inject(JobsApi);
+  private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
 
+  protected readonly currentUserId = this.auth.getUserId();
   protected readonly loading = signal<boolean>(true);
   protected readonly report = signal<JobReportDto | null>(null);
   protected readonly backRoute = signal<string>('/supervisor/production');
@@ -164,7 +167,8 @@ export class JobReportPageComponent implements OnInit {
       downtimeHours,
       downtimeMinutes,
       description: dto.description,
-      createdDateTime: formatted
+      createdDateTime: formatted,
+      createdByUserId: dto.createdByUserId
     };
   }
 }
@@ -178,4 +182,5 @@ interface IssueLogRow {
   downtimeMinutes: number;
   description: string;
   createdDateTime: string;
+  createdByUserId: number | null;
 }

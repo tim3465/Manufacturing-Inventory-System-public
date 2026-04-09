@@ -90,6 +90,7 @@ public partial class JobService
                             : s.Operator.UserName)
                         : string.Empty,
                     CreatedDateTime = log.CreatedDateTime,
+                    CreatedByUserId = log.CreatedByUserId,
                     IssueType = log.IssueType,
                     Description = log.Description,
                     ScrapQuantity = log.ScrapQuantity,
