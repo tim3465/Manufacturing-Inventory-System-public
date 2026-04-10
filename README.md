@@ -7,38 +7,77 @@ Full-stack CNC shop inventory system built with ASP.NET Core (.NET 8) and Angula
 ## Tech Stack
 
 ### Backend
-- .NET 8
-- ASP.NET Core Web API
-- Entity Framework Core (SQL Server)
-- ASP.NET Identity
-- JWT Authentication (role claims)
-- AutoMapper
-- xUnit + Moq (unit testing)
-- Swagger / OpenAPI
+
+* .NET 8
+* ASP.NET Core Web API
+* Entity Framework Core (SQL Server)
+* ASP.NET Identity
+* JWT Authentication (role claims)
+* AutoMapper
+* xUnit + Moq (unit testing)
+* Swagger / OpenAPI
 
 ### Frontend
-- Angular 21 (standalone components)
-- Angular Signals
-- Reactive Forms
-- Tailwind CSS (custom styling, no component library)
-- Vitest (unit testing)
-- HTTP Interceptors (JWT attachment + 401 handling)
-- Custom API client with caching layer (TTL + invalidation)
-- Dark mode via ThemeService
+
+* Angular 21 (standalone components)
+* Angular Signals
+* Reactive Forms
+* Tailwind CSS (custom styling, no component library)
+* Vitest (unit testing)
+* HTTP Interceptors (JWT attachment + 401 handling)
+* Custom API client with caching layer (TTL + invalidation)
+* Dark mode via ThemeService
 
 ---
 
 ## Key Features
 
-- Role-based authentication and authorization (JWT with role claims)
-- Dual-user system (Identity user + Domain user)
-- Soft delete pattern across all entities
-- Full audit trail (Created/Updated/Inactivated with user tracking)
-- Global exception handler returning RFC 7807 ProblemDetails
-- Development-only database seeding (roles + admin user)
-- API request caching layer (frontend)
-- 60+ application-layer unit tests
-- Strict Domain / Application / Infrastructure / API separation
+* Role-based authentication and authorization (JWT with role claims)
+* Dual-user system (Identity user + Domain user)
+* Soft delete pattern across all entities
+* Full audit trail (Created/Updated/Inactivated with user tracking)
+* Global exception handler returning RFC 7807 ProblemDetails
+* Development-only database seeding (roles + admin user)
+* API request caching layer (frontend)
+* 60+ application-layer unit tests
+* Strict Domain / Application / Infrastructure / API separation
+
+---
+
+## AI-Assisted Development Workflow
+
+This project includes a structured AI-assisted development system built on top of Claude Code.
+
+Key capabilities:
+
+* Ticket-driven development using GitHub issues as the source of truth
+* Automated backend and frontend orchestration via specialized agents
+* Strict output contracts for predictable implementation results
+* Worktree-based isolation for parallel feature development
+* Automated PR creation, issue linking, and cleanup workflows
+
+Core commands:
+
+* `/plan` — generate full implementation plan and write to issue
+* `/new-worktree` — create isolated work environment per ticket
+* `/start-ticket` — execute backend and frontend implementation
+* `/git-commit` — guided commit message generation
+* `/close-ticket` — push, open PR, and clean up worktree
+* `/amend-ticket` — apply scoped refinements to existing tickets
+
+This system enforces consistency, reduces manual overhead, and ensures alignment between planning and implementation.
+
+---
+
+## Developer Workflow System
+
+The `.claude` directory contains a structured development system including:
+
+* custom agents (backend/frontend implementation)
+* reusable skills for ticket execution
+* orchestration rules and validation layers
+
+This system enables consistent, repeatable development workflows and enforces architectural boundaries during implementation.
 
 ---
 
@@ -46,15 +85,16 @@ Full-stack CNC shop inventory system built with ASP.NET Core (.NET 8) and Angula
 
 Supported roles:
 
-- Machinist
-- Shipping & Receiving
-- Supervisor
-- Administrator
-- User (baseline authenticated access)
+* Machinist
+* Shipping & Receiving
+* Supervisor
+* Administrator
+* User (baseline authenticated access)
 
 Pages are restricted by role both:
-- Backend (JWT role enforcement)
-- Frontend (route guards + conditional navigation)
+
+* Backend (JWT role enforcement)
+* Frontend (route guards + conditional navigation)
 
 ---
 
@@ -83,38 +123,93 @@ frontend/angular/
 
 ---
 
+## UI Patterns
+
+### Smart Table System
+
+The frontend uses a reusable smart table pattern for data-heavy pages, featuring:
+
+* Server-driven filtering and pagination
+* Column-level filtering
+* Consistent layout and interaction model
+* Shared implementation across inventory, orders, and reporting views
+
+The Shipping/Receiving Inventory table serves as the reference implementation for all future tables.
+
+---
+
+## Issue Log System
+
+A messaging-style issue log system is used for tracking:
+
+* downtime
+* scrap
+* production issues
+
+Features include:
+
+* user-specific highlighting
+* timestamped entries
+* structured logging for reporting
+* reusable UI between shift logs and reports
+
+---
+
 ## Design Highlights
 
 ### Dual User Model
-Authentication uses `IdentityUser<int>`, while business logic uses a separate `Domain.User` entity linked by `IdentityUserId`. This keeps authentication concerns separate from business concerns.
+
+Authentication uses `IdentityUser<int>`, while business logic uses a separate `Domain.User` entity linked by `IdentityUserId`.
 
 ### Soft Delete + Audit Trail
+
 All entities inherit from `AuditableEntityBase` and include:
-- CreatedDateTime / CreatedByUserId
-- UpdatedDateTime / UpdatedByUserId
-- InactivatedDateTime / InactivatedByUserId
+
+* CreatedDateTime / CreatedByUserId
+* UpdatedDateTime / UpdatedByUserId
+* InactivatedDateTime / InactivatedByUserId
 
 Audit fields are automatically populated in `SaveChangesAsync`.
 
 ### Global Exception Handling
-Unhandled exceptions are mapped to structured RFC 7807 `ProblemDetails` responses with trace IDs for debugging.
+
+Unhandled exceptions are mapped to structured RFC 7807 `ProblemDetails` responses with trace IDs.
 
 ### Service-per-Aggregate Pattern
-The Application layer uses a service-per-aggregate structure, with partial classes organized into `Commands/` and `Queries/` folders.  
-This is not CQRS with MediatR — it maintains a straightforward orchestration model without mediator abstraction.
+
+Application layer uses a service-per-aggregate structure organized into `Commands/` and `Queries/`.
+
+---
+
+## Performance Considerations
+
+* Read-only database context used for query operations
+* Entity Framework query optimizations (Include ordering)
+* Frontend caching with TTL and invalidation
+* Lazy loading of large datasets (e.g., shift history)
+
+---
+
+## API Authorization
+
+All API endpoints are explicitly secured using role-based authorization.
+
+* No anonymous access unless explicitly required
+* Endpoint access aligned with frontend role restrictions
+* Authorization audited and standardized across all controllers
 
 ---
 
 ## Testing
 
-- xUnit for backend tests
-- Moq for mocking dependencies
-- 60+ application-layer test files
-- Domain tests validate invariants without touching persistence
-- Application tests validate orchestration without re-testing domain rules
-- Vitest for frontend unit tests
+* xUnit for backend tests
+* Moq for mocking dependencies
+* 60+ application-layer test files
+* Domain tests validate invariants without persistence
+* Application tests validate orchestration without re-testing domain rules
+* Vitest for frontend unit tests
 
-The Domain layer has zero external NuGet dependencies.
+The Domain layer has zero external dependencies.
 
 ---
 
@@ -122,10 +217,10 @@ The Domain layer has zero external NuGet dependencies.
 
 ### Prerequisites
 
-- .NET 8 SDK
-- Node.js (v18+ recommended)
-- SQL Server or SQL Server LocalDB
-- Angular CLI
+* .NET 8 SDK
+* Node.js (v18+)
+* SQL Server or LocalDB
+* Angular CLI
 
 ---
 
@@ -138,12 +233,14 @@ dotnet ef database update
 dotnet run --project CncApp.Api
 ```
 
-Backend runs on:
+Backend:
+
 ```
 https://localhost:7136
 ```
 
-Swagger UI:
+Swagger:
+
 ```
 https://localhost:7136/swagger
 ```
@@ -158,40 +255,37 @@ npm install
 ng serve
 ```
 
-Frontend runs on:
+Frontend:
+
 ```
 http://localhost:4200
 ```
-
-The Angular proxy configuration forwards API requests to the backend.
 
 ---
 
 ## Development Seeding
 
-Controlled via `appsettings.Development.json` flags:
+Controlled via `appsettings.Development.json`:
 
-- Role seeding
-- Admin user seeding
-
-This ensures clean local database resets without affecting production environments.
+* Role seeding
+* Admin user seeding
 
 ---
 
 ## API Testing
 
-A Postman collection is available in the `/postman` directory for manual API testing.
+A Postman collection is available in `/postman`.
 
 ---
 
 ## Documentation
 
-Additional technical documentation is available in the `/docs` directory, including architecture notes and testing philosophy.
+Additional technical documentation is available in `/docs`, including architecture notes and testing philosophy.
 
 ---
 
 ## Status
 
-Active development.  
-Architecture foundation complete.  
+Active development.
+Architecture foundation complete.
 Incrementally expanding business workflows and UI integration.
