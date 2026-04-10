@@ -1,7 +1,10 @@
 using CncApp.Application.Dtos.Jobs;
 using CncApp.Application.Services.Jobs;
+using CncApp.Application.Services.Users;
+using CncApp.Application.Services.Workflows.StartJob;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace CncApp.Api.Controllers;
 
@@ -10,10 +13,14 @@ namespace CncApp.Api.Controllers;
 public class JobsController : ControllerBase
 {
     private readonly JobService _jobService;
+    private readonly StartJobService _startJobService;
+    private readonly UserService _userService;
 
-    public JobsController(JobService jobService)
+    public JobsController(JobService jobService, StartJobService startJobService, UserService userService)
     {
         _jobService = jobService;
+        _startJobService = startJobService;
+        _userService = userService;
     }
 
     // Conventions:
@@ -22,7 +29,6 @@ public class JobsController : ControllerBase
     // - Most resources allow anonymous read access; Users requires authentication.
 
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<JobDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<JobDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -31,7 +37,6 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet("{id:int}", Name = "GetJob")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(JobDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobDto>> GetAsync(int id, CancellationToken ct = default)
@@ -98,6 +103,115 @@ public class JobsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpGet("production")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<JobProductionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<JobProductionDto>>> ListProductionAsync(CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListProductionAsync(ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("production/search")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(JobProductionSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<JobProductionSearchResultDto>> SearchProductionAsync(
+        [FromQuery] JobProductionSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _jobService.SearchProductionAsync(request, ct);
+        return Ok(result);
+    }
+
+    [HttpPost("{id:int}/start")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(StartJobResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<StartJobResponseDto>> StartJobAsync(
+        int id,
+        [FromBody] StartJobRequestDto dto,
+        CancellationToken ct = default)
+    {
+        var result = await _startJobService.StartJobAsync(id, dto, ct);
+        return StatusCode(StatusCodes.Status201Created, result);
+    }
+    [HttpPatch("{id:int}/assign-stocklot")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AssignStockLotAsync(int id, [FromBody] AssignStockLotRequestDto dto, CancellationToken ct = default)
+    {
+        var success = await _jobService.AssignStockLotAsync(id, dto, ct);
+        return success ? NoContent() : NotFound();
+
+    }
+
+    [HttpGet("{id:int}/report")]
+    [Authorize(Roles = "Supervisor,Admin,Machinist")]
+    [ProducesResponseType(typeof(JobReportDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<JobReportDto>> GetReportAsync(int id, CancellationToken ct = default)
+    {
+        if (User.IsInRole("Machinist") && !User.IsInRole("Supervisor") && !User.IsInRole("Admin"))
+        {
+            var operator_ = await _userService.GetCurrentUserAsync(ct);
+            var shifts = await _jobService.GetJobShiftsForOperatorAsync(id, operator_.Id, ct);
+            if (shifts == null)
+                return NotFound();
+        }
+
+        var report = await _jobService.GetReportAsync(id, ct);
+        if (report == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(report);
+    }
+
+    [HttpGet("by-order/{orderId:int}")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<JobProductionDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListByOrder(int orderId, CancellationToken ct = default)
+    {
+        var jobs = await _jobService.ListByOrderAsync(orderId, ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("my-jobs")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(List<MyJobListItemDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MyJobListItemDto>>> ListMyJobsAsync(CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var jobs = await _jobService.ListMyJobsAsync(operator_.Id, ct);
+        return Ok(jobs);
+    }
+
+    [HttpGet("my-jobs/search")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(MyJobSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<MyJobSearchResultDto>> SearchMyJobsAsync(
+        [FromQuery] MyJobSearchRequestDto request, CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var result = await _jobService.SearchMyJobsAsync(operator_.Id, request, ct);
+        return Ok(result);
+    }
+
+    [HttpGet("my-jobs/{jobId:int}/shifts")]
+    [Authorize(Roles = "Machinist,Admin")]
+    [ProducesResponseType(typeof(List<JobShiftDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<List<JobShiftDto>>> GetMyJobShiftsAsync(int jobId, CancellationToken ct = default)
+    {
+        var operator_ = await _userService.GetCurrentUserAsync(ct);
+        var shifts = await _jobService.GetJobShiftsForOperatorAsync(jobId, operator_.Id, ct);
+        if (shifts == null) return Forbid();
+        return Ok(shifts);
     }
 }
 

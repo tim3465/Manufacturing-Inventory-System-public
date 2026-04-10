@@ -74,6 +74,18 @@ login(email: string, password: string, returnUrl?: string | null): Observable<st
     return this.cachedRoles;
   }
 
+  getUserId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const payload = this.decodeJwtPayload(token);
+    const sub = payload?.['sub'];
+    if (typeof sub === 'string') {
+      const id = parseInt(sub, 10);
+      return isNaN(id) ? null : id;
+    }
+    return null;
+  }
+
   getDisplayName(): string | null {
     if (this.cachedDisplayName) return this.cachedDisplayName;
     const token = this.getToken();

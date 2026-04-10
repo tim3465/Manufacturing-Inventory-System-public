@@ -1,0 +1,93 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div class="relative z-10 w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl">
+    <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+      <div class="text-lg font-semibold text-[var(--fg)]">Add Part</div>
+      <button
+        type="button"
+        class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+        (click)="onCancel()"
+        [disabled]="submitting()"
+        aria-label="Close"
+      >
+        &#x2715;
+      </button>
+    </div>
+
+    <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Part Name</div>
+        <input
+          type="text"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="partName"
+          autocomplete="off"
+        />
+        @if (form.controls.partName.touched && form.controls.partName.invalid) {
+          <div class="mt-1 text-xs text-red-500">Part name is required (max 100 characters)</div>
+        }
+      </label>
+
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Part Number</div>
+        <input
+          type="text"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="partNumber"
+          autocomplete="off"
+        />
+        @if (form.controls.partNumber.touched && form.controls.partNumber.invalid) {
+          <div class="mt-1 text-xs text-red-500">Part number is required (max 50 characters)</div>
+        }
+      </label>
+
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Approx Part Cycle Time <span class="text-slate-400 text-xs">(HH:MM:SS)</span></div>
+        <input
+          type="text"
+          placeholder="00:00:30"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="approxPartCycleTime"
+          autocomplete="off"
+        />
+        @if (form.controls.approxPartCycleTime.touched && form.controls.approxPartCycleTime.invalid) {
+          <div class="mt-1 text-xs text-red-500">Required, format HH:MM:SS (e.g. 00:00:30)</div>
+        }
+      </label>
+
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Check Per Part</div>
+        <input
+          type="number"
+          min="0"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="checkPerPart"
+        />
+        @if (form.controls.checkPerPart.touched && form.controls.checkPerPart.invalid) {
+          <div class="mt-1 text-xs text-red-500">Check per part is required (min 0)</div>
+        }
+      </label>
+
+      <div class="pt-2 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="submitting()"
+        >
+          {{ submitting() ? 'Saving...' : 'Add Part' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

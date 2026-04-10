@@ -10,8 +10,7 @@ public class JobDto
     [Required(ErrorMessage = "OrderId is required.")]
     public int OrderId { get; set; }
 
-    [Required(ErrorMessage = "StockLotId is required.")]
-    public int StockLotId { get; set; }
+    public int? StockLotId { get; set; }
 
     [Required(ErrorMessage = "MachineId is required.")]
     public int MachineId { get; set; }
@@ -29,5 +28,12 @@ public class JobDto
     public int BarsInJob { get; set; }
 
     public int? EstimatedPartsPerBar { get; set; }
+
+    [Required(ErrorMessage = "DueDate is required.")]
+    public DateOnly DueDate { get; set; }
+
+    public DateTimeOffset? StartedDateTime { get; set; }
+
+    public DateTimeOffset? EndedDateTime { get; set; }
 }
 

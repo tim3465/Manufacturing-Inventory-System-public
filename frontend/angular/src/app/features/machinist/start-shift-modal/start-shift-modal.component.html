@@ -1,0 +1,81 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div class="relative z-10 w-full max-w-lg rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl">
+    <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+      <div class="text-lg font-semibold text-[var(--fg)]">Start Shift</div>
+      <button
+        type="button"
+        class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+        (click)="onCancel()"
+        [disabled]="submitting()"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="p-5 space-y-4">
+      <!-- Read-only context -->
+      <div class="rounded-lg bg-[var(--surface)] border border-[var(--border)] px-4 py-3 space-y-1 text-sm">
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-32 shrink-0">Machine</span>
+          <span class="font-medium text-[var(--fg)]">{{ machineSerialNumber }}</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-slate-500 w-32 shrink-0">Part Number</span>
+          <span class="font-medium text-[var(--fg)]">{{ partNumber }}</span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)] mb-1">Start Time</div>
+          <div class="flex gap-2">
+            <input
+              type="datetime-local"
+              class="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="startTime"
+              autocomplete="off"
+            />
+            <button
+              type="button"
+              class="px-3 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+              (click)="setNow()"
+              [disabled]="submitting()"
+            >
+              Now
+            </button>
+          </div>
+          @if (form.controls.startTime.touched && form.controls.startTime.invalid) {
+            <div class="mt-1 text-xs text-red-500">Start time is required</div>
+          }
+        </label>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+            (click)="onCancel()"
+            [disabled]="submitting()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-[var(--secondary)] text-white hover:opacity-90 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              Starting...
+            } @else {
+              Start Shift
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

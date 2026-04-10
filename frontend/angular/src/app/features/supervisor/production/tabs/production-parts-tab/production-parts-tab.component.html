@@ -1,0 +1,65 @@
+<div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+  <table class="min-w-full text-sm">
+    <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+      <tr class="bg-[var(--surface)]">
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="partsTable.onSortColumn('PartName')"
+        >Part Name{{ partsTable.sortIndicator('PartName') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="partsTable.onSortColumn('PartNumber')"
+        >Part Number{{ partsTable.sortIndicator('PartNumber') }}</th>
+        <th class="px-4 py-3 font-medium">Cycle Time</th>
+        <th class="px-4 py-3 font-medium text-right">Check / Part</th>
+      </tr>
+      <tr [formGroup]="partsFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="partName"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="partNumber"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--border)]">
+      @if (partsTable.loading()) {
+        <tr><td colspan="4" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+      } @else if (partsTable.error()) {
+        <tr><td colspan="4" class="px-4 py-3 text-sm text-red-500">{{ partsTable.error() }}</td></tr>
+      } @else if (partRows().length === 0) {
+        <tr><td colspan="4" class="px-4 py-3 text-sm text-slate-500">No active parts found.</td></tr>
+      } @else {
+        @for (part of partRows(); track part.id) {
+          <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors text-[var(--fg)]">
+            <td class="px-4 py-3 text-[var(--fg)]">{{ part.partName }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ part.partNumber }}</td>
+            <td class="px-4 py-3 text-[var(--fg)]">{{ formatCycleTime(part.approxPartCycleTime) }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ part.checkPerPart }}</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+  <app-pager
+    [currentPage]="partsTable.currentPage()"
+    [totalPages]="partsTotalPages()"
+    [totalCount]="partsTotalCount()"
+    (pageChange)="partsTable.goToPage($event)"
+    [pageSize]="partsTable.pageSize()"
+    [pageSizes]="pageSizes"
+    (pageSizeChange)="partsTable.onPageSizeChange($event)"
+  />
+</div>

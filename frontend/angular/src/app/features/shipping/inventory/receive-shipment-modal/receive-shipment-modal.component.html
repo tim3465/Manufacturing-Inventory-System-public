@@ -1,0 +1,174 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div
+    class="relative z-10 w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+  >
+    <div
+      class="relative w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl"
+    >
+      <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+        <div>
+          <div class="text-lg font-semibold text-[var(--fg)]">Receive Shipment</div>
+        </div>
+        <button
+          type="button"
+          class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form class="p-5 space-y-4 max-h-[70vh] overflow-y-auto" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Material fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Heat number</div>
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="heatNumber"
+            />
+            @if (form.controls.heatNumber.touched && form.controls.heatNumber.invalid) {
+              <div class="mt-1 text-xs text-red-500">Heat number is required</div>
+            }
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Material name</div>
+            <input
+              type="text"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="materialName"
+            />
+            @if (form.controls.materialName.touched && form.controls.materialName.invalid) {
+              <div class="mt-1 text-xs text-red-500">Material name is required</div>
+            }
+          </label>
+        </div>
+
+        <!-- Lot number -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Lot number</div>
+          <input
+            type="text"
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+            formControlName="lotNumber"
+          />
+          @if (form.controls.lotNumber.touched && form.controls.lotNumber.invalid) {
+            <div class="mt-1 text-xs text-red-500">Lot number is required</div>
+          }
+        </label>
+
+        <!-- Amount, Diameter, Bar Length -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Amount of bars</div>
+            <input
+              type="number"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="amountOfBars"
+              min="1"
+            />
+            @if (form.controls.amountOfBars.touched && form.controls.amountOfBars.invalid) {
+              <div class="mt-1 text-xs text-red-500">At least 1 bar required</div>
+            }
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Diameter</div>
+            <input
+              type="number"
+              step="any"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="diameter"
+            />
+            @if (form.controls.diameter.touched && form.controls.diameter.invalid) {
+              <div class="mt-1 text-xs text-red-500">Diameter is required</div>
+            }
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Bar length</div>
+            <input
+              type="number"
+              step="any"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="barLength"
+            />
+            @if (form.controls.barLength.touched && form.controls.barLength.invalid) {
+              <div class="mt-1 text-xs text-red-500">Bar length is required</div>
+            }
+          </label>
+        </div>
+
+        <!-- Condition, Checked-in date -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Condition</div>
+            <select
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="condition"
+            >
+              <option value="0" disabled>Select condition</option>
+              @for (c of conditionOptions; track c) {
+                <option [value]="c">{{ conditionLabels[c] }}</option>
+              }
+            </select>
+            @if (form.controls.condition.touched && form.controls.condition.invalid) {
+              <div class="mt-1 text-xs text-red-500">Condition is required</div>
+            }
+          </label>
+
+          <label class="block">
+            <div class="text-sm font-medium text-[var(--fg)]">Checked-in date/time</div>
+            <input
+              type="datetime-local"
+              class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+              formControlName="checkedInDateTime"
+            />
+            @if (form.controls.checkedInDateTime.touched && form.controls.checkedInDateTime.invalid) {
+              <div class="mt-1 text-xs text-red-500">Checked-in date is required</div>
+            }
+          </label>
+        </div>
+
+        <!-- Notes -->
+        <label class="block">
+          <div class="text-sm font-medium text-[var(--fg)]">Notes</div>
+          <textarea
+            rows="3"
+            class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm resize-y"
+            formControlName="notes"
+            maxlength="2000"
+          ></textarea>
+        </label>
+
+        <!-- Actions -->
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+            (click)="onCancel()"
+            [disabled]="submitting()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="submitting()"
+          >
+            Receive shipment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

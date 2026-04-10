@@ -1,0 +1,216 @@
+<div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+  <table class="min-w-full text-sm">
+    <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+      <tr class="bg-[var(--surface)]">
+        <th class="px-4 py-3 font-medium w-6"></th>
+        <th class="px-4 py-3 font-medium">Job #</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('DueDate')"
+        >Due Date{{ jobsTable.sortIndicator('DueDate') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('OrderId')"
+        >Order #{{ jobsTable.sortIndicator('OrderId') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('PartName')"
+        >Part Name{{ jobsTable.sortIndicator('PartName') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('PartNumber')"
+        >Part #{{ jobsTable.sortIndicator('PartNumber') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('MachineName')"
+        >Machine{{ jobsTable.sortIndicator('MachineName') }}</th>
+        <th
+          class="px-4 py-3 font-medium cursor-pointer select-none"
+          (click)="jobsTable.onSortColumn('LotNumber')"
+        >Lot #{{ jobsTable.sortIndicator('LotNumber') }}</th>
+        <th class="px-4 py-3 font-medium text-right">Planned</th>
+        <th class="px-4 py-3 font-medium text-right">Completed</th>
+        <th class="px-4 py-3 font-medium text-right">% Done</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        <th class="px-4 py-3 font-medium w-24"></th>
+      </tr>
+      <tr [formGroup]="jobsFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal">
+          <div class="flex items-center gap-1">
+            <input formControlName="dueDateFrom"
+                   type="date"
+                   class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]" />
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
+            <input formControlName="dueDateTo"
+                   type="date"
+                   class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]" />
+          </div>
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="orderNumber"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="partName"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="partNumber"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="machineName"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal">
+          <input
+            formControlName="lotNumber"
+            type="text"
+            placeholder="Search..."
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+          />
+        </th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal"></th>
+        <th class="px-4 py-2 font-normal">
+          <select
+            formControlName="status"
+            class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
+          >
+            <option value="">All</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </th>
+        <th class="px-4 py-2 font-normal"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--border)]">
+      @if (jobsTable.loading()) {
+        <tr><td colspan="13" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+      } @else if (jobsTable.error()) {
+        <tr><td colspan="13" class="px-4 py-3 text-sm text-red-500">{{ jobsTable.error() }}</td></tr>
+      } @else if (jobRows().length === 0) {
+        <tr><td colspan="13" class="px-4 py-3 text-sm text-slate-500">No active jobs found.</td></tr>
+      } @else {
+        @for (job of jobRows(); track job.id) {
+          <tr
+            class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors cursor-pointer"
+            (click)="toggleJobExpanded(job.id)"
+          >
+            <td
+              class="px-4 py-3 text-xl transition"
+              [class.text-slate-400]="!isJobExpanded(job.id)"
+            >
+              {{ isJobExpanded(job.id) ? '▾' : '▸' }}
+            </td>
+            <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ job.id }}</td>
+            <td class="px-4 py-3 text-[var(--fg)]">{{ job.dueDate }}</td>
+            <td class="px-4 py-3 font-semibold text-[var(--fg)]">#{{ job.orderId }}</td>
+            <td class="px-4 py-3 text-[var(--fg)]">{{ job.partName }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ job.partNumber }}</td>
+            <td class="px-4 py-3 text-[var(--fg)]">{{ job.machineName }}</td>
+            <td
+              class="px-4 py-3"
+              (click)="$event.stopPropagation(); openAssignLotModal(job)"
+            >
+              @if (job.lotNumber !== null) {
+                <span class="text-[var(--primary)] underline cursor-pointer">{{ job.lotNumber }}</span>
+              } @else {
+                <span class="text-[var(--primary)] underline cursor-pointer">Add Lot</span>
+              }
+            </td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partAmountPlanned }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.partsCompleted }}</td>
+            <td class="px-4 py-3 text-right text-[var(--fg)]">{{ job.percentComplete | number:'1.0-1' }}%</td>
+            <td class="px-4 py-3">
+              <span
+                class="text-xs px-2 py-1 rounded-full border"
+                [class.border-green-500]="job.status === 'Completed'"
+                [class.text-green-600]="job.status === 'Completed'"
+                [class.border-[var(--primary)]]="job.status === 'In Progress'"
+                [class.text-[var(--primary)]]="job.status === 'In Progress'"
+              >
+                {{ job.status }}
+              </span>
+            </td>
+            <td
+              class="px-4 py-3 text-center"
+              (click)="$event.stopPropagation(); viewJobReport(job.id)"
+            >
+              <span class="text-[var(--primary)] underline cursor-pointer text-xs">View Report</span>
+            </td>
+          </tr>
+
+          @if (isJobExpanded(job.id)) {
+            @if (job.shifts.length === 0) {
+              <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
+                <td colspan="13" class="px-8 py-2 text-xs text-slate-400">No shifts recorded for this job.</td>
+              </tr>
+            } @else {
+              <!-- Shift sub-header -->
+              <tr class="bg-slate-50 dark:bg-slate-800 border-b border-[var(--border)]">
+                <td></td>
+                <td></td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500" colspan="2">Operator</td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500">Start</td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500">Stop</td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Parts Made</td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Scrap</td>
+                <td class="px-4 py-1 text-xs font-semibold text-slate-500 text-right">Bars</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              @for (shift of job.shifts; track shift.id) {
+                <tr class="border-b border-[var(--border)] bg-[var(--surface)]">
+                  <td></td>
+                  <td></td>
+                  <td class="px-4 py-2 text-xs text-[var(--fg)]" colspan="2">{{ shift.operatorName }}</td>
+                  <td class="px-4 py-2 text-xs text-slate-500">{{ formatStartTime(shift.startTime) }}</td>
+                  <td class="px-4 py-2 text-xs text-slate-500">{{ formatStopTime(shift.stopTime) }}</td>
+                  <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.partsMade }}</td>
+                  <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.scrap }}</td>
+                  <td class="px-4 py-2 text-xs text-right text-[var(--fg)]">{{ shift.barsConsumed }}</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              }
+            }
+          }
+        }
+      }
+    </tbody>
+  </table>
+  <app-pager
+    [currentPage]="jobsTable.currentPage()"
+    [totalPages]="jobsTotalPages()"
+    [totalCount]="jobsTotalCount()"
+    (pageChange)="jobsTable.goToPage($event)"
+    [pageSize]="jobsTable.pageSize()"
+    [pageSizes]="pageSizes"
+    (pageSizeChange)="jobsTable.onPageSizeChange($event)"
+  />
+</div>

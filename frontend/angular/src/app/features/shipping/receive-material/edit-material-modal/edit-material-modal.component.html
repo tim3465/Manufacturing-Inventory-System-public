@@ -1,0 +1,70 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
+
+  <!-- Modal -->
+  <div class="relative z-10 w-full max-w-md rounded-xl border border-[var(--border)] bg-[var(--bg)] shadow-xl">
+    <div class="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+      <div class="text-lg font-semibold text-[var(--fg)]">Edit Material</div>
+      <button
+        type="button"
+        class="h-9 w-9 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition"
+        (click)="onCancel()"
+        [disabled]="submitting()"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form class="p-5 space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <!-- Heat Number -->
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Heat number</div>
+        <input
+          type="text"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="heatNumber"
+          maxlength="100"
+        />
+        @if (form.controls.heatNumber.touched && form.controls.heatNumber.invalid) {
+          <div class="mt-1 text-xs text-red-500">Heat number is required (max 100 characters)</div>
+        }
+      </label>
+
+      <!-- Material Name -->
+      <label class="block">
+        <div class="text-sm font-medium text-[var(--fg)]">Material name</div>
+        <input
+          type="text"
+          class="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm"
+          formControlName="materialName"
+          maxlength="100"
+        />
+        @if (form.controls.materialName.touched && form.controls.materialName.invalid) {
+          <div class="mt-1 text-xs text-red-500">Material name is required (max 100 characters)</div>
+        }
+      </label>
+
+      <!-- Actions -->
+      <div class="pt-2 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-[var(--border)] hover:bg-[var(--surface)] transition text-sm"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="submitting()"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<section class="space-y-6">
+  <header>
+    <p class="text-sm text-slate-500">Machinist</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Machines</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="text-sm text-slate-500">Loading...</div>
+  } @else if (machineCards().length === 0) {
+    <div class="text-sm text-slate-500">No active machines.</div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (card of machineCards(); track card.id) {
+        <div
+          class="rounded-xl border bg-[var(--surface)] p-4 space-y-3"
+          [class.border-[var(--primary)]]="card.cardState === 'my-running'"
+          [class.border-[var(--secondary)]]="card.cardState === 'other-running'"
+          [class.border-[var(--success)]]="card.cardState === 'available'"
+          [class.border-[var(--border)]]="card.cardState === 'default'"
+        >
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-base font-bold text-[var(--fg)]">{{ card.name }}</p>
+              <p class="text-xs text-slate-500">{{ card.modelNumber }}</p>
+            </div>
+            @if (card.cardState === 'available') {
+              @for (job of card.jobs; track job.id) {
+                @if (job.isActive) {
+                  <button
+                    type="button"
+                    class="px-3 py-1 rounded-lg text-xs font-medium border border-[var(--success)] text-[var(--success)] hover:bg-[var(--success)] hover:text-white transition"
+                    (click)="openStartShift(job, card.name)"
+                  >
+                    Start Shift
+                  </button>
+                }
+              }
+            }
+          </div>
+
+          @if (card.jobs.length === 0) {
+            <p class="text-sm text-slate-400">No active jobs</p>
+          } @else {
+            <div class="space-y-1">
+              <div class="grid grid-cols-5 gap-2 text-xs font-medium text-slate-500 pb-1 border-b border-[var(--border)]">
+                <span>Part #</span>
+                <span>Due Date</span>
+                <span>Lot #</span>
+                <span>Bars In Job</span>
+                <span>Bar Amt Planned</span>
+              </div>
+              @for (job of card.jobs; track job.id) {
+                <div
+                  class="job-row grid grid-cols-5 gap-2 text-sm rounded px-1 -mx-1 transition"
+                  [class.cursor-pointer]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
+                  [class.cursor-not-allowed]="!job.hasLotNumber"
+                  [class.opacity-40]="!job.hasLotNumber"
+                  [class.job-row-selectable]="!job.isActive && job.hasLotNumber && !job.machineHasActiveJob"
+                  [class.job-row-active]="job.isActive"
+                  [style.background-color]="job.isActive ? 'var(--primary)' : ''"
+                  [style.color]="job.isActive ? 'var(--primary-fg)' : 'var(--fg)'"
+                  (click)="onJobRowClick(job)"
+                >
+                  <span>{{ job.partNumber }}</span>
+                  <span>{{ job.dueDate }}</span>
+                  <span class="overflow-hidden min-w-0">{{ job.lotNumber ?? '—' }}</span>
+                  <span>{{ job.barsInJob }}</span>
+                  <span>{{ job.barAmountPlanned }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (showStartModal() && selectedJob()) {
+    <app-start-job-modal
+      [jobId]="selectedJob()!.id"
+      [barAmountPlanned]="selectedJob()!.barAmountPlanned"
+      (closed)="showStartModal.set(false)"
+      (started)="onJobStarted()"
+    />
+  }
+
+  @if (showStartShiftModal() && selectedJobId() !== null && selectedMachineSerial() !== null && selectedPartNumber() !== null) {
+    <app-start-shift-modal
+      [jobId]="selectedJobId()!"
+      [machineSerialNumber]="selectedMachineSerial()!"
+      [partNumber]="selectedPartNumber()!"
+      (closed)="showStartShiftModal.set(false)"
+      (started)="onShiftStarted()"
+    />
+  }
+</section>

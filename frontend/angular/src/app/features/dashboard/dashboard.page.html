@@ -4,41 +4,101 @@
     <h1 class="text-2xl font-semibold text-[var(--fg)]">Dashboard</h1>
   </header>
 
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    @for (stat of stats; track stat.label) {
-    <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-      <p class="text-sm text-slate-500">{{ stat.label }}</p>
-      <p class="text-3xl font-semibold text-[var(--fg)] mt-2">
-        {{ stat.value }}
-      </p>
+  @if (loading()) {
+    <p class="text-sm text-slate-500">Loading...</p>
+  } @else if (dashboard()) {
+    <!-- Metrics stat grid -->
+    <div class="grid gap-4 sm:grid-cols-3">
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+        <p class="text-sm text-slate-500">Machines Running</p>
+        <p class="text-3xl font-semibold text-[var(--fg)] mt-2">{{ dashboard()!.machinesRunning }}</p>
+      </div>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+        <p class="text-sm text-slate-500">Operators Active</p>
+        <p class="text-3xl font-semibold text-[var(--fg)] mt-2">{{ dashboard()!.operatorsActive }}</p>
+      </div>
+      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+        <p class="text-sm text-slate-500">Late Jobs</p>
+        <p
+          class="text-3xl font-semibold mt-2"
+          [class.text-red-500]="dashboard()!.lateJobs > 0"
+          [class.text-[var(--fg)]]="dashboard()!.lateJobs === 0"
+        >
+          {{ dashboard()!.lateJobs }}
+        </p>
+      </div>
     </div>
+
+    <!-- Order progress cards -->
+    @if (orderCards().length > 0) {
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (card of orderCards(); track card.orderId) {
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 flex flex-col items-center text-center gap-3">
+            <app-donut-ring
+              [target]="card.target"
+              [good]="card.goodParts"
+              [scrap]="card.scrap"
+              [size]="160"
+            />
+            <div class="min-w-0 w-full">
+              <p class="font-semibold text-[var(--fg)] truncate">{{ card.partName }}</p>
+              <p class="text-xs text-slate-500 truncate mt-0.5">{{ card.customerName }}</p>
+            </div>
+          </div>
+        }
+      </div>
     }
-  </div>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-[var(--fg)]">Activity</h2>
-      <button
-        type="button"
-        class="text-sm text-slate-500 hover:text-[var(--fg)] underline underline-offset-4"
-      >
-        View all
-      </button>
-    </div>
-    <ul class="mt-4 divide-y divide-[var(--border)]">
-      <li class="py-3 flex items-center justify-between text-sm">
-        <span>Job #182 moved to QA</span>
-        <span class="text-slate-500">2m ago</span>
-      </li>
-      <li class="py-3 flex items-center justify-between text-sm">
-        <span>Machine HA-01 is scheduled for maintenance</span>
-        <span class="text-slate-500">1h ago</span>
-      </li>
-      <li class="py-3 flex items-center justify-between text-sm">
-        <span>Order #5125 received</span>
-        <span class="text-slate-500">Yesterday</span>
-      </li>
-    </ul>
-  </div>
+    <!-- Operator activity cards -->
+    @if (operatorCards().length === 0) {
+      <p class="text-sm text-slate-500">No active operators at this time.</p>
+    } @else {
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @for (card of operatorCards(); track card.operatorId) {
+          <div
+            class="rounded-xl border bg-[var(--surface)] p-4 space-y-3"
+            [class.border-[var(--primary)]]="card.operatorId === currentUserId()"
+            [class.border-[var(--border)]]="card.operatorId !== currentUserId()"
+          >
+            <!-- Card header -->
+            <div class="flex items-center justify-between">
+              <p class="font-semibold text-[var(--fg)]">{{ card.operatorName }}</p>
+              <span class="text-xs text-slate-500">{{ card.machinesRunning }} machine{{ card.machinesRunning === 1 ? '' : 's' }}</span>
+            </div>
+
+            <!-- Active jobs list -->
+            @if (card.activeJobs.length === 0) {
+              <p class="text-xs text-slate-400">No active jobs</p>
+            } @else {
+              <ul class="space-y-1">
+                @for (job of card.activeJobs; track job.jobId) {
+                  <li class="text-xs text-slate-500">
+                    <span class="font-medium text-[var(--fg)]">{{ job.machineName }}</span>
+                    &rarr;
+                    {{ job.partName }}
+                  </li>
+                }
+              </ul>
+            }
+
+            <!-- Stats footer -->
+            <div class="flex items-center justify-between border-t border-[var(--border)] pt-3 text-xs text-slate-500">
+              <div class="text-center">
+                <p class="font-semibold text-[var(--fg)] text-sm">{{ card.partsMadeToday }}</p>
+                <p>Parts Today</p>
+              </div>
+              <div class="text-center">
+                <p class="font-semibold text-[var(--fg)] text-sm">{{ card.scrapToday }}</p>
+                <p>Scrap Today</p>
+              </div>
+              <div class="text-center">
+                <p class="font-semibold text-[var(--fg)] text-sm">{{ card.scrapPercentage }}</p>
+                <p>Scrap %</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
 </section>
-

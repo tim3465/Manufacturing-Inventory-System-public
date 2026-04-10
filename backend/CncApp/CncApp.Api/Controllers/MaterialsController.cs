@@ -25,12 +25,26 @@ public class MaterialsController : ControllerBase
     // - Most resources allow anonymous read access; Users requires authentication.
 
     /// <summary>
+    /// Searches active materials with filtering, sorting, and paging.
+    /// </summary>
+    /// <param name="request">Search parameters including optional HeatNumber/MaterialName filters, sort, and page.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Paged result of matching active materials.</returns>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(MaterialSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<MaterialSearchResultDto>> SearchActiveAsync(
+        [FromQuery] MaterialSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _materialService.SearchActiveAsync(request, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Gets all active materials.
     /// </summary>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active materials.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MaterialDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MaterialDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -45,7 +59,6 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The material if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetMaterial")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MaterialDto>> GetAsync(int id, CancellationToken ct = default)
@@ -99,7 +112,7 @@ public class MaterialsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The updated material if found, otherwise 404.</returns>
     [HttpPatch("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Shipping")]
     [ProducesResponseType(typeof(MaterialDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MaterialDto>> UpdateAsync(

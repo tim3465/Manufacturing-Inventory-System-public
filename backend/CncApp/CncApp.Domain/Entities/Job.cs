@@ -17,13 +17,13 @@ public class Job : AuditableEntityBase
     /// <exception cref="DomainException">Thrown when invariants are violated.</exception>
     public Job(
         int orderId,
-        int stockLotId,
+        int? stockLotId,
         int machineId,
         int partAmountPlanned,
         int barAmountPlanned,
         TimeSpan barCycleTime,
-        int barsInJob,
-        int? estimatedPartsPerBar)
+        int? estimatedPartsPerBar,
+        DateOnly dueDate)
     {
         OrderId = orderId;
         StockLotId = stockLotId;
@@ -31,8 +31,8 @@ public class Job : AuditableEntityBase
         PartAmountPlanned = partAmountPlanned;
         BarAmountPlanned = barAmountPlanned;
         BarCycleTime = barCycleTime;
-        BarsInJob = barsInJob;
         EstimatedPartsPerBar = estimatedPartsPerBar;
+        DueDate = dueDate;
         Shifts = new List<Shift>();
     }
 
@@ -52,14 +52,14 @@ public class Job : AuditableEntityBase
         }
     }
 
-    private int _stockLotId;
+    private int? _stockLotId;
 
-    public int StockLotId
+    public int? StockLotId
     {
         get => _stockLotId;
         set
         {
-            if (value <= 0)
+            if (value.HasValue && value.Value <= 0)
             {
                 throw new DomainException("StockLotId must be greater than zero.");
             }
@@ -164,13 +164,78 @@ public class Job : AuditableEntityBase
         }
     }
 
+    private DateOnly _dueDate;
+
+    public DateOnly DueDate
+    {
+        get => _dueDate;
+        set
+        {
+            if (value == default)
+            {
+                throw new DomainException("DueDate must not be the default value.");
+            }
+
+            _dueDate = value;
+        }
+    }
+
+    private DateTimeOffset? _startedDateTime;
+
+    public DateTimeOffset? StartedDateTime
+    {
+        get => _startedDateTime;
+        private set => _startedDateTime = value;
+    }
+
+    private DateTimeOffset? _endedDateTime;
+
+    public DateTimeOffset? EndedDateTime
+    {
+        get => _endedDateTime;
+        private set => _endedDateTime = value;
+    }
+
     public Order Order { get; set; } = null!;
 
-    public StockLot StockLot { get; set; } = null!;
+    public StockLot? StockLot { get; set; }
 
     public Machine Machine { get; set; } = null!;
 
     public ICollection<Shift> Shifts { get; set; } = new List<Shift>();
+
+    /// <summary>
+    /// Starts the job by recording the start time and adding bars to the job.
+    /// </summary>
+    /// <param name="barsToAdd">The number of bars being pulled from inventory into this job.</param>
+    /// <exception cref="DomainException">Thrown when the job is already started or barsToAdd is not positive.</exception>
+    public void Start(int barsToAdd)
+    {
+        if (StartedDateTime.HasValue)
+        {
+            throw new DomainException("Job has already been started.");
+        }
+
+        if (barsToAdd <= 0)
+        {
+            throw new DomainException("BarsToAdd must be greater than zero.");
+        }
+
+        StartedDateTime = DateTimeOffset.UtcNow;
+        BarsInJob += barsToAdd;
+    }
+
+    /// Closes the job by recording the end time.
+    /// </summary>
+    /// <exception cref="DomainException">Thrown when the job has not been started or has already been closed.</exception>
+    public void Close()
+    {
+        if (!StartedDateTime.HasValue)
+            throw new DomainException("Job cannot be closed because it has not been started.");
+        if (EndedDateTime.HasValue)
+            throw new DomainException("Job has already been closed.");
+        EndedDateTime = DateTimeOffset.UtcNow;
+    }
 
     /// <summary>
     /// Inactivates the job (soft-delete).

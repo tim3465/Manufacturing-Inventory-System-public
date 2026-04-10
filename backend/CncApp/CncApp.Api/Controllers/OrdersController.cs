@@ -3,6 +3,7 @@ using CncApp.Application.Services.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace CncApp.Api.Controllers;
 
 /// <summary>
@@ -30,7 +31,6 @@ public class OrdersController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active orders.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<OrderDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<OrderDto>>> ListAsync(CancellationToken ct = default)
     {
@@ -45,7 +45,6 @@ public class OrdersController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The order if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetOrder")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<OrderDto>> GetAsync(int id, CancellationToken ct = default)
@@ -114,6 +113,31 @@ public class OrdersController : ControllerBase
         }
 
         return Ok(order);
+    }
+
+    /// <summary>
+    /// Searches active orders with production detail using optional filters and server-side paging.
+    /// </summary>
+    [HttpGet("production/search")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(OrderProductionSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<OrderProductionSearchResultDto>> SearchProductionAsync(
+        [FromQuery] OrderProductionSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _orderService.SearchProductionAsync(request, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Gets all active orders with production detail (customer, part, computed completion).
+    /// </summary>
+    [HttpGet("production")]
+    [Authorize(Roles = "Supervisor,Admin")]
+    [ProducesResponseType(typeof(List<OrderProductionDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<OrderProductionDto>>> ListProductionAsync(CancellationToken ct = default)
+    {
+        var orders = await _orderService.ListProductionAsync(ct);
+        return Ok(orders);
     }
 
     /// <summary>

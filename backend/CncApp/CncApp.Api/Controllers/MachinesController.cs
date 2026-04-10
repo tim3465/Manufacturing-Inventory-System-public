@@ -30,11 +30,23 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all Active machines.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<MachineDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<MachineDto>>> ListAsync(CancellationToken ct = default)
     {
         var machines = await _machineService.ListActiveAsync(ct);
+        return Ok(machines);
+    }
+
+    /// <summary>
+    /// Gets all active machines with their active jobs.
+    /// </summary>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>List of active machines with their active jobs.</returns>
+    [HttpGet("with-jobs")]
+    [ProducesResponseType(typeof(List<MachineWithJobsDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<MachineWithJobsDto>>> ListWithJobsAsync(CancellationToken ct = default)
+    {
+        var machines = await _machineService.ListActiveWithJobsAsync(ct);
         return Ok(machines);
     }
 
@@ -45,7 +57,6 @@ public class MachinesController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The machine if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetMachine")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(MachineDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MachineDto>> GetAsync(int id, CancellationToken ct = default)
@@ -104,6 +115,27 @@ public class MachinesController : ControllerBase
     public async Task<ActionResult> InactivateAsync(int id, CancellationToken ct = default)
     {
         var result = await _machineService.InactivateAsync(id, null, ct);
+        if (!result)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Activates a previously inactivated machine by ID.
+    /// </summary>
+    /// <param name="id">The machine ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>204 NoContent if successful, otherwise 404.</returns>
+    [HttpPatch("{id:int}/activate")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ActivateAsync(int id, CancellationToken ct = default)
+    {
+        var result = await _machineService.ActivateAsync(id, ct);
         if (!result)
         {
             return NotFound();

@@ -14,6 +14,8 @@ public class MachineDto
     [Required(ErrorMessage = "ModelNumber is required.")]
     [MaxLength(100, ErrorMessage = "ModelNumber cannot exceed 100 characters.")]
     public string ModelNumber { get; set; } = string.Empty;
+
+    public DateTimeOffset? InactivatedDateTime { get; set; }
 }
 
 
