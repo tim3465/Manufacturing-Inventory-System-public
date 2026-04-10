@@ -31,7 +31,6 @@ public class StockLotAdjustmentsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The stock lot adjustment if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetStockLotAdjustment")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(StockLotAdjustmentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<StockLotAdjustmentDto>> GetAsync(int id, CancellationToken ct = default)
@@ -52,7 +51,6 @@ public class StockLotAdjustmentsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of active stock lot adjustments for the stock lot.</returns>
     [HttpGet("by-stocklot/{stockLotId:int}")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<StockLotAdjustmentDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<StockLotAdjustmentDto>>> ListByStockLotAsync(int stockLotId, CancellationToken ct = default)
     {
@@ -81,7 +79,7 @@ public class StockLotAdjustmentsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created stock lot adjustment ID with Location header.</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Shipping")]
     [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreateAsync(

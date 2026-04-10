@@ -23,13 +23,18 @@ public static class DependencyInjection
         // Register Repositories
         services.AddScoped<IMachineRepository, MachineRepository>();
         services.AddScoped<IMaterialRepository, MaterialRepository>();
-        services.AddScoped<IPartRepository, PartRepository>();  
+        services.AddScoped<IPartRepository, PartRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IStockLotRepository, StockLotRepository>();
         services.AddScoped<IStockLotAdjustmentRepository, StockLotAdjustmentRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IShiftIssueLogRepository, ShiftIssueLogRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+        // Register Transaction Manager
+        services.AddScoped<ITransactionManager, TransactionManager>();
 
         // Register Current User Service
         services.AddHttpContextAccessor();

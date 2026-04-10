@@ -29,12 +29,26 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>List of all active parts.</returns>
     [HttpGet]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(List<PartDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<PartDto>>> ListAsync(CancellationToken ct = default)
     {
         var parts = await _partService.ListActiveAsync(ct);
         return Ok(parts);
+    }
+
+    /// <summary>
+    /// Searches active parts with optional filtering by part name and part number, with paging and sorting.
+    /// </summary>
+    /// <param name="request">Search request with optional filters, sort, and paging parameters.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Paged list of matching active parts.</returns>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(PartSearchResultDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PartSearchResultDto>> SearchActiveAsync(
+        [FromQuery] PartSearchRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _partService.SearchActiveAsync(request, ct);
+        return Ok(result);
     }
 
     /// <summary>
@@ -44,7 +58,6 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The part if found, otherwise 404.</returns>
     [HttpGet("{id:int}", Name = "GetPart")]
-    [AllowAnonymous]
     [ProducesResponseType(typeof(PartDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PartDto>> GetAsync(int id, CancellationToken ct = default)
@@ -79,7 +92,7 @@ public class PartsController : ControllerBase
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The created part DTO with Location header.</returns>
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Supervisor")]
     [ProducesResponseType(typeof(PartDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PartDto>> CreateAsync(

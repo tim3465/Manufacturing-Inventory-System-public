@@ -18,5 +18,7 @@ public class UpdateJobRequestDto
     public int? BarsInJob { get; set; }
 
     public int? EstimatedPartsPerBar { get; set; }
+
+    public DateOnly? DueDate { get; set; }
 }
 

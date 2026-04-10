@@ -8,5 +8,6 @@ public enum StockLotAdjustmentReasonEnum : byte
     Consumed = 2,
     Adjusted = 3,
     Scrap = 4,
-    Return = 5
+    Return = 5,
+    JobStart = 6
 }

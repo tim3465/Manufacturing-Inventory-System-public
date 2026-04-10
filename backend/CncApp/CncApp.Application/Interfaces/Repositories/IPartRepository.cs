@@ -1,3 +1,4 @@
+using CncApp.Application.Dtos.Parts;
 using CncApp.Domain.Entities;
 
 namespace CncApp.Application.Interfaces.Repositories;
@@ -7,6 +8,8 @@ public interface IPartRepository
     Task<Part?> GetByIdAsync(int id, CancellationToken ct = default);
 
     Task<List<Part>> ListActiveAsync(CancellationToken ct = default);
+
+    Task<(List<Part> Items, int TotalCount)> SearchActiveAsync(PartSearchRequestDto request, CancellationToken ct = default);
 
     Task<List<Part>> ListAllAsync(CancellationToken ct = default);
 

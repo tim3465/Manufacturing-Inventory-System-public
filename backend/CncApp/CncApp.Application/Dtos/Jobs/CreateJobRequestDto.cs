@@ -8,8 +8,7 @@ public class CreateJobRequestDto
     [Required(ErrorMessage = "OrderId is required.")]
     public int OrderId { get; set; }
 
-    [Required(ErrorMessage = "StockLotId is required.")]
-    public int StockLotId { get; set; }
+    public int? StockLotId { get; set; }
 
     [Required(ErrorMessage = "MachineId is required.")]
     public int MachineId { get; set; }
@@ -23,9 +22,9 @@ public class CreateJobRequestDto
     [Required(ErrorMessage = "BarCycleTime is required.")]
     public TimeSpan BarCycleTime { get; set; }
 
-    [Required(ErrorMessage = "BarsInJob is required.")]
-    public int BarsInJob { get; set; }
-
     public int? EstimatedPartsPerBar { get; set; }
+
+    [Required(ErrorMessage = "DueDate is required.")]
+    public DateOnly DueDate { get; set; }
 }
 

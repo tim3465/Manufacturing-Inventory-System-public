@@ -18,7 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CncApp.Application\CncApp.Application.csproj" />
+    <ProjectReference Include="..\CncApp.Infrastructure\CncApp.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

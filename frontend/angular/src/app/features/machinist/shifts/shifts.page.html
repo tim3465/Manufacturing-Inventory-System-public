@@ -1,0 +1,200 @@
+<section class="space-y-6">
+  <header>
+    <p class="text-sm text-slate-500">Machinist</p>
+    <h1 class="text-2xl font-semibold text-[var(--fg)]">Shifts</h1>
+  </header>
+
+  <!-- Tab bar -->
+  <div class="flex gap-2 border-b border-[var(--border)]">
+    <button
+      type="button"
+      class="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
+      [class.border-[var(--primary)]]="activeTab() === 'running'"
+      [class.text-[var(--primary)]]="activeTab() === 'running'"
+      [class.border-transparent]="activeTab() !== 'running'"
+      [class.text-slate-500]="activeTab() !== 'running'"
+      (click)="setTab('running')"
+    >
+      Running Shifts
+    </button>
+    <button
+      type="button"
+      class="px-4 py-2 text-sm font-medium transition border-b-2 -mb-px"
+      [class.border-[var(--primary)]]="activeTab() === 'logs'"
+      [class.text-[var(--primary)]]="activeTab() === 'logs'"
+      [class.border-transparent]="activeTab() !== 'logs'"
+      [class.text-slate-500]="activeTab() !== 'logs'"
+      (click)="setTab('logs')"
+    >
+      Shift Logs
+    </button>
+  </div>
+
+  <!-- Running Shifts tab -->
+  @if (activeTab() === 'running') {
+    @if (runningLoading()) {
+      <div class="text-sm text-slate-500">Loading...</div>
+    } @else if (runningShifts().length === 0) {
+      <p class="text-sm text-slate-500">No running shifts.</p>
+    } @else {
+      <div class="space-y-3">
+        @for (shift of runningShifts(); track shift.id) {
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
+            <!-- Row header -->
+            <button
+              type="button"
+              class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[var(--bg)] transition"
+              (click)="toggleExpand(shift.id)"
+            >
+              <div class="flex gap-6 text-sm">
+                <span class="font-medium text-[var(--fg)]">{{ shift.machineSerialNumber }}</span>
+                <span class="text-slate-500">{{ shift.partNumber }}</span>
+                <span class="text-slate-500">{{ shift.partName }}</span>
+              </div>
+              <span class="text-slate-400 text-xs">
+                @if (expandedShiftId() === shift.id) { ▲ } @else { ▼ }
+              </span>
+            </button>
+
+            <!-- Expanded form -->
+            @if (expandedShiftId() === shift.id) {
+              <div class="border-t border-[var(--border)] p-4">
+                <app-running-shift-form
+                  [shiftId]="shift.id"
+                  (saved)="onShiftSaved()"
+                  (closed)="onShiftClosed()"
+                />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Shift Logs tab -->
+  @if (activeTab() === 'logs') {
+    <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+          <!-- Sortable header row -->
+          <tr class="bg-[var(--surface)]">
+            <th
+              class="px-4 py-3 font-medium cursor-pointer select-none"
+              (click)="logsTable.onSortColumn('MachineSerialNumber')"
+            >Machine{{ logsTable.sortIndicator('MachineSerialNumber') }}</th>
+            <th
+              class="px-4 py-3 font-medium cursor-pointer select-none"
+              (click)="logsTable.onSortColumn('JobNumber')"
+            >Job #{{ logsTable.sortIndicator('JobNumber') }}</th>
+            <th
+              class="px-4 py-3 font-medium cursor-pointer select-none"
+              (click)="logsTable.onSortColumn('PartNumber')"
+            >Part #{{ logsTable.sortIndicator('PartNumber') }}</th>
+            <th
+              class="px-4 py-3 font-medium cursor-pointer select-none"
+              (click)="logsTable.onSortColumn('StartTime')"
+            >Start{{ logsTable.sortIndicator('StartTime') }}</th>
+            <th
+              class="px-4 py-3 font-medium cursor-pointer select-none"
+              (click)="logsTable.onSortColumn('StopTime')"
+            >Stop{{ logsTable.sortIndicator('StopTime') }}</th>
+            <th class="px-4 py-3 font-medium">Parts Made</th>
+            <th class="px-4 py-3 font-medium">Scrap</th>
+          </tr>
+          <!-- Filter row -->
+          <tr [formGroup]="logsFilterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+            <th class="px-4 py-2 font-normal">
+              <input
+                formControlName="machineName"
+                type="text"
+                placeholder="Search..."
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+              />
+            </th>
+            <th class="px-4 py-2 font-normal">
+              <input
+                formControlName="jobNumber"
+                type="text"
+                placeholder="Search..."
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+              />
+            </th>
+            <th class="px-4 py-2 font-normal">
+              <input
+                formControlName="partNumber"
+                type="text"
+                placeholder="Search..."
+                class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+              />
+            </th>
+            <th class="px-4 py-2 font-normal">
+              <div class="flex items-center gap-1">
+                <input
+                  formControlName="startTimeFrom"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+                <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
+                <input
+                  formControlName="startTimeTo"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+              </div>
+            </th>
+            <th class="px-4 py-2 font-normal">
+              <div class="flex items-center gap-1">
+                <input
+                  formControlName="stopTimeFrom"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+                <span class="text-xs text-[var(--fg-muted)] shrink-0">/</span>
+                <input
+                  formControlName="stopTimeTo"
+                  type="date"
+                  class="min-w-0 w-24 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-1.5 py-0.5 text-xs text-[var(--fg)]"
+                />
+              </div>
+            </th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--border)]">
+          @if (logsTable.loading()) {
+            <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+          } @else if (logsTable.error()) {
+            <tr><td colspan="7" class="px-4 py-3 text-sm text-red-500">{{ logsTable.error() }}</td></tr>
+          } @else if (logRows().length === 0) {
+            <tr><td colspan="7" class="px-4 py-3 text-sm text-slate-500">No shift logs found.</td></tr>
+          } @else {
+            @for (row of logRows(); track row.id) {
+              <tr class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors text-[var(--fg)]">
+                <td class="px-4 py-3">{{ row.machineSerialNumber }}</td>
+                <td class="px-4 py-3">{{ row.jobNumber }}</td>
+                <td class="px-4 py-3">{{ row.partNumber }}</td>
+                <td class="px-4 py-3">{{ row.startTime | date:'short' }}</td>
+                <td class="px-4 py-3">{{ row.stopTime ? (row.stopTime | date:'short') : '—' }}</td>
+                <td class="px-4 py-3">{{ row.partsMade }}</td>
+                <td class="px-4 py-3">{{ row.scrap }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+      <!-- Pager -->
+      <app-pager
+        [currentPage]="logsTable.currentPage()"
+        [totalPages]="logsTotalPages()"
+        [totalCount]="logsTotalCount()"
+        (pageChange)="logsTable.goToPage($event)"
+        [pageSize]="logsTable.pageSize()"
+        [pageSizes]="pageSizes"
+        (pageSizeChange)="logsTable.onPageSizeChange($event)"
+      />
+    </div>
+  }
+
+</section>

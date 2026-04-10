@@ -9,6 +9,7 @@ public class Order : AuditableEntityBase
     private Order()
     {
         Part = null!;
+        Customer = null!;
         Jobs = new List<Job>();
     }
 
@@ -27,6 +28,7 @@ public class Order : AuditableEntityBase
         PartAmountRequested = partAmountRequested;
         PartsPerBar = partsPerBar;
         Part = null!;
+        Customer = null!;
         Jobs = new List<Job>();
     }
 
@@ -91,6 +93,8 @@ public class Order : AuditableEntityBase
     }
 
     public Part Part { get; set; } = null!;
+
+    public Customer Customer { get; set; } = null!;
 
     public ICollection<Job> Jobs { get; set; } = new List<Job>();
 

@@ -1,32 +1,144 @@
 <section class="space-y-6">
-  <header class="space-y-1">
+  <header>
     <p class="text-sm text-slate-500">Machinist</p>
     <h1 class="text-2xl font-semibold text-[var(--fg)]">My Jobs</h1>
   </header>
 
-  <div class="rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-    <div class="px-4 py-3 border-b border-[var(--border)] flex justify-between">
-      <span class="text-sm font-medium">Queue</span>
-      <button
-        type="button"
-        class="text-sm text-slate-500 hover:text-[var(--fg)] underline underline-offset-4"
-      >
-        Refresh
-      </button>
-    </div>
-    <ul class="divide-y divide-[var(--border)]">
-      @for (job of jobs; track job.id) {
-      <li class="px-4 py-3 flex items-center justify-between text-sm">
-        <div>
-          <p class="font-semibold text-[var(--fg)]">{{ job.id }}</p>
-          <p class="text-slate-500">{{ job.part }}</p>
-        </div>
-        <span class="text-xs px-2 py-1 rounded-full border border-[var(--border)]">
-          {{ job.status }}
-        </span>
-      </li>
-      }
-    </ul>
+  <div class="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+    <table class="min-w-full text-sm">
+      <thead class="text-left text-slate-500 border-b border-[var(--border)]">
+        <tr class="bg-[var(--surface)]">
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="table.onSortColumn('JobNumber')"
+          >Job #{{ table.sortIndicator('JobNumber') }}</th>
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="table.onSortColumn('PartNumber')"
+          >Part Number{{ table.sortIndicator('PartNumber') }}</th>
+          <th
+            class="px-4 py-3 font-medium cursor-pointer select-none"
+            (click)="table.onSortColumn('MachineName')"
+          >Machine{{ table.sortIndicator('MachineName') }}</th>
+          <th class="px-4 py-3 font-medium">Status</th>
+          <th class="px-4 py-3 font-medium"></th>
+        </tr>
+        <tr [formGroup]="filterForm" class="border-b border-[var(--border)] bg-[var(--surface)]">
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="jobNumber"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="partNumber"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal">
+            <input
+              formControlName="machineName"
+              type="text"
+              placeholder="Search..."
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)]"
+            />
+          </th>
+          <th class="px-4 py-2 font-normal">
+            <select
+              formControlName="status"
+              class="w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-xs text-[var(--fg)] cursor-pointer"
+            >
+              <option value="">All</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </th>
+          <th class="px-4 py-2 font-normal"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--border)]">
+        @if (table.loading()) {
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-slate-500">Loading...</td></tr>
+        } @else if (table.error()) {
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-red-500">{{ table.error() }}</td></tr>
+        } @else if (rows().length === 0) {
+          <tr><td colspan="5" class="px-4 py-3 text-sm text-slate-500">No jobs found.</td></tr>
+        } @else {
+          @for (row of rows(); track row.id) {
+            <tr
+              class="bg-[var(--bg)] hover:bg-[var(--surface)] transition-colors cursor-pointer text-[var(--fg)]"
+              (click)="toggleJob(row.id)"
+            >
+              <td class="px-4 py-3 font-semibold text-[var(--fg)]">{{ row.jobNumber }}</td>
+              <td class="px-4 py-3 text-[var(--fg)]">{{ row.partNumber }}</td>
+              <td class="px-4 py-3 text-[var(--fg)]">{{ row.machineName }}</td>
+              <td class="px-4 py-3">
+                <span
+                  class="text-xs px-2 py-1 rounded-full border"
+                  [class.border-green-500]="row.status === 'Completed'"
+                  [class.text-green-600]="row.status === 'Completed'"
+                  [class.border-[var(--primary)]]="row.status === 'In Progress'"
+                  [class.text-[var(--primary)]]="row.status === 'In Progress'"
+                >
+                  {{ row.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <button
+                  class="text-xs text-[var(--primary)] hover:underline"
+                  (click)="viewJobReport(row.id, $event)"
+                >Report</button>
+              </td>
+            </tr>
+
+            @if (expandedJobId() === row.id) {
+              <tr>
+                <td colspan="5" class="bg-[var(--bg)] px-6 py-4">
+                  @if (loadingShiftForJobId() === row.id) {
+                    <p class="text-sm text-slate-400">Loading shifts...</p>
+                  } @else if (hasShiftCache(row.id) && shiftsForJob(row.id).length === 0) {
+                    <p class="text-sm text-slate-400">No shifts logged for this job.</p>
+                  } @else {
+                    <table class="w-full text-sm text-left">
+                      <thead>
+                        <tr class="border-b border-[var(--border)] text-slate-500 text-xs font-medium">
+                          <th class="pb-2 pr-6">Machinist</th>
+                          <th class="pb-2 pr-6">Start</th>
+                          <th class="pb-2">End</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-[var(--border)]">
+                        @for (shift of shiftsForJob(row.id); track shift.shiftId) {
+                          <tr class="text-[var(--fg)]">
+                            <td class="py-2 pr-6">{{ shift.machinistName }}</td>
+                            <td class="py-2 pr-6">{{ shift.startDateTime | date:'short' }}</td>
+                            <td class="py-2">{{ shift.endDateTime ? (shift.endDateTime | date:'short') : '—' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+    <!-- Pagination -->
+    <app-pager
+      [currentPage]="table.currentPage()"
+      [totalPages]="totalPages()"
+      [totalCount]="totalCount()"
+      (pageChange)="table.goToPage($event)"
+      [pageSize]="table.pageSize()"
+      [pageSizes]="pageSizes"
+      (pageSizeChange)="table.onPageSizeChange($event)"
+    />
   </div>
 </section>
-
